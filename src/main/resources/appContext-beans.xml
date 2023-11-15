@@ -180,7 +180,7 @@
 
     <!-- API -->
 
-    <bean id="abstractAPI" class="com.mandark.jira.web.test.AbstractAPI" abstract="true">
+    <bean id="abstractAPI" class="com.mandark.jira.web.rest.AbstractAPI" abstract="true">
     </bean>
 
 
