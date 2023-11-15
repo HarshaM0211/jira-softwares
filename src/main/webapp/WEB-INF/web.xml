@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+    id="WebApp_ID" version="3.1">
+
+    <display-name>Jira Software Service</display-name>
+
+
+    <!-- Spring Context -->
+
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath*:appContext.xml</param-value>
+    </context-param>
+
+
+    <!-- Servlet And Mappings -->
+
+    <!-- Default Servlet -->
+
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+
+        <!-- Favicon -->
+        <url-pattern>*.ico</url-pattern>
+
+        <!-- images -->
+        <url-pattern>*.gif</url-pattern>
+        <url-pattern>*.jpg</url-pattern>
+        <url-pattern>*.png</url-pattern>
+
+        <!-- Scripts & CSS -->
+        <url-pattern>*.js</url-pattern>
+        <url-pattern>*.js.map</url-pattern>
+        <url-pattern>*.css</url-pattern>
+        <url-pattern>*.css.map</url-pattern>
+
+        <!-- JSON -->
+        <url-pattern>*.json</url-pattern>
+        <url-pattern>*.geojson</url-pattern>
+
+        <!-- fonts -->
+        <url-pattern>*.ttf</url-pattern>
+        <url-pattern>*.woff</url-pattern>
+        <url-pattern>*.woff2</url-pattern>
+
+        <!-- files -->
+        <url-pattern>*.xls</url-pattern>
+        <url-pattern>*.xlsx</url-pattern>
+        <url-pattern>*.ppt</url-pattern>
+        <url-pattern>*.pptx</url-pattern>
+        <url-pattern>*.doc</url-pattern>
+        <url-pattern>*.docx</url-pattern>
+        <url-pattern>*.pdf</url-pattern>
+
+        <!-- media -->
+        <url-pattern>*.mp3</url-pattern>
+        <url-pattern>*.mp4</url-pattern>
+    </servlet-mapping>
+
+
+    <!-- Spring Dispatcher Servlet -->
+
+    <servlet>
+        <servlet-name>dispatcher</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>WEB-INF/spring/servlet-context.xml</param-value>
+        </init-param>
+        <load-on-startup>2</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>dispatcher</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+
+    <!-- Welcome file lists -->
+
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+
+
+
+    <!-- Listeners -->
+
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+    <session-config>
+        <session-timeout>20</session-timeout>
+    </session-config>
+
+
+</web-app>
