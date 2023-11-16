@@ -2,6 +2,7 @@ package com.mandark.jira.app.persistence.orm.entity;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,6 +17,7 @@ import com.mandark.jira.app.enums.IssuePriority;
 import com.mandark.jira.app.enums.IssueStatus;
 import com.mandark.jira.app.enums.IssueType;
 import com.mandark.jira.app.persistence.orm.JpaAuditEntity;
+import com.mandark.jira.spi.lang.ValidationException;
 
 
 @Entity
@@ -67,27 +69,34 @@ public class Issue extends JpaAuditEntity {
         super();
     }
 
-    public Issue(Project project, String issue_key, String description, IssueType type, User assignee,
-            IssueStatus status, int parent_issue_id, List<Sprint> sprint, User reported_by, Date start_date,
-            Date end_date, String version, IssuePriority priority, String label, List<Attachment> Attachment,
-            List<Comment> comments) {
-        super();
-        this.project = project;
-        this.issueKey = issue_key;
-        this.description = description;
-        this.type = type;
-        this.assignee = assignee;
-        this.status = status;
-        this.parentIssueId = parent_issue_id;
-        this.sprint = sprint;
-        this.reportedBy = reported_by;
-        this.startDate = start_date;
-        this.endDate = end_date;
-        this.versionStr = version;
-        this.priority = priority;
-        this.label = label;
-        this.attachments = Attachment;
-        this.comments = comments;
+    // Validatable
+    // ------------------------------------------------------------------------
+
+    @Override
+    public void validate() {
+
+        super.validate();
+
+        if (Objects.isNull(project)) {
+            throw new ValidationException("#validate :: project is BLANK");
+        }
+
+        if (Objects.isNull(issueKey)) {
+            throw new ValidationException("#validate :: issueKey is BLANK");
+        }
+
+        if (Objects.isNull(description)) {
+            throw new ValidationException("#validate :: description is BLANK");
+        }
+
+        if (Objects.isNull(type)) {
+            throw new ValidationException("#validate :: type is BLANK");
+        }
+
+        if (Objects.isNull(reportedBy)) {
+            throw new ValidationException("#validate :: reportedBy is BLANK");
+        }
+
     }
 
     // Getters and Setters

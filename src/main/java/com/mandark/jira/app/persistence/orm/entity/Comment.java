@@ -1,11 +1,14 @@
 package com.mandark.jira.app.persistence.orm.entity;
 
+import java.util.Objects;
+
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.mandark.jira.app.persistence.orm.JpaAuditEntity;
+import com.mandark.jira.spi.lang.ValidationException;
 
 
 
@@ -28,12 +31,26 @@ public class Comment extends JpaAuditEntity {
         super();
     }
 
+    // Validatable
+    // ------------------------------------------------------------------------
 
-    public Comment(Issue issue, User org_member, String comment) {
-        super();
-        this.issue = issue;
-        this.commenter = org_member;
-        this.comment = comment;
+    @Override
+    public void validate() {
+
+        super.validate();
+
+        if (Objects.isNull(issue)) {
+            throw new ValidationException("#validate :: issue is BLANK");
+        }
+
+        if (Objects.isNull(commenter)) {
+            throw new ValidationException("#validate :: commenter is BLANK");
+        }
+
+        if (Objects.isNull(comment)) {
+            throw new ValidationException("#validate :: comment is BLANK");
+        }
+
     }
 
 

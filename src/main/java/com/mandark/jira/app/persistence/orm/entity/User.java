@@ -1,6 +1,7 @@
 package com.mandark.jira.app.persistence.orm.entity;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,6 +13,7 @@ import javax.persistence.Table;
 
 import com.mandark.jira.app.enums.UserRole;
 import com.mandark.jira.app.persistence.orm.JpaAuditEntity;
+import com.mandark.jira.spi.lang.ValidationException;
 
 
 @Entity
@@ -42,17 +44,30 @@ public class User extends JpaAuditEntity {
         super();
     }
 
-    public User(String user_name, String password, String user_email, Organisation organisation, List<Comment> comments,
-            List<Project> projects, List<Team> teams, UserRole role) {
-        super();
-        this.userName = user_name;
-        this.password = password;
-        this.mail = user_email;
-        this.organisation = organisation;
-        this.comments = comments;
-        this.projects = projects;
-        this.teams = teams;
-        this.role = role;
+    // Validatable
+    // ------------------------------------------------------------------------
+
+    @Override
+    public void validate() {
+
+        super.validate();
+
+        if (Objects.isNull(userName)) {
+            throw new ValidationException("#validate :: userName is BLANK");
+        }
+
+        if (Objects.isNull(password)) {
+            throw new ValidationException("#validate :: password is BLANK");
+        }
+
+        if (Objects.isNull(mail)) {
+            throw new ValidationException("#validate :: mail is BLANK");
+        }
+
+        if (Objects.isNull(organisation)) {
+            throw new ValidationException("#validate :: organisation is BLANK");
+        }
+
     }
 
 

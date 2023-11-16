@@ -1,6 +1,7 @@
 package com.mandark.jira.app.persistence.orm.entity;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -10,6 +11,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.mandark.jira.app.persistence.orm.JpaAuditEntity;
+import com.mandark.jira.spi.lang.ValidationException;
 
 
 
@@ -33,12 +35,22 @@ public class Team extends JpaAuditEntity {
         // TODO Auto-generated constructor stub
     }
 
-    public Team(String name, Organisation org_id, User team_leader, List<User> org_members) {
-        super();
-        this.name = name;
-        this.organisation = org_id;
-        this.teamLeader = team_leader;
-        this.users = org_members;
+    // Validatable
+    // ------------------------------------------------------------------------
+
+    @Override
+    public void validate() {
+
+        super.validate();
+
+        if (Objects.isNull(organisation)) {
+            throw new ValidationException("#validate :: organisation is BLANK");
+        }
+
+        if (Objects.isNull(name)) {
+            throw new ValidationException("#validate :: name is BLANK");
+        }
+
     }
 
     // Getters and Setters

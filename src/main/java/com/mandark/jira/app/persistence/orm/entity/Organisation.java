@@ -1,12 +1,14 @@
 package com.mandark.jira.app.persistence.orm.entity;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.mandark.jira.app.persistence.orm.JpaAuditEntity;
+import com.mandark.jira.spi.lang.ValidationException;
 
 
 
@@ -32,14 +34,18 @@ public class Organisation extends JpaAuditEntity {
         super();
     }
 
-    public Organisation(String name, String description, List<Project> projects, List<Sprint> sprints,
-            List<Team> teams) {
-        super();
-        this.name = name;
-        this.description = description;
-        this.projects = projects;
-        this.sprints = sprints;
-        this.teams = teams;
+    // Validatable
+    // ------------------------------------------------------------------------
+
+    @Override
+    public void validate() {
+
+        super.validate();
+
+        if (Objects.isNull(name)) {
+            throw new ValidationException("#validate :: name is BLANK");
+        }
+
     }
 
     // Getters and Setters

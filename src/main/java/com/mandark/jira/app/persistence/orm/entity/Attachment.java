@@ -1,6 +1,7 @@
 package com.mandark.jira.app.persistence.orm.entity;
 
 import java.sql.Blob;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,6 +10,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.mandark.jira.app.persistence.orm.JpaAuditEntity;
+import com.mandark.jira.spi.lang.ValidationException;
 
 
 
@@ -32,13 +34,25 @@ public class Attachment extends JpaAuditEntity {
         super();
     }
 
-    public Attachment(String file_name, Blob file_data, Issue issue, String description) {
-        super();
-        this.fileName = file_name;
-        this.fileData = file_data;
-        this.issue = issue;
-        this.description = description;
+
+    // Validatable
+    // ------------------------------------------------------------------------
+
+    @Override
+    public void validate() {
+
+        super.validate();
+
+        if (Objects.isNull(fileData)) {
+            throw new ValidationException("#validate :: fileData is BLANK");
+        }
+
+        if (Objects.isNull(issue)) {
+            throw new ValidationException("#validate :: issue is BLANK");
+        }
+
     }
+
 
     // Getters and Setters
     // -------------------------------------------------------------------------

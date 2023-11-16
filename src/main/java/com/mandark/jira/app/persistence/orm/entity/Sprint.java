@@ -2,6 +2,7 @@ package com.mandark.jira.app.persistence.orm.entity;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,6 +13,7 @@ import javax.persistence.Table;
 
 import com.mandark.jira.app.enums.SprintStatus;
 import com.mandark.jira.app.persistence.orm.JpaAuditEntity;
+import com.mandark.jira.spi.lang.ValidationException;
 
 
 @Entity
@@ -40,16 +42,26 @@ public class Sprint extends JpaAuditEntity {
         super();
     }
 
-    public Sprint(Organisation organisation, Project project, String sprint_key, Date start_date, Date end_date,
-            List<Issue> issues, SprintStatus status) {
-        super();
-        this.organisation = organisation;
-        this.project = project;
-        this.sprintKey = sprint_key;
-        this.startDate = start_date;
-        this.endDate = end_date;
-        this.issues = issues;
-        this.status = status;
+    // Validatable
+    // ------------------------------------------------------------------------
+
+    @Override
+    public void validate() {
+
+        super.validate();
+
+        if (Objects.isNull(organisation)) {
+            throw new ValidationException("#validate :: organisation is BLANK");
+        }
+
+        if (Objects.isNull(project)) {
+            throw new ValidationException("#validate :: project is BLANK");
+        }
+
+        if (Objects.isNull(sprintKey)) {
+            throw new ValidationException("#validate :: sprintKey is BLANK");
+        }
+
     }
 
     // Getters and Setters

@@ -1,6 +1,7 @@
 package com.mandark.jira.app.persistence.orm.entity;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,6 +12,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.mandark.jira.app.persistence.orm.JpaAuditEntity;
+import com.mandark.jira.spi.lang.ValidationException;
 
 
 
@@ -40,17 +42,27 @@ public class Project extends JpaAuditEntity {
         // TODO Auto-generated constructor stub
     }
 
-    // public Project(Organisation organisation, String project_key, String project_name, String project_description,
-    // List<Sprint> sprint_ids, List<User> org_members, List<Issue> issues) {
-    // super();
-    // this.organisation = organisation;
-    // this.projectKey = project_key;
-    // this.name = project_name;
-    // this.description = project_description;
-    // this.sprints = sprint_ids;
-    // this.users = org_members;
-    // this.issues = issues;
-    // }
+    // Validatable
+    // ------------------------------------------------------------------------
+
+    @Override
+    public void validate() {
+
+        super.validate();
+
+        if (Objects.isNull(organisation)) {
+            throw new ValidationException("#validate :: organisation is BLANK");
+        }
+
+        if (Objects.isNull(projectKey)) {
+            throw new ValidationException("#validate :: projectKey is BLANK");
+        }
+
+        if (Objects.isNull(name)) {
+            throw new ValidationException("#validate :: name is BLANK");
+        }
+
+    }
 
     // Getters and Setters
     // ------------------------------------------------------------------------
