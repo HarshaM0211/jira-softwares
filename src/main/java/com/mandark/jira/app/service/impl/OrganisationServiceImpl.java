@@ -91,20 +91,6 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
     }
 
     @Override
-    @Transactional
-    public void updateOrganisation(Integer orgId, OrganisationBean orgBean) {
-
-        super.update(orgId, orgBean);
-    }
-
-    @Override
-    @Transactional
-    public void deleteOrganisation(Integer orgId) {
-
-        super.purge(orgId);
-    }
-
-    @Override
     public List<OrganisationDTO> read(int pageNo, int pageSize) {
 
         List<Organisation> orgEntities = dao.read(Organisation.class, pageNo, pageSize);
@@ -115,23 +101,24 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
         return orgDtos;
     }
 
+    // Update
+    // ------------------------------------------------------------------------
 
-    // Verify.notNull(id);
-    // Organisation organisation = dao.read(Organisation.class, id, false);
-    //
-    // OrganisationDTO orgDTO = Objects.isNull(organisation) ? null : toDTO(organisation);
-    //
-    // return orgDTO;
+    @Override
+    @Transactional
+    public void updateOrganisation(Integer orgId, OrganisationBean orgBean) {
 
-    // @Override
-    // public OrganisationDTO read(Integer id, boolean errorIfNotFound) {
-    //
-    // Verify.notNull(id);
-    // Organisation organisation = dao.read(Organisation.class, id, false);
-    //
-    // OrganisationDTO orgDTO = Objects.isNull(organisation) ? null : toDTO(organisation);
-    //
-    // return orgDTO;
-    //
-    // }
+        super.update(orgId, orgBean);
+    }
+
+    // Delete
+    // ------------------------------------------------------------------------
+
+    @Override
+    @Transactional
+    public void deleteOrganisation(Integer orgId) {
+
+        super.purge(orgId);
+    }
+
 }
