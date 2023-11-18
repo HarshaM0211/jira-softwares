@@ -6,10 +6,14 @@ import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import com.mandark.jira.app.enums.SprintStatus;
 import com.mandark.jira.app.persistence.orm.JpaAuditEntity;
@@ -17,10 +21,12 @@ import com.mandark.jira.spi.lang.ValidationException;
 
 
 @Entity
-@Table(name = "sprints")
+@Table(name = "sprints",
+        indexes = {@Index(columnList = "project_id", name = "project_id"),
+                @Index(columnList = "start_date", name = "start_date"),
+                @Index(columnList = "end_date", name = "end_date"), @Index(columnList = "status", name = "status")},
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"project_id", "sprint_key"})})
 public class Sprint extends JpaAuditEntity {
-
-    private Organisation organisation;
 
     private Project project;
 
@@ -37,7 +43,7 @@ public class Sprint extends JpaAuditEntity {
     // Constructors
     // ------------------------------------------------------------------------
 
-    // Defaults
+    // Default
     public Sprint() {
         super();
     }
@@ -48,12 +54,6 @@ public class Sprint extends JpaAuditEntity {
     @Override
     public void validate() {
 
-        super.validate();
-
-        if (Objects.isNull(organisation)) {
-            throw new ValidationException("#validate :: organisation is BLANK");
-        }
-
         if (Objects.isNull(project)) {
             throw new ValidationException("#validate :: project is BLANK");
         }
@@ -62,23 +62,17 @@ public class Sprint extends JpaAuditEntity {
             throw new ValidationException("#validate :: sprintKey is BLANK");
         }
 
+        if (Objects.isNull(status)) {
+            throw new ValidationException("#validate :: status is BLANK");
+        }
+
     }
 
     // Getters and Setters
     // ------------------------------------------------------------------------
 
     @ManyToOne
-    @JoinColumn(name = "org_id")
-    public Organisation getOrganisation() {
-        return organisation;
-    }
-
-    public void setOrganisation(Organisation organisation) {
-        this.organisation = organisation;
-    }
-
-    @ManyToOne
-    @JoinColumn(name = "project_id")
+    @JoinColumn(name = "project_id", nullable = false)
     public Project getProject() {
         return project;
     }
@@ -87,7 +81,7 @@ public class Sprint extends JpaAuditEntity {
         this.project = project;
     }
 
-    @Column(name = "sprint_key")
+    @Column(name = "sprint_key", nullable = false)
     public String getSprintKey() {
         return sprintKey;
     }
@@ -123,6 +117,8 @@ public class Sprint extends JpaAuditEntity {
         this.issues = issues;
     }
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     public SprintStatus getStatus() {
         return status;
     }
@@ -136,9 +132,7 @@ public class Sprint extends JpaAuditEntity {
 
     @Override
     public String toString() {
-        return "Sprint [organisation=" + organisation + ", project=" + project + ", sprintKey=" + sprintKey
-                + ", startDate=" + startDate + ", endDate=" + endDate + ", issues=" + issues + ", status=" + status
-                + "]";
+        return "Sprint [project=" + project.getId() + ", sprintKey=" + sprintKey + ", status=" + status + "]";
     }
 
 }

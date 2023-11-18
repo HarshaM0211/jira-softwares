@@ -5,6 +5,7 @@ import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -15,7 +16,7 @@ import com.mandark.jira.spi.lang.ValidationException;
 
 
 @Entity
-@Table(name = "attachments")
+@Table(name = "attachments", indexes = {@Index(columnList = "issue_id", name = "issue_id")})
 public class Attachment extends JpaAuditEntity {
 
     private String fileName;
@@ -41,7 +42,9 @@ public class Attachment extends JpaAuditEntity {
     @Override
     public void validate() {
 
-        super.validate();
+        if (Objects.isNull(fileName)) {
+            throw new ValidationException("#validate :: fileName is BLANK");
+        }
 
         if (Objects.isNull(fileData)) {
             throw new ValidationException("#validate :: fileData is BLANK");
@@ -56,7 +59,8 @@ public class Attachment extends JpaAuditEntity {
 
     // Getters and Setters
     // -------------------------------------------------------------------------
-    @Column(name = "file_name")
+
+    @Column(name = "file_name", nullable = false)
     public String getFileName() {
         return fileName;
     }
@@ -65,7 +69,7 @@ public class Attachment extends JpaAuditEntity {
         this.fileName = file_name;
     }
 
-    @Column(name = "file_data")
+    @Column(name = "file_data", nullable = false)
     public Blob getFileData() {
         return fileData;
     }
@@ -75,7 +79,7 @@ public class Attachment extends JpaAuditEntity {
     }
 
     @ManyToOne
-    @JoinColumn(name = "issue_id")
+    @JoinColumn(name = "issue_id", nullable = false)
     public Issue getIssue() {
         return issue;
     }
@@ -98,8 +102,7 @@ public class Attachment extends JpaAuditEntity {
 
     @Override
     public String toString() {
-        return "Attachments [file_name=" + fileName + ", file_data=" + fileData + ", issue=" + issue + ", description="
-                + description + "]";
+        return "Attachments [file_name=" + fileName + ", issue=" + issue.getId() + ", description=" + description + "]";
     }
 
 

@@ -5,11 +5,13 @@ import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import com.mandark.jira.app.enums.UserRole;
 import com.mandark.jira.app.persistence.orm.JpaAuditEntity;
@@ -17,7 +19,9 @@ import com.mandark.jira.spi.lang.ValidationException;
 
 
 @Entity
-@Table(name = "users")
+@Table(name = "users",
+        indexes = {@Index(columnList = "org_id", name = "org_id"), @Index(columnList = "role", name = "role")},
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"mail"})})
 public class User extends JpaAuditEntity {
 
     private String userName;
@@ -50,8 +54,6 @@ public class User extends JpaAuditEntity {
     @Override
     public void validate() {
 
-        super.validate();
-
         if (Objects.isNull(userName)) {
             throw new ValidationException("#validate :: userName is BLANK");
         }
@@ -68,13 +70,17 @@ public class User extends JpaAuditEntity {
             throw new ValidationException("#validate :: organisation is BLANK");
         }
 
+        if (Objects.isNull(role)) {
+            throw new ValidationException("#validate :: role is BLANK");
+        }
+
     }
 
 
     // Getters and Setters
     // ------------------------------------------------------------------------
 
-    @Column(name = "user_name")
+    @Column(name = "user_name", nullable = false)
     public String getUserName() {
         return userName;
     }
@@ -83,6 +89,7 @@ public class User extends JpaAuditEntity {
         this.userName = user_name;
     }
 
+    @Column(nullable = false)
     public String getPassword() {
         return password;
     }
@@ -91,6 +98,7 @@ public class User extends JpaAuditEntity {
         this.password = password;
     }
 
+    @Column(nullable = false, unique = true)
     public String getMail() {
         return mail;
     }
@@ -100,7 +108,7 @@ public class User extends JpaAuditEntity {
     }
 
     @OneToOne
-    @JoinColumn(name = "org_id")
+    @JoinColumn(name = "org_id", nullable = false)
     public Organisation getOrganisation() {
         return organisation;
     }
@@ -136,6 +144,7 @@ public class User extends JpaAuditEntity {
         this.teams = teams;
     }
 
+    @Column(nullable = false)
     public UserRole getRole() {
         return role;
     }
@@ -149,9 +158,8 @@ public class User extends JpaAuditEntity {
 
     @Override
     public String toString() {
-        return "OrganisationMembers [user_name=" + userName + ", password=" + password + ", user_email=" + mail
-                + ", organisation=" + organisation + ", comments=" + comments + ", projects=" + projects + ", teams="
-                + teams + ", role=" + role + "]";
+        return "Users [user_name=" + userName + ", user_email=" + mail + ", organisation="
+                + organisation.getName() + ", role=" + role + "]";
     }
 
 
