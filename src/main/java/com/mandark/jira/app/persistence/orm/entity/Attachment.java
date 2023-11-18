@@ -1,12 +1,12 @@
 package com.mandark.jira.app.persistence.orm.entity;
 
-import java.sql.Blob;
 import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -21,7 +21,7 @@ public class Attachment extends JpaAuditEntity {
 
     private String fileName;
 
-    private Blob fileData;
+    private byte[] fileData;
 
     private Issue issue;
 
@@ -69,12 +69,13 @@ public class Attachment extends JpaAuditEntity {
         this.fileName = file_name;
     }
 
+    @Lob
     @Column(name = "file_data", nullable = false)
-    public Blob getFileData() {
+    public byte[] getFileData() {
         return fileData;
     }
 
-    public void setFileData(Blob file_data) {
+    public void setFileData(byte[] file_data) {
         this.fileData = file_data;
     }
 
