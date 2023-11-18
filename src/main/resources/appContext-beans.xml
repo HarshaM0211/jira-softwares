@@ -165,7 +165,7 @@
    <bean id="abstractJpaEntityService" class="com.mandark.jira.spi.app.service.AbstractJpaEntityService" abstract="true">
         <constructor-arg name="dao" ref="genericJpaDao" />
     </bean>
-    <bean id="organisationService" class="com.mandark.jira.app.service.OrganisationService" abstract="true">
+    <bean id="organisationService" class="com.mandark.jira.app.service.impl.OrganisationServiceImpl">
         <constructor-arg name="dao" ref="genericJpaDao" />
     </bean>
  
@@ -185,8 +185,8 @@
 
     <bean id="abstractAPI" class="com.mandark.jira.web.rest.AbstractAPI" abstract="true">
     </bean>
-    <bean id="organisationAPI" class="com.mandark.jira.web.rest.OrganisationAPI" abstract="true">
-    <property name="orgService" ref="organisationService"></property>
+    <bean id="organisationAPI" class="com.mandark.jira.web.rest.OrganisationAPI">
+    <property name="orgService" ref="organisationService"/>
     </bean>
 
 
