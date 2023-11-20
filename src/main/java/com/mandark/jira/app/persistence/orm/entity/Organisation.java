@@ -26,6 +26,8 @@ public class Organisation extends JpaAuditEntity {
 
     private List<Team> teams;
 
+    private List<User> users;
+
     // Constructors
     // ------------------------------------------------------------------------
 
@@ -84,8 +86,18 @@ public class Organisation extends JpaAuditEntity {
         this.teams = teams;
     }
 
+    @OneToMany(mappedBy = "organisation")
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
+    }
+
     // Object Methods
     // ------------------------------------------------------------------------
+
 
     @Override
     public String toString() {

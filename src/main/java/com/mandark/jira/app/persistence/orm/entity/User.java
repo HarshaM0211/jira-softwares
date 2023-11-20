@@ -8,8 +8,8 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -107,8 +107,8 @@ public class User extends JpaAuditEntity {
         this.mail = user_email;
     }
 
-    @OneToOne
-    @JoinColumn(name = "org_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "org_id")
     public Organisation getOrganisation() {
         return organisation;
     }
@@ -158,8 +158,8 @@ public class User extends JpaAuditEntity {
 
     @Override
     public String toString() {
-        return "Users [user_name=" + userName + ", user_email=" + mail + ", organisation="
-                + organisation.getName() + ", role=" + role + "]";
+        return "Users [user_name=" + userName + ", user_email=" + mail + ", organisation=" + organisation.getName()
+                + ", role=" + role + "]";
     }
 
 
