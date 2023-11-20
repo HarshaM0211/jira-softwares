@@ -26,6 +26,8 @@ public class User extends JpaAuditEntity {
 
     private String mail;
 
+    private UserRole role;
+
     private Organisation organisation;
 
     private List<Comment> comments;
@@ -34,7 +36,6 @@ public class User extends JpaAuditEntity {
 
     private List<Team> teams;
 
-    private UserRole role;
 
     // Constructors
     // ------------------------------------------------------------------------

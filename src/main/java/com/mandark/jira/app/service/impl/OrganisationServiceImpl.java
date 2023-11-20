@@ -15,8 +15,8 @@ import com.mandark.jira.app.dto.OrganisationDTO;
 import com.mandark.jira.app.persistence.orm.entity.Organisation;
 import com.mandark.jira.app.service.OrganisationService;
 import com.mandark.jira.spi.app.persistence.IDao;
-import com.mandark.jira.spi.app.persistence.IEntity;
 import com.mandark.jira.spi.app.service.AbstractJpaEntityService;
+import com.mandark.jira.spi.util.Verify;
 
 
 public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisation, OrganisationBean, OrganisationDTO>
@@ -92,6 +92,9 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
 
     @Override
     public List<OrganisationDTO> read(int pageNo, int pageSize) {
+
+        Verify.notNull(pageNo, "PageNo is NULL");
+        Verify.notNull(pageSize, "PageSize is NULL");
 
         List<Organisation> orgEntities = dao.read(Organisation.class, pageNo, pageSize);
         List<OrganisationDTO> orgDtos = orgEntities.stream().map(e -> new OrganisationDTO(e))
