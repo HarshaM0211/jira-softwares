@@ -79,7 +79,7 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
         if (Objects.isNull(bean)) {
             throw new IllegalArgumentException("[failed] - bean must not null");
         }
-        final int id = this.save(bean);
+        final int id = super.save(bean);
 
         return id;
     }
@@ -91,7 +91,7 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
     @Transactional
     public void update(Integer orgId, OrganisationBean orgBean) {
 
-        this.update(orgId, orgBean);
+        super.update(orgId, orgBean);
     }
 
     // Delete
@@ -101,7 +101,7 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
     @Transactional
     public void delete(Integer orgId) {
 
-        this.purge(orgId);
+        super.purge(orgId);
     }
 
 }
