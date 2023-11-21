@@ -19,13 +19,20 @@ import com.mandark.jira.spi.app.service.AbstractJpaEntityService;
 public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisation, OrganisationBean, OrganisationDTO>
         implements OrganisationService {
 
+    // Fields
+    // ------------------------------------------------------------------------
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganisationServiceImpl.class);
 
+    // Constructor
+    // ------------------------------------------------------------------------
 
     public OrganisationServiceImpl(IDao dao) {
         super(dao);
     }
+
+    // Super Class implementations
+    // ------------------------------------------------------------------------
 
     @Override
     protected Class<Organisation> getEntityClass() {

@@ -34,6 +34,7 @@ public class OrganisationAPI extends AbstractAPI {
     // ------------------------------------------------------------------------
 
     // Organisation :: Create
+    // ------------------------------------------------------------------------
 
     @RequestMapping(value = "", method = RequestMethod.POST)
     public ResponseEntity<?> createOrganisation(@RequestBody OrganisationBean orgBean) {
@@ -47,6 +48,7 @@ public class OrganisationAPI extends AbstractAPI {
     }
 
     // Organisation :: Read
+    // ------------------------------------------------------------------------
 
     @RequestMapping(value = "/{orgId}", method = RequestMethod.GET)
     public ResponseEntity<?> readOrganisation(@PathVariable("orgId") Integer orgId) {
@@ -74,6 +76,7 @@ public class OrganisationAPI extends AbstractAPI {
 
 
     // Organisation :: Update
+    // ------------------------------------------------------------------------
 
     @RequestMapping(value = "/{orgId}", method = RequestMethod.PUT)
     public ResponseEntity<?> updateOrganisation(@PathVariable("orgId") Integer orgId,
@@ -88,6 +91,7 @@ public class OrganisationAPI extends AbstractAPI {
     }
 
     // Organisation :: Delete
+    // ------------------------------------------------------------------------
 
     @RequestMapping(value = "/{orgId}", method = RequestMethod.DELETE)
     public ResponseEntity<?> deleteOrg(@PathVariable("orgId") Integer orgId) {
