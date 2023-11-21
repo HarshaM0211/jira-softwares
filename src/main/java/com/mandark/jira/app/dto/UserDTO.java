@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mandark.jira.app.enums.UserRole;
+import com.mandark.jira.app.persistence.orm.entity.Organisation;
 import com.mandark.jira.app.persistence.orm.entity.Project;
 import com.mandark.jira.app.persistence.orm.entity.Team;
 import com.mandark.jira.app.persistence.orm.entity.User;
@@ -23,6 +24,8 @@ public class UserDTO extends EntityDTO<User> {
     private final List<TeamDTO> teams;
 
     private final UserRole role;
+
+    private final Organisation org;
 
     // Constructors
     // ------------------------------------------------------------------------
@@ -45,6 +48,7 @@ public class UserDTO extends EntityDTO<User> {
         this.teams = teamsDTO;
 
         this.role = e.getRole();
+        this.org = e.getOrganisation();
     }
 
     // Getters
@@ -70,13 +74,18 @@ public class UserDTO extends EntityDTO<User> {
         return role;
     }
 
+    public Organisation getOrg() {
+        return org;
+    }
+
     // Object Methods
     // ------------------------------------------------------------------------
+
 
     @Override
     public String toString() {
         return "OrganisationMembersDTO [user_name=" + user_name + ", user_email=" + user_email + ", projects="
-                + projects + ", teams=" + teams + ", role=" + role + "]";
+                + projects + ", teams=" + teams + ", role=" + role + ", organisation=" + org.getId() + "]";
     }
 
 

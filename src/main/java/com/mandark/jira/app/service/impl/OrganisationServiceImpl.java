@@ -22,16 +22,22 @@ import com.mandark.jira.spi.util.Verify;
 public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisation, OrganisationBean, OrganisationDTO>
         implements OrganisationService {
 
-
+    // Fields
+    // ------------------------------------------------------------------------
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganisationServiceImpl.class);
 
+    // Constructor
+    // ------------------------------------------------------------------------
 
     public OrganisationServiceImpl(IDao dao) {
         super(dao);
     }
 
+    // AbstractJpaEntity Service methods
+    // ------------------------------------------------------------------------
+
     @Override
-    protected Class getEntityClass() {
+    protected Class<Organisation> getEntityClass() {
         return Organisation.class;
     }
 
@@ -59,6 +65,9 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
         return exEntity;
     }
 
+    // APIs
+    // ------------------------------------------------------------------------
+
 
     // Create
     // ------------------------------------------------------------------------
@@ -84,17 +93,16 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
     // ------------------------------------------------------------------------
 
     @Override
-    public OrganisationDTO read(Integer id) {
+    public OrganisationDTO read(Integer orgId) {
 
-        OrganisationDTO orgDTO = super.read(id);
+        Verify.notNull(orgId, "Organisation Id is NULL");
+
+        OrganisationDTO orgDTO = this.read(orgId);
         return orgDTO;
     }
 
     @Override
     public List<OrganisationDTO> read(int pageNo, int pageSize) {
-
-        Verify.notNull(pageNo, "PageNo is NULL");
-        Verify.notNull(pageSize, "PageSize is NULL");
 
         List<Organisation> orgEntities = dao.read(Organisation.class, pageNo, pageSize);
         List<OrganisationDTO> orgDtos = orgEntities.stream().map(e -> new OrganisationDTO(e))
@@ -110,8 +118,11 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
     @Override
     @Transactional
     public void updateOrganisation(Integer orgId, OrganisationBean orgBean) {
+        // Sanity Checks
+        Verify.notNull(orgId, "Organisation Id is NULL");
+        Verify.notNull(orgBean, "Organisation Bean is NULL");
 
-        super.update(orgId, orgBean);
+        this.update(orgId, orgBean);
     }
 
     // Delete
@@ -121,7 +132,9 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
     @Transactional
     public void deleteOrganisation(Integer orgId) {
 
-        super.purge(orgId);
+        Verify.notNull(orgId, "Organisation Id is NULL");
+
+        this.purge(orgId);
     }
 
 }

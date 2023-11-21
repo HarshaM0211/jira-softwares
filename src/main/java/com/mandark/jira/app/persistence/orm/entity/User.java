@@ -65,10 +65,6 @@ public class User extends JpaAuditEntity {
             throw new ValidationException("#validate :: mail is BLANK");
         }
 
-        if (Objects.isNull(organisation)) {
-            throw new ValidationException("#validate :: organisation is BLANK");
-        }
-
     }
 
 
