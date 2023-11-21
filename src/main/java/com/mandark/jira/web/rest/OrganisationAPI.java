@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mandark.jira.app.beans.OrganisationBean;
@@ -20,7 +21,7 @@ import com.mandark.jira.web.WebConstants;
 
 
 @RestController
-@RequestMapping("/api/orgs")
+@RequestMapping("/api/v1/orgs")
 public class OrganisationAPI extends AbstractAPI {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganisationAPI.class);
@@ -34,12 +35,12 @@ public class OrganisationAPI extends AbstractAPI {
 
     // Organisation :: Create
 
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @RequestMapping(value = "", method = RequestMethod.POST)
     public ResponseEntity<?> createOrganisation(@RequestBody OrganisationBean orgBean) {
 
-        int orgId = orgService.create(orgBean);
+        final int orgId = orgService.create(orgBean);
 
-        String msg = String
+        final String msg = String
                 .format("Successfully created a new Organisation having id:- %s and added the User as Manager", orgId);
         LOGGER.info(msg);
         return Responses.ok(msg);
@@ -50,19 +51,23 @@ public class OrganisationAPI extends AbstractAPI {
     @RequestMapping(value = "/{orgId}", method = RequestMethod.GET)
     public ResponseEntity<?> readOrganisation(@PathVariable("orgId") Integer orgId) {
 
-        OrganisationDTO orgDto = orgService.read(orgId);
+        final OrganisationDTO orgDto = orgService.read(orgId);
 
         return Responses.ok(orgDto);
     }
 
 
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public ResponseEntity<?> readOrgs() {
+    public ResponseEntity<?> readOrgs(
+            @RequestParam(name = WebConstants.DEFAULT_PAGE_NO,
+                    defaultValue = WebConstants.DEFAULT_PAGE_NO) Integer pageNo,
+            @RequestParam(name = WebConstants.DEFAULT_PAGE_SIZE,
+                    defaultValue = WebConstants.DEFAULT_PAGE_SIZE) Integer pageSize) {
 
-        int pageNo = Integer.parseInt(WebConstants.DEFAULT_PAGE_NO);
-        int pageSize = Integer.parseInt(WebConstants.DEFAULT_PAGE_SIZE);
+        final List<OrganisationDTO> organisations = orgService.read(pageNo, pageSize);
 
-        List<OrganisationDTO> organisations = orgService.read(pageNo, pageSize);
+        final String msg = String.format("Successfully fetched list of all Organisations");
+        LOGGER.info(msg);
 
         return new ResponseEntity<>(organisations, HttpStatus.OK);
     }
@@ -74,9 +79,9 @@ public class OrganisationAPI extends AbstractAPI {
     public ResponseEntity<?> updateOrganisation(@PathVariable("orgId") Integer orgId,
             @RequestBody OrganisationBean orgBean) {
 
-        orgService.updateOrganisation(orgId, orgBean);
+        orgService.update(orgId, orgBean);
 
-        String msg = String.format("Successfully updated the Organisation with ID :- %s", orgId);
+        final String msg = String.format("Successfully updated the Organisation with ID :- %s", orgId);
 
         LOGGER.info(msg);
         return Responses.ok(msg);
@@ -87,9 +92,9 @@ public class OrganisationAPI extends AbstractAPI {
     @RequestMapping(value = "/{orgId}", method = RequestMethod.DELETE)
     public ResponseEntity<?> deleteOrg(@PathVariable("orgId") Integer orgId) {
 
-        orgService.deleteOrganisation(orgId);
+        orgService.delete(orgId);
 
-        String msg = String.format("Successfully deleted the Organisation with ID :- %s", orgId);
+        final String msg = String.format("Successfully deleted the Organisation with ID :- %s", orgId);
 
         LOGGER.info(msg);
         return Responses.ok(msg);
