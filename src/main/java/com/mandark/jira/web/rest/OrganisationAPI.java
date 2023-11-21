@@ -61,9 +61,9 @@ public class OrganisationAPI extends AbstractAPI {
 
     @RequestMapping(value = "", method = RequestMethod.GET)
     public ResponseEntity<?> readOrgs(
-            @RequestParam(name = WebConstants.DEFAULT_PAGE_NO,
+            @RequestParam(name = WebConstants.REQ_PARAM_PAGE_NO,
                     defaultValue = WebConstants.DEFAULT_PAGE_NO) Integer pageNo,
-            @RequestParam(name = WebConstants.DEFAULT_PAGE_SIZE,
+            @RequestParam(name = WebConstants.REQ_PARAM_PAGE_SIZE,
                     defaultValue = WebConstants.DEFAULT_PAGE_SIZE) Integer pageSize) {
 
         final List<OrganisationDTO> organisations = orgService.read(pageNo, pageSize);
