@@ -87,7 +87,7 @@ public class Project extends JpaAuditEntity {
         this.projectKey = project_key;
     }
 
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false)
     public String getName() {
         return name;
     }
@@ -96,6 +96,7 @@ public class Project extends JpaAuditEntity {
         this.name = project_name;
     }
 
+    @Column(name = "description")
     public String getDescription() {
         return description;
     }

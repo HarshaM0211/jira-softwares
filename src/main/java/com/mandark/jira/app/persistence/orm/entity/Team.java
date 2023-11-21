@@ -36,7 +36,6 @@ public class Team extends JpaAuditEntity {
 
     public Team() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
     // Validatable

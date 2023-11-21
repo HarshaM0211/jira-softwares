@@ -60,6 +60,7 @@ public class Organisation extends JpaAuditEntity {
         this.name = name;
     }
 
+    @Column(name = "description")
     public String getDescription() {
         return description;
     }

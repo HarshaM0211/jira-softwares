@@ -117,7 +117,7 @@ public class Sprint extends JpaAuditEntity {
         this.issues = issues;
     }
 
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     public SprintStatus getStatus() {
         return status;

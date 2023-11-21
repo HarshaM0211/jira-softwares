@@ -79,7 +79,7 @@ public class Comment extends JpaAuditEntity {
         this.commenter = org_member;
     }
 
-    @Column(nullable = false)
+    @Column(name = "comment", nullable = false)
     public String getComment() {
         return comment;
     }

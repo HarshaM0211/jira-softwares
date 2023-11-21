@@ -133,7 +133,7 @@ public class Issue extends JpaAuditEntity {
         this.issueKey = issue_key;
     }
 
-    @Column(nullable = false)
+    @Column(name = "summary", nullable = false)
     public String getSummary() {
         return summary;
     }
@@ -151,7 +151,7 @@ public class Issue extends JpaAuditEntity {
         this.versionStr = versionStr;
     }
 
-    @Column(nullable = false)
+    @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
     public IssueType getType() {
         return type;
@@ -171,7 +171,7 @@ public class Issue extends JpaAuditEntity {
         this.assignee = assignee;
     }
 
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     public IssueStatus getStatus() {
         return status;
@@ -228,7 +228,7 @@ public class Issue extends JpaAuditEntity {
         this.endDate = end_date;
     }
 
-    @Column(nullable = false)
+    @Column(name = "priority", nullable = false)
     @Enumerated(EnumType.STRING)
     public IssuePriority getPriority() {
         return priority;
@@ -238,6 +238,7 @@ public class Issue extends JpaAuditEntity {
         this.priority = priority;
     }
 
+    @Column(name = "label")
     public String getLabel() {
         return label;
     }
