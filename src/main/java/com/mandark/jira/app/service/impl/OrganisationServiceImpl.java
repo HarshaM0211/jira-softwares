@@ -94,14 +94,4 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
         super.update(orgId, orgBean);
     }
 
-    // Delete
-    // ------------------------------------------------------------------------
-
-    @Override
-    @Transactional
-    public void delete(Integer orgId) {
-
-        super.purge(orgId);
-    }
-
 }

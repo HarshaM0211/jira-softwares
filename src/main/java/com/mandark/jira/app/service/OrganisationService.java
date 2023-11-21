@@ -13,5 +13,4 @@ public interface OrganisationService extends EntityService<Integer, Organisation
 
     void update(Integer orgId, OrganisationBean orgBean);
 
-    void delete(Integer orgId);
 }

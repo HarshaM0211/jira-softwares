@@ -90,21 +90,6 @@ public class OrganisationAPI extends AbstractAPI {
         return Responses.ok(msg);
     }
 
-    // Organisation :: Delete
-    // ------------------------------------------------------------------------
-
-    @RequestMapping(value = "/{orgId}", method = RequestMethod.DELETE)
-    public ResponseEntity<?> deleteOrg(@PathVariable("orgId") Integer orgId) {
-
-        orgService.delete(orgId);
-
-        final String msg = String.format("Successfully deleted the Organisation with ID :- %s", orgId);
-
-        LOGGER.info(msg);
-        return Responses.ok(msg);
-    }
-
-
     // Getters and Setters
     // ------------------------------------------------------------------------
 
