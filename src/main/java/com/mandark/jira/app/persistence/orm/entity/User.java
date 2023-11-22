@@ -5,11 +5,13 @@ import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import com.mandark.jira.app.enums.UserRole;
 import com.mandark.jira.app.persistence.orm.JpaAuditEntity;
@@ -17,16 +19,18 @@ import com.mandark.jira.spi.lang.ValidationException;
 
 
 @Entity
-@Table(name = "users")
+@Table(name = "users",
+        indexes = {@Index(columnList = "org_id", name = "org_id"), @Index(columnList = "role", name = "role")},
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"email"})})
 public class User extends JpaAuditEntity {
 
-    private String userName;
+    private String firstName;
+
+    private String lastName;
 
     private String password;
 
-    private String mail;
-
-    private UserRole role;
+    private String email;
 
     private Organisation organisation;
 
@@ -36,6 +40,9 @@ public class User extends JpaAuditEntity {
 
     private List<Team> teams;
 
+    private UserRole role;
+
+    private String phone;
 
     // Constructors
     // ------------------------------------------------------------------------
@@ -51,9 +58,7 @@ public class User extends JpaAuditEntity {
     @Override
     public void validate() {
 
-        super.validate();
-
-        if (Objects.isNull(userName)) {
+        if (Objects.isNull(firstName)) {
             throw new ValidationException("#validate :: userName is BLANK");
         }
 
@@ -61,8 +66,20 @@ public class User extends JpaAuditEntity {
             throw new ValidationException("#validate :: password is BLANK");
         }
 
-        if (Objects.isNull(mail)) {
+        if (Objects.isNull(email)) {
             throw new ValidationException("#validate :: mail is BLANK");
+        }
+
+        if (Objects.isNull(organisation)) {
+            throw new ValidationException("#validate :: organisation is BLANK");
+        }
+
+        if (Objects.isNull(role)) {
+            throw new ValidationException("#validate :: role is BLANK");
+        }
+
+        if (Objects.isNull(phone)) {
+            throw new ValidationException("#validate :: phone is BLANK");
         }
 
     }
@@ -71,15 +88,25 @@ public class User extends JpaAuditEntity {
     // Getters and Setters
     // ------------------------------------------------------------------------
 
-    @Column(name = "user_name")
-    public String getUserName() {
-        return userName;
+    @Column(name = "first_name", nullable = false)
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setUserName(String user_name) {
-        this.userName = user_name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
+    @Column(name = "last_name")
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    @Column(name = "password", nullable = false)
     public String getPassword() {
         return password;
     }
@@ -88,15 +115,16 @@ public class User extends JpaAuditEntity {
         this.password = password;
     }
 
-    public String getMail() {
-        return mail;
+    @Column(name = "email", nullable = false, unique = true)
+    public String getEmail() {
+        return email;
     }
 
-    public void setMail(String user_email) {
-        this.mail = user_email;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "org_id")
     public Organisation getOrganisation() {
         return organisation;
@@ -133,6 +161,7 @@ public class User extends JpaAuditEntity {
         this.teams = teams;
     }
 
+    @Column(name = "role", nullable = false)
     public UserRole getRole() {
         return role;
     }
@@ -141,14 +170,24 @@ public class User extends JpaAuditEntity {
         this.role = role;
     }
 
+    @Column(name = "phone", unique = true, nullable = false)
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
     // Object Methods
     // ------------------------------------------------------------------------
 
+
+
     @Override
     public String toString() {
-        return "OrganisationMembers [user_name=" + userName + ", password=" + password + ", user_email=" + mail
-                + ", organisation=" + organisation + ", comments=" + comments + ", projects=" + projects + ", teams="
-                + teams + ", role=" + role + "]";
+        return "Users [user_name=" + firstName + lastName + ", user_email=" + email + ", organisation="
+                + organisation.getName() + ", role=" + role + "]";
     }
 
 
