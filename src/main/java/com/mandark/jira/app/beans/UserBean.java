@@ -78,4 +78,14 @@ public class UserBean implements EntityBean<User> {
     public void setPhone(String phone) {
         this.phone = phone;
     }
+
+    // Object Methods
+    // ------------------------------------------------------------------------
+
+    @Override
+    public String toString() {
+        return "UserBean [firstName=" + firstName + ", lastName=" + lastName + ", password=" + password + ", email="
+                + email + ", phone=" + phone + "]";
+    }
+
 }
