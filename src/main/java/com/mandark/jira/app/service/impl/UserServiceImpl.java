@@ -43,8 +43,8 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
     }
 
     @Override
-    protected UserDTO toDTO(User entityObj) {
-        return new UserDTO(entityObj);
+    protected UserDTO toDTO(User userEntity) {
+        return Objects.isNull(userEntity) ? null : new UserDTO(userEntity);
     }
 
     @Override
@@ -55,21 +55,14 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
     @Override
     protected User copyFromBean(User exEntity, UserBean entityBean) {
 
-        if (!Objects.isNull(entityBean.getUserName())) {
-            exEntity.setUserName(entityBean.getUserName());
+        if (Objects.isNull(exEntity) || Objects.isNull(entityBean)) {
+            return exEntity;
         }
-
-        if (!Objects.isNull(entityBean.getPassword())) {
-            exEntity.setPassword(entityBean.getPassword());
-        }
-
-        if (!Objects.isNull(entityBean.getMail())) {
-            exEntity.setMail(entityBean.getMail());
-        }
-
-        if (!Objects.isNull(entityBean.getRole())) {
-            exEntity.setRole(entityBean.getRole());
-        }
+        exEntity.setFirstName(entityBean.getFirstName());
+        exEntity.setLastName(entityBean.getLastName());
+        exEntity.setPassword(entityBean.getPassword());
+        exEntity.setEmail(entityBean.getEmail());
+        exEntity.setPhone(entityBean.getPhone());
 
         return exEntity;
     }
@@ -81,18 +74,11 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
     // Create
     // ------------------------------------------------------------------------
 
-
     @Override
     @Transactional
-    public int create(UserBean userBean) {
-        // Sanity Checks
-        Verify.notNull(userBean, "User Bean is NULL");
+    public int create(final UserBean userBean) {
 
-        User userEntity = new User();
-        this.copyFromBean(userEntity, userBean);
-
-        int userId = dao.save(userEntity);
-
+        final int userId = super.save(userBean);
         return userId;
     }
 
@@ -101,46 +87,43 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
 
     @Override
     @Transactional
-    public void addUserToOrgByMail(Integer orgId, String userMail) {
+    public void addUserToOrgByMail(final Integer orgId, final String userMail) {
         // Sanity Checks
         Verify.notNull(orgId, "Organisation ID is NULL");
         Verify.notNull(userMail, "User Mail is NULL");
 
-        Criteria userMailCriteria = Criteria.equal("mail", userMail);
-        User user = dao.findOne(this.getEntityClass(), userMailCriteria);
-        this.addUserToOrg(orgId, user);
-
+        final Criteria userMailCriteria = Criteria.equal("mail", userMail);
+        final User userEntity = dao.findOne(this.getEntityClass(), userMailCriteria);
+        this.addUserToOrg(orgId, userEntity);
     }
 
     // Add User to Organisation By User Entity
     // ------------------------------------------------------------------------
 
-    @Override
     @Transactional
-    public void addUserToOrg(Integer orgId, User userEntity) {
+    public void addUserToOrg(final Integer orgId, final User userEntity) {
         // Sanity Checks
         Verify.notNull(orgId, "Organisation ID is NULL");
         Verify.notNull(userEntity, "UserEntity is NULL");
 
         if (!Objects.isNull(userEntity.getOrganisation())) {
-            // throw new Exception
-            String msg = String.format(
+            // TODO throw new Exception ?
+            final String msg = String.format(
                     "Not Successfull. User with ID :- %s is already a member in the Organisation with ID :- %s",
                     userEntity.getId(), userEntity.getOrganisation().getId());
             LOGGER.info(msg);
             return;
         }
 
-        Organisation organisation = dao.read(Organisation.class, orgId, true);
-        // if (Objects.isNull(userEntity.getOrganisation())) {
+        final Organisation organisation = dao.read(Organisation.class, orgId, true);
 
         userEntity.setOrganisation(organisation);
 
         dao.update(userEntity.getId(), userEntity);
 
-        String msg =
+        final String msg =
                 String.format("Successfully added User :-ID = %s with mail :- %s to the Organisation with ID :- %s",
-                        userEntity.getId(), userEntity.getMail(), organisation.getId());
+                        userEntity.getId(), userEntity.getEmail(), organisation.getId());
         LOGGER.info(msg);
 
     }
@@ -150,53 +133,21 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
 
     @Override
     @Transactional
-    public void updateUser(Integer userId, UserBean userBean) {
-        // Sanity Checks
-        Verify.notNull(userId, "UserId is NULL");
-        Verify.notNull(userBean, "UserBean is NULL");
-
-        User userEntity = new User();
-        this.copyFromBean(userEntity, userBean);
-
-        dao.update(userId, userEntity);
-
-    }
-
-    // Read :: All Users
-    // ------------------------------------------------------------------------
-
-    @Override
-    public List<UserDTO> getUsers(int pageNo, int pageSize) {
-        // Sanity Checks
-        Verify.notNull(pageNo, "PageNo is NULL");
-        Verify.notNull(pageSize, "PageSize is NULL");
-
-        List<User> userEntities = dao.read(this.getEntityClass(), pageNo, pageSize);
-        List<UserDTO> userDtos = userEntities.stream().map(e -> new UserDTO(e))
-                .sorted((e1, e2) -> e1.getId().toString().compareTo(e2.getId().toString()))
-                .collect(Collectors.toList());
-
-        return userDtos;
+    public void update(final Integer userId, final UserBean userBean) {
+        super.update(userId, userBean);
     }
 
     // Read :: Users in Organisation
     // ------------------------------------------------------------------------
 
     @Override
-    public List<UserDTO> getUsers(Integer orgId, int pageNo, int pageSize) {
+    public List<UserDTO> getUsersByOrgId(final Integer orgId, int pageNo, int pageSize) {
         // Sanity Checks
         Verify.notNull(orgId, "Organisation ID is NULL");
-        Verify.notNull(pageNo, "PageNo is NULL");
-        Verify.notNull(pageSize, "PageSize is NULL");
 
-        Organisation organisation = dao.read(Organisation.class, orgId, true);
-
-        Criteria orgUsersCriteria = Criteria.equal("organisation", organisation);
-
-        List<User> userEntities = dao.find(this.getEntityClass(), orgUsersCriteria, pageNo, pageSize);
-        List<UserDTO> userDtos = userEntities.stream().map(e -> new UserDTO(e))
-                .sorted((e1, e2) -> e1.getId().toString().compareTo(e2.getId().toString()))
-                .collect(Collectors.toList());
+        final Organisation organisation = dao.read(Organisation.class, orgId, true);
+        final Criteria orgUsersCriteria = Criteria.equal("organisation", organisation);
+        final List<UserDTO> userDtos = super.find(orgUsersCriteria, null, pageNo, pageSize);
 
         return userDtos;
     }
@@ -206,13 +157,8 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
 
     @Override
     @Transactional
-    public void delete(Integer userId) {
-        // Sanity Checks
-        Verify.notNull(userId, "User ID is NULL");
-
-        dao.purge(this.getEntityClass(), userId);
-
-
+    public void delete(final Integer userId) {
+        super.purge(userId);
     }
 
 }

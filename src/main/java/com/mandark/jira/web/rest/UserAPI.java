@@ -21,13 +21,12 @@ import com.mandark.jira.web.WebConstants;
 
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 public class UserAPI extends AbstractAPI {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganisationAPI.class);
 
     private UserService userService;
-
 
     // APIs
     // ------------------------------------------------------------------------
@@ -36,10 +35,10 @@ public class UserAPI extends AbstractAPI {
     // User :: Create
     // ------------------------------------------------------------------------
 
-    @RequestMapping(value = "/signup", method = RequestMethod.POST)
-    public ResponseEntity<?> createUser(@RequestBody UserBean userBean) {
+    @RequestMapping(value = "/user", method = RequestMethod.POST)
+    public ResponseEntity<?> create(@RequestBody UserBean userBean) {
 
-        int userId = userService.create(userBean);
+        final int userId = userService.create(userBean);
 
         String msg = String.format("Successfully created a new User having id:- %s", userId);
         LOGGER.info(msg);
@@ -52,18 +51,17 @@ public class UserAPI extends AbstractAPI {
     @RequestMapping(value = "/users/{userId}", method = RequestMethod.PUT)
     public ResponseEntity<?> updateUser(@PathVariable("userId") Integer userId, @RequestBody UserBean userBean) {
 
-        userService.updateUser(userId, userBean);
+        userService.update(userId, userBean);
 
-        String msg = String.format("Successfully Updated the User having id:- %s", userId);
+        final String msg = String.format("Successfully Updated the User having id:- %s", userId);
         LOGGER.info(msg);
         return Responses.ok(msg);
     }
 
-
     // User :: Add User to an existing Organisation
     // ------------------------------------------------------------------------
 
-    @RequestMapping(value = "/signup/orgs/{orgId}/addUser", method = RequestMethod.PUT)
+    @RequestMapping(value = "/orgs/{orgId}/users", method = RequestMethod.PUT)
     public ResponseEntity<?> addUser(@PathVariable("orgId") Integer orgId, @RequestParam String userMail) {
 
         userService.addUserToOrgByMail(orgId, userMail);
@@ -77,22 +75,22 @@ public class UserAPI extends AbstractAPI {
     @RequestMapping(value = "/users/{userId}", method = RequestMethod.GET)
     public ResponseEntity<?> getUser(@PathVariable("userId") Integer userId) {
 
-        UserDTO user = userService.read(userId);
+        final UserDTO user = userService.read(userId);
 
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
-
 
     // Users :: Read all the Users
     // ------------------------------------------------------------------------
 
     @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public ResponseEntity<?> getUsers() {
+    public ResponseEntity<?> getUsers(
+            @RequestParam(name = WebConstants.REQ_PARAM_PAGE_NO,
+                    defaultValue = WebConstants.DEFAULT_PAGE_NO) int pageNo,
+            @RequestParam(name = WebConstants.REQ_PARAM_PAGE_SIZE,
+                    defaultValue = WebConstants.DEFAULT_PAGE_SIZE) int pageSize) {
 
-        int pageNo = Integer.parseInt(WebConstants.DEFAULT_PAGE_NO);
-        int pageSize = Integer.parseInt(WebConstants.DEFAULT_PAGE_SIZE);
-
-        List<UserDTO> users = userService.getUsers(pageNo, pageSize);
+        final List<UserDTO> users = userService.read(pageNo, pageSize);
 
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
@@ -100,13 +98,14 @@ public class UserAPI extends AbstractAPI {
     // Users :: Read the Users in the particular Organisation
     // ------------------------------------------------------------------------
 
-    @RequestMapping(value = "/signup/{orgId}/users", method = RequestMethod.GET)
-    public ResponseEntity<?> getUsersOfOrg(@PathVariable("orgId") Integer orgId) {
+    @RequestMapping(value = "/orgs/{orgId}/users", method = RequestMethod.GET)
+    public ResponseEntity<?> getUsersOfOrg(@PathVariable("orgId") Integer orgId,
+            @RequestParam(name = WebConstants.REQ_PARAM_PAGE_NO,
+                    defaultValue = WebConstants.DEFAULT_PAGE_NO) int pageNo,
+            @RequestParam(name = WebConstants.REQ_PARAM_PAGE_SIZE,
+                    defaultValue = WebConstants.DEFAULT_PAGE_SIZE) int pageSize) {
 
-        int pageNo = Integer.parseInt(WebConstants.DEFAULT_PAGE_NO);
-        int pageSize = Integer.parseInt(WebConstants.DEFAULT_PAGE_SIZE);
-
-        List<UserDTO> users = userService.getUsers(orgId, pageNo, pageSize);
+        final List<UserDTO> users = userService.getUsersByOrgId(orgId, pageNo, pageSize);
 
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
@@ -114,15 +113,14 @@ public class UserAPI extends AbstractAPI {
     // Users :: Delete
     // ------------------------------------------------------------------------
 
-    @RequestMapping(value = "/user/{userId}/del", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/users/{userId}", method = RequestMethod.DELETE)
     public ResponseEntity<?> deleteUser(@PathVariable("userId") Integer userId) {
 
         userService.delete(userId);
-        String msg = String.format("Successfully Deleted User with Id :- %s", userId);
+        final String msg = String.format("Successfully Deleted User with Id :- %s", userId);
 
         return Responses.ok(msg);
     }
-
 
 
     // Getters and Setters
@@ -131,7 +129,4 @@ public class UserAPI extends AbstractAPI {
     public void setUserService(UserService userService) {
         this.userService = userService;
     }
-
-
-
 }
