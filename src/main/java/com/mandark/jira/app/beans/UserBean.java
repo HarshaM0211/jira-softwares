@@ -1,6 +1,5 @@
 package com.mandark.jira.app.beans;
 
-import com.mandark.jira.app.enums.UserRole;
 import com.mandark.jira.app.persistence.orm.entity.User;
 import com.mandark.jira.spi.app.EntityBean;
 
@@ -10,13 +9,15 @@ public class UserBean implements EntityBean<User> {
     // Fields
     // ------------------------------------------------------------------------
 
-    private String userName;
+    private String firstName;
+
+    private String lastName;
 
     private String password;
 
-    private String mail;
+    private String email;
 
-    private UserRole role;
+    private String phone;
 
 
     // Constructors
@@ -24,35 +25,34 @@ public class UserBean implements EntityBean<User> {
 
     public UserBean() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
-
-    public UserBean(String userName, String password, String mail, UserRole role) {
+    public UserBean(String firstName, String lastName, String password, String email, String phone) {
         super();
-        this.userName = userName;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.password = password;
-        this.mail = mail;
-        this.role = role;
+        this.email = email;
+        this.phone = phone;
     }
 
     // Getters and Setters
     // ------------------------------------------------------------------------
 
-    public String getUserName() {
-        return userName;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-    public String getMail() {
-        return mail;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setMail(String mail) {
-        this.mail = mail;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getPassword() {
@@ -63,13 +63,19 @@ public class UserBean implements EntityBean<User> {
         this.password = password;
     }
 
-    public UserRole getRole() {
-        return role;
+    public String getEmail() {
+        return email;
     }
 
-    public void setRole(UserRole role) {
-        this.role = role;
+    public void setEmail(String mail) {
+        this.email = mail;
     }
 
+    public String getPhone() {
+        return phone;
+    }
 
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 }
