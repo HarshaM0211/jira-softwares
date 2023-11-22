@@ -11,6 +11,6 @@ public interface OrganisationService extends EntityService<Integer, Organisation
 
     int create(final OrganisationBean orgbean);
 
-    void update(Integer orgId, OrganisationBean orgBean);
+    void update(final Integer orgId, final OrganisationBean orgBean);
 
 }

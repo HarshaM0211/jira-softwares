@@ -102,7 +102,4 @@ public class Organisation extends JpaAuditEntity {
         return "Organisations [name=" + name + ", description=" + description + ", project_ids=" + projects
                 + ", sprint_ids=" + sprints + ", team_ids=" + teams + "]";
     }
-
-
-
 }

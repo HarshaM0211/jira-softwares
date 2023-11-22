@@ -24,11 +24,12 @@ import com.mandark.jira.web.WebConstants;
 @RequestMapping("/api/v1/orgs")
 public class OrganisationAPI extends AbstractAPI {
 
+    // Fields
+    // ------------------------------------------------------------------------
+
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganisationAPI.class);
 
     private OrganisationService orgService;
-
-
 
     // APIs
     // ------------------------------------------------------------------------
@@ -37,7 +38,7 @@ public class OrganisationAPI extends AbstractAPI {
     // ------------------------------------------------------------------------
 
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public ResponseEntity<?> createOrganisation(@RequestBody OrganisationBean orgBean) {
+    public ResponseEntity<?> create(@RequestBody OrganisationBean orgBean) {
 
         final int orgId = orgService.create(orgBean);
 
@@ -51,7 +52,7 @@ public class OrganisationAPI extends AbstractAPI {
     // ------------------------------------------------------------------------
 
     @RequestMapping(value = "/{orgId}", method = RequestMethod.GET)
-    public ResponseEntity<?> readOrganisation(@PathVariable("orgId") Integer orgId) {
+    public ResponseEntity<?> read(@PathVariable("orgId") Integer orgId) {
 
         final OrganisationDTO orgDto = orgService.read(orgId);
 
@@ -60,7 +61,7 @@ public class OrganisationAPI extends AbstractAPI {
 
 
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public ResponseEntity<?> readOrgs(
+    public ResponseEntity<?> readAll(
             @RequestParam(name = WebConstants.REQ_PARAM_PAGE_NO,
                     defaultValue = WebConstants.DEFAULT_PAGE_NO) Integer pageNo,
             @RequestParam(name = WebConstants.REQ_PARAM_PAGE_SIZE,
@@ -74,13 +75,11 @@ public class OrganisationAPI extends AbstractAPI {
         return new ResponseEntity<>(organisations, HttpStatus.OK);
     }
 
-
     // Organisation :: Update
     // ------------------------------------------------------------------------
 
     @RequestMapping(value = "/{orgId}", method = RequestMethod.PUT)
-    public ResponseEntity<?> updateOrganisation(@PathVariable("orgId") Integer orgId,
-            @RequestBody OrganisationBean orgBean) {
+    public ResponseEntity<?> update(@PathVariable("orgId") Integer orgId, @RequestBody OrganisationBean orgBean) {
 
         orgService.update(orgId, orgBean);
 

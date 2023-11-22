@@ -15,15 +15,11 @@ public class OrganisationBean implements EntityBean<Organisation> {
 
     // Constructors
     // ------------------------------------------------------------------------
-    
-    
+
     public OrganisationBean() {
         super();
-        // TODO Auto-generated constructor stub
     }
-    
-    
-    
+
     public OrganisationBean(String name, String description) {
         super();
         this.name = name;
@@ -32,9 +28,6 @@ public class OrganisationBean implements EntityBean<Organisation> {
 
     // Getters and Setters
     // ------------------------------------------------------------------------
-
-
-    
 
     public String getName() {
         return name;
@@ -51,6 +44,4 @@ public class OrganisationBean implements EntityBean<Organisation> {
     public void setDescription(String description) {
         this.description = description;
     }
-
-
 }
