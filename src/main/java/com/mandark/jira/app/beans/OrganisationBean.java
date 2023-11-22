@@ -44,4 +44,12 @@ public class OrganisationBean implements EntityBean<Organisation> {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    // Object Methods
+    // ------------------------------------------------------------------------
+
+    @Override
+    public String toString() {
+        return "OrganisationBean [name=" + name + ", description=" + description + "]";
+    }
 }
