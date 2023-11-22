@@ -6,6 +6,9 @@ import com.mandark.jira.spi.app.EntityDTO;
 
 public class CommentDTO extends EntityDTO<Comment> {
 
+    // Fields
+    // -------------------------------------------------------------------------
+
     private final IssueDTO issue;
 
     private final UserDTO commenter;// (org_member)
@@ -16,14 +19,12 @@ public class CommentDTO extends EntityDTO<Comment> {
     // Constructors
     // -------------------------------------------------------------------------
 
-    // Default
     public CommentDTO(Comment e) {
         super(e);
         this.issue = new IssueDTO(e.getIssue());
         this.commenter = new UserDTO(e.getCommenter());
         this.comment = e.getComment();
     }
-
 
     // Getters and Setters
     // -------------------------------------------------------------------------
@@ -45,7 +46,7 @@ public class CommentDTO extends EntityDTO<Comment> {
 
     @Override
     public String toString() {
-        return "CommentsDTO [issue=" + issue + ", commenter=" + commenter + ", comment=" + comment + "]";
+        return "CommentDTO [issue=" + issue + ", commenter=" + commenter + ", comment=" + comment + "]";
     }
 
 

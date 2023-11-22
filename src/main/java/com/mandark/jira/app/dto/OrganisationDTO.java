@@ -8,6 +8,9 @@ import com.mandark.jira.spi.app.EntityDTO;
 // TODO
 public class OrganisationDTO extends EntityDTO<Organisation> {
 
+    // Fields
+    // -------------------------------------------------------------------------
+
     private final String name;
 
     private final String description;
@@ -40,7 +43,7 @@ public class OrganisationDTO extends EntityDTO<Organisation> {
 
     @Override
     public String toString() {
-        return "OrganisationsDTO [name=" + name + ", description=" + description + "]";
+        return "OrganisationDTO [name=" + name + ", description=" + description + "]";
     }
 
 }

@@ -16,7 +16,10 @@ import com.mandark.jira.spi.app.EntityDTO;
 
 public class IssueDTO extends EntityDTO<Issue> {
 
-    private final String issue_key;
+    // Fields
+    // -------------------------------------------------------------------------
+
+    private final String issueKey;
 
     private final String description;// (name)
 
@@ -26,15 +29,15 @@ public class IssueDTO extends EntityDTO<Issue> {
 
     private final IssueStatus status;
 
-    private final int parent_issue_id;// (Issue ID of this table)
+    private final int parentIssueId;// (Issue ID of this table)
 
     private final List<SprintDTO> sprints;
 
-    private final UserDTO reported_by;// (mem_id)
+    private final UserDTO reportedBy;// (mem_id)
 
-    private final Date start_date;
+    private final Date startDate;
 
-    private final Date end_date;
+    private final Date endDate;
 
     private final String versionStr;
 
@@ -46,27 +49,26 @@ public class IssueDTO extends EntityDTO<Issue> {
 
     private final List<CommentDTO> comments;
 
-
     // Constructors
     // ------------------------------------------------------------------------
 
     public IssueDTO(Issue e) {
         super(e);
-        this.issue_key = e.getIssueKey();
+        this.issueKey = e.getIssueKey();
         this.description = e.getDescription();
         this.type = e.getType();
         this.assignee = new UserDTO(e.getAssignee());
         this.status = e.getStatus();
-        this.parent_issue_id = e.getParentIssueId();
-        
+        this.parentIssueId = e.getParentIssueId();
+
         List<SprintDTO> sprintDTOs = new ArrayList<>();
-        for(Sprint s : e.getSprint()) {
+        for (Sprint s : e.getSprint()) {
             sprintDTOs.add(new SprintDTO(s));
         }
         this.sprints = sprintDTOs;
-        this.reported_by = new UserDTO(e.getReportedBy());
-        this.start_date = e.getStartDate();
-        this.end_date = e.getEndDate();
+        this.reportedBy = new UserDTO(e.getReportedBy());
+        this.startDate = e.getStartDate();
+        this.endDate = e.getEndDate();
         this.versionStr = e.getVersionStr();
         this.priority = e.getPriority();
         this.label = e.getLabel();
@@ -87,8 +89,8 @@ public class IssueDTO extends EntityDTO<Issue> {
     // Getters and Setters
     // ------------------------------------------------------------------------
 
-    public String getIssue_key() {
-        return issue_key;
+    public String getIssueKey() {
+        return issueKey;
     }
 
     public String getDescription() {
@@ -107,24 +109,24 @@ public class IssueDTO extends EntityDTO<Issue> {
         return status;
     }
 
-    public int getParent_issue_id() {
-        return parent_issue_id;
+    public int getParentIssueId() {
+        return parentIssueId;
     }
 
-    public List<SprintDTO> getSprint() {
+    public List<SprintDTO> getSprints() {
         return sprints;
     }
 
-    public UserDTO getReported_by() {
-        return reported_by;
+    public UserDTO getReportedBy() {
+        return reportedBy;
     }
 
-    public Date getStart_date() {
-        return start_date;
+    public Date getStartDate() {
+        return startDate;
     }
 
-    public Date getEnd_date() {
-        return end_date;
+    public Date getEndDate() {
+        return endDate;
     }
 
     public String getVersionStr() {
@@ -151,16 +153,12 @@ public class IssueDTO extends EntityDTO<Issue> {
     // Object Methods
     // -------------------------------------------------------------------------
 
-
     @Override
     public String toString() {
-        return "IssuesDTO [issue_key=" + issue_key + ", description=" + description + ", type=" + type + ", assignee="
-                + assignee + ", status=" + status + ", parent_issue_id=" + parent_issue_id + ", sprint=" + sprints
-                + ", reported_by=" + reported_by + ", start_date=" + start_date + ", end_date=" + end_date
-                + ", version=" + versionStr + ", priority=" + priority + ", label=" + label + ", attachments="
-                + attachments + ", comments=" + comments + "]";
+        return "IssueDTO [issueKey=" + issueKey + ", description=" + description + ", type=" + type + ", assignee="
+                + assignee + ", status=" + status + ", parentIssueId=" + parentIssueId + ", reportedBy=" + reportedBy
+                + ", startDate=" + startDate + ", endDate=" + endDate + ", versionStr=" + versionStr + ", priority="
+                + priority + ", label=" + label + "]";
     }
-
-
 
 }

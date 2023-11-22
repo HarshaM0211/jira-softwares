@@ -15,9 +15,10 @@ public class UserDTO extends EntityDTO<User> {
 
     // Fields
     // ------------------------------------------------------------------------
-    private final String user_name;
 
-    private final String user_email;
+    private final String userName;
+
+    private final String email;
 
     private final List<ProjectDTO> projects;
 
@@ -32,8 +33,8 @@ public class UserDTO extends EntityDTO<User> {
 
     public UserDTO(User e) {
         super(e);
-        this.user_name = e.getUserName();
-        this.user_email = e.getMail();
+        this.userName = e.getFirstName() + e.getLastName();
+        this.email = e.getEmail();
 
         List<ProjectDTO> projectsDTO = new ArrayList<>();
         for (Project p : e.getProjects()) {
@@ -54,16 +55,16 @@ public class UserDTO extends EntityDTO<User> {
     // Getters
     // ------------------------------------------------------------------------
 
-    public String getUser_name() {
-        return user_name;
-    }
-
-    public String getUser_email() {
-        return user_email;
-    }
-
     public List<ProjectDTO> getProjects() {
         return projects;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public List<TeamDTO> getTeams() {
@@ -84,9 +85,7 @@ public class UserDTO extends EntityDTO<User> {
 
     @Override
     public String toString() {
-        return "OrganisationMembersDTO [user_name=" + user_name + ", user_email=" + user_email + ", projects="
-                + projects + ", teams=" + teams + ", role=" + role + ", organisation=" + org.getId() + "]";
+        return "UserDTO [userName=" + userName + ", email=" + email + ", projects=" + projects + ", teams=" + teams
+                + ", role=" + role + ", organisation=" + org.getId() + "]";
     }
-
-
 }

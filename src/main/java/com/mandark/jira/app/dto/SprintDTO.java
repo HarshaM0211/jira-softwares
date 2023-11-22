@@ -12,16 +12,18 @@ import com.mandark.jira.spi.app.EntityDTO;
 
 public class SprintDTO extends EntityDTO<Sprint> {
 
-    private final String sprint_key;
+    // Fields
+    // -------------------------------------------------------------------------
 
-    private final Date start_date;
+    private final String sprintKey;
 
-    private final Date end_date;
+    private final Date startDate;
+
+    private final Date endDate;
 
     private final List<IssueDTO> issues;
 
     private final SprintStatus status;
-
 
     // Constructors
     // ------------------------------------------------------------------------
@@ -29,9 +31,9 @@ public class SprintDTO extends EntityDTO<Sprint> {
     public SprintDTO(Sprint e) {
         super(e);
 
-        this.sprint_key = e.getSprintKey();
-        this.start_date = e.getStartDate();
-        this.end_date = e.getEndDate();
+        this.sprintKey = e.getSprintKey();
+        this.startDate = e.getStartDate();
+        this.endDate = e.getEndDate();
 
         List<IssueDTO> issuesDTO = new ArrayList<>();
         for (Issue n : e.getIssues()) {
@@ -45,16 +47,16 @@ public class SprintDTO extends EntityDTO<Sprint> {
     // Getters
     // ------------------------------------------------------------------------
 
-    public String getSprint_key() {
-        return sprint_key;
+    public String getSprintKey() {
+        return sprintKey;
     }
 
-    public Date getStart_date() {
-        return start_date;
+    public Date getStartDate() {
+        return startDate;
     }
 
-    public Date getEnd_date() {
-        return end_date;
+    public Date getEndDate() {
+        return endDate;
     }
 
     public List<IssueDTO> getIssues() {
@@ -70,9 +72,8 @@ public class SprintDTO extends EntityDTO<Sprint> {
 
     @Override
     public String toString() {
-        return "SprintsDTO [sprint_key=" + sprint_key + ", start_date=" + start_date + ", end_date=" + end_date
-                + ", issues=" + issues + ", status=" + status + "]";
+        return "SprintDTO [sprintKey=" + sprintKey + ", startDate=" + startDate + ", endDate=" + endDate + ", issues="
+                + issues + ", status=" + status + "]";
     }
-
 
 }

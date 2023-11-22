@@ -16,9 +16,9 @@ public class TeamDTO extends EntityDTO<Team> {
 
     private final String name;
 
-    private final UserDTO team_leader; // (org_mem_id)
+    private final UserDTO teamLeader; // (org_mem_id)
 
-    private final List<UserDTO> org_members;
+    private final List<UserDTO> users;
 
     // Constructors
     // ------------------------------------------------------------------------
@@ -26,14 +26,14 @@ public class TeamDTO extends EntityDTO<Team> {
     public TeamDTO(Team e) {
         super(e);
         this.name = e.getName();
-        this.team_leader = new UserDTO(e.getTeamLeader());
+        this.teamLeader = new UserDTO(e.getTeamLeader());
 
-        List<UserDTO> org_membersDTO = new ArrayList<UserDTO>();
+        List<UserDTO> userDTOs = new ArrayList<UserDTO>();
         for (User n : e.getUsers()) {
-            org_membersDTO.add(new UserDTO(n));
+            userDTOs.add(new UserDTO(n));
         }
 
-        this.org_members = org_membersDTO;
+        this.users = userDTOs;
     }
 
     // Getters
@@ -43,24 +43,20 @@ public class TeamDTO extends EntityDTO<Team> {
         return name;
     }
 
-
-    public UserDTO getTeam_leader() {
-        return team_leader;
+    public UserDTO getTeamLeader() {
+        return teamLeader;
     }
 
-
-    public List<UserDTO> getOrg_members() {
-        return org_members;
+    public List<UserDTO> getUsers() {
+        return users;
     }
-
 
     // Object Methods
     // ------------------------------------------------------------------------
 
     @Override
     public String toString() {
-        return "TeamsDTO [name=" + name + ", team_leader=" + team_leader + ", org_members=" + org_members + "]";
+        return "TeamDTO [name=" + name + ", teamLeader=" + teamLeader + ", users=" + users + "]";
     }
-
 
 }

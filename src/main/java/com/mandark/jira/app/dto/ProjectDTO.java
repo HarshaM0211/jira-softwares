@@ -15,7 +15,8 @@ public class ProjectDTO extends EntityDTO<Project> {
 
     // Fields
     // ------------------------------------------------------------------------
-    private final String project_key;
+
+    private final String projectKey;
 
     private final String name;
 
@@ -23,7 +24,7 @@ public class ProjectDTO extends EntityDTO<Project> {
 
     private final List<SprintDTO> sprints;
 
-    private final List<UserDTO> org_members;
+    private final List<UserDTO> users;
 
     private final List<IssueDTO> issues;
 
@@ -33,72 +34,62 @@ public class ProjectDTO extends EntityDTO<Project> {
     public ProjectDTO(Project e) {
         super(e);
 
-        this.project_key = e.getProjectKey();
+        this.projectKey = e.getProjectKey();
         this.name = e.getName();
         this.description = e.getDescription();
 
-        List<SprintDTO> sprintsDTO = new ArrayList<>();
+        List<SprintDTO> sprintDTOs = new ArrayList<>();
         for (Sprint s : e.getSprints()) {
-            sprintsDTO.add(new SprintDTO(s));
+            sprintDTOs.add(new SprintDTO(s));
         }
-        this.sprints = sprintsDTO;
+        this.sprints = sprintDTOs;
 
-        List<UserDTO> org_membersDTO = new ArrayList<>();
+        List<UserDTO> userDTOs = new ArrayList<>();
         for (User om : e.getUsers()) {
-            org_membersDTO.add(new UserDTO(om));
+            userDTOs.add(new UserDTO(om));
         }
-        this.org_members = org_membersDTO;
+        this.users = userDTOs;
 
-        List<IssueDTO> issuesDTO = new ArrayList<>();
+        List<IssueDTO> issueDTOs = new ArrayList<>();
         for (Issue i : e.getIssues()) {
-            issuesDTO.add(new IssueDTO(i));
+            issueDTOs.add(new IssueDTO(i));
         }
-        this.issues = issuesDTO;
+        this.issues = issueDTOs;
     }
-
 
     // Getters and Setters
     // ------------------------------------------------------------------------
 
-    public String getProject_key() {
-        return project_key;
+    public String getProjectKey() {
+        return projectKey;
     }
-
 
     public String getName() {
         return name;
     }
 
+    public List<UserDTO> getUsers() {
+        return users;
+    }
 
     public String getDescription() {
         return description;
     }
 
-
     public List<SprintDTO> getSprints() {
         return sprints;
     }
 
-
-    public List<UserDTO> getOrg_members() {
-        return org_members;
-    }
-
-
     public List<IssueDTO> getIssues() {
         return issues;
     }
-
 
     // Object Methods
     // ------------------------------------------------------------------------
 
     @Override
     public String toString() {
-        return "ProjectsDTO [project_key=" + project_key + ", name=" + name + ", description=" + description
-                + ", sprints=" + sprints + ", org_members=" + org_members + ", issues=" + issues + "]";
+        return "ProjectDTO [projectKey=" + projectKey + ", name=" + name + ", description=" + description + ", sprints="
+                + sprints + ", users=" + users + ", issues=" + issues + "]";
     }
-
-
-
 }
