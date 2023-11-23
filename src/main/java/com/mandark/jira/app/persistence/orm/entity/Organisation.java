@@ -104,7 +104,4 @@ public class Organisation extends JpaAuditEntity {
     public String toString() {
         return "Organisations [name=" + name + ", description=" + description + "]";
     }
-
-
-
 }

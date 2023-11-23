@@ -42,11 +42,7 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
     @Override
     protected OrganisationDTO toDTO(Organisation entityObj) {
 
-        if (Objects.isNull(entityObj)) {
-            throw new IllegalArgumentException("[failed] - entityObj must not null");
-        }
-
-        return new OrganisationDTO(entityObj);
+        return Objects.isNull(entityObj) ? null : new OrganisationDTO(entityObj);
     }
 
     @Override
@@ -57,13 +53,11 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
     @Override
     protected Organisation copyFromBean(Organisation exEntity, OrganisationBean entityBean) {
 
-        if (Objects.isNull(entityBean)) {
-            throw new IllegalArgumentException("[failed] - bean must not null");
+        if (Objects.isNull(exEntity) || Objects.isNull(entityBean)) {
+            return exEntity;
         }
-
-        if (Objects.isNull(exEntity)) {
-            throw new IllegalArgumentException("[failed] - entity must not null");
-        }
+        exEntity.setName(entityBean.getName());
+        exEntity.setDescription(entityBean.getDescription());
 
         return exEntity;
     }
@@ -74,7 +68,7 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
 
     @Override
     @Transactional
-    public int create(OrganisationBean bean) {
+    public int create(final OrganisationBean bean) {
 
         if (Objects.isNull(bean)) {
             throw new IllegalArgumentException("[failed] - bean must not null");
@@ -89,7 +83,7 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
 
     @Override
     @Transactional
-    public void update(Integer orgId, OrganisationBean orgBean) {
+    public void update(final Integer orgId, final OrganisationBean orgBean) {
 
         super.update(orgId, orgBean);
     }
