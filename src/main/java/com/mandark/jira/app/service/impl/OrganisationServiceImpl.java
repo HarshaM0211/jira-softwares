@@ -43,7 +43,7 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
 
     @Override
     protected OrganisationDTO toDTO(Organisation entityObj) {
-        return new OrganisationDTO(entityObj);
+        return Objects.isNull(entityObj) ? null : new OrganisationDTO(entityObj);
     }
 
     @Override
@@ -54,13 +54,11 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
     @Override
     protected Organisation copyFromBean(Organisation exEntity, OrganisationBean entityBean) {
 
-        if (Objects.nonNull(entityBean.getName())) {
-            exEntity.setName(entityBean.getName());
+        if (Objects.isNull(exEntity) || Objects.isNull(entityBean)) {
+            return exEntity;
         }
-
-        if (Objects.nonNull(entityBean.getDescription())) {
-            exEntity.setDescription(entityBean.getDescription());
-        }
+        exEntity.setName(entityBean.getName());
+        exEntity.setDescription(entityBean.getDescription());
 
         return exEntity;
     }
@@ -76,12 +74,12 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
     @Transactional
     public int create(OrganisationBean bean) {
 
-        if (Objects.isNull(bean)) {
-            throw new IllegalArgumentException("[failed] - bean must not null");
-        }
-        Organisation organisation = createFromBean(bean);
+        // Sanity Checks
+        Verify.notNull(bean);
 
-        int id = dao.save(organisation);
+        final Organisation organisation = createFromBean(bean);
+
+        final int id = dao.save(organisation);
 
         LOGGER.info("#Create :: Organisation is created for the {} with the ID : {}", organisation.getName(), id);
 
@@ -97,7 +95,7 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
 
         Verify.notNull(orgId, "Organisation Id is NULL");
 
-        OrganisationDTO orgDTO = this.read(orgId);
+        OrganisationDTO orgDTO = super.read(orgId);
         return orgDTO;
     }
 
@@ -123,18 +121,6 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
         Verify.notNull(orgBean, "Organisation Bean is NULL");
 
         this.update(orgId, orgBean);
-    }
-
-    // Delete
-    // ------------------------------------------------------------------------
-
-    @Override
-    @Transactional
-    public void deleteOrganisation(Integer orgId) {
-
-        Verify.notNull(orgId, "Organisation Id is NULL");
-
-        this.purge(orgId);
     }
 
 }

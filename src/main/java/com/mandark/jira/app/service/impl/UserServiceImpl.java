@@ -78,7 +78,13 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
     @Transactional
     public int create(final UserBean userBean) {
 
+        // Sanity Checks
+        Verify.notNull(userBean, "$create :: userBean must be non NULL");
+
         final int userId = super.save(userBean);
+
+        LOGGER.info("Successfully created new User with Id : {}", userId);
+
         return userId;
     }
 
@@ -87,14 +93,18 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
 
     @Override
     @Transactional
-    public void addUserToOrgByMail(final Integer orgId, final String userMail) {
+    public void addUserToOrgByMail(final Integer orgId, final String userEmail) {
         // Sanity Checks
         Verify.notNull(orgId, "Organisation ID is NULL");
-        Verify.notNull(userMail, "User Mail is NULL");
+        Verify.notNull(userEmail, "User Mail is NULL");
 
-        final Criteria userMailCriteria = Criteria.equal("mail", userMail);
-        final User userEntity = dao.findOne(this.getEntityClass(), userMailCriteria);
+        final Criteria userEmailCriteria = Criteria.equal("email", userEmail);
+        final User userEntity = dao.findOne(this.getEntityClass(), userEmailCriteria);
         this.addUserToOrg(orgId, userEntity);
+
+        final String msg = String.format("Successfully added User with mail : {} , into the Organisation with ID : {}",
+                userEmail, orgId);
+        LOGGER.info(msg);
     }
 
     // Add User to Organisation By User Entity
@@ -134,6 +144,11 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
     @Override
     @Transactional
     public void update(final Integer userId, final UserBean userBean) {
+
+        // Sanity Checks
+        Verify.notNull(userId, "$update :: userId must be non NULL");
+        Verify.notNull(userBean, "$update :: userBean must be non NULL");
+
         super.update(userId, userBean);
     }
 
@@ -141,7 +156,7 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
     // ------------------------------------------------------------------------
 
     @Override
-    public List<UserDTO> getUsersByOrgId(final Integer orgId, int pageNo, int pageSize) {
+    public List<UserDTO> getUsersByOrgId(final Integer orgId, final int pageNo, final int pageSize) {
         // Sanity Checks
         Verify.notNull(orgId, "Organisation ID is NULL");
 
@@ -149,16 +164,63 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
         final Criteria orgUsersCriteria = Criteria.equal("organisation", organisation);
         final List<UserDTO> userDtos = super.find(orgUsersCriteria, null, pageNo, pageSize);
 
+        LOGGER.info("Successfully fetched Users from Organisation with ID : {}", orgId);
+
         return userDtos;
     }
 
-    // Delete
+    // Count
+    // ------------------------------------------------------------------------
+
+    @Override
+    public int count(final Integer orgId) {
+
+        // Sanity Checks
+        Verify.notNull(orgId, "$count :: Organisation ID : orgId must be nonn NULL");
+
+        final int count = super.count(this.getOrgCriteria(orgId));
+
+        LOGGER.info("# of entity objects found for critera :: {} - {} : {}", this.getEntityClass(),
+                this.getOrgCriteria(orgId), count);
+        return count;
+
+    }
+
+    // Criteria
+    // ------------------------------------------------------------------------
+
+    private Criteria getOrgCriteria(final Integer orgId) {
+
+        // Sanity Checks
+        Verify.notNull(orgId, "$getOrgCriteria :: Organisation ID : orgId must be nonn NULL");
+
+        final Organisation organisation = dao.read(Organisation.class, orgId, true);
+        final Criteria criteria = Criteria.equal("organisation", organisation);
+
+        return criteria;
+    }
+
+    // Remove User Form Organisation
     // ------------------------------------------------------------------------
 
     @Override
     @Transactional
-    public void delete(final Integer userId) {
-        super.purge(userId);
+    public void removeFromOrg(final Integer orgId, final Integer userId) {
+
+        User user = this.dao.read(this.getEntityClass(), userId, true);
+
+        if (orgId.equals(user.getOrganisation().getId())) {
+            user.setOrganisation(null);
+            this.dao.update(userId, user);
+            String msg = String.format(
+                    "$removeFromOrg :: Successfully removed User with ID : {} , from Organisation with ID : {}", userId,
+                    orgId);
+            LOGGER.info(msg);
+            return;
+        }
+        final String msg = String.format("User with Id : {}, not belongs to Organisation with Id : {}", userId, orgId);
+
+        throw new IllegalArgumentException(msg);
     }
 
 }

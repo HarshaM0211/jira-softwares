@@ -16,12 +16,15 @@ import org.springframework.web.bind.annotation.RestController;
 import com.mandark.jira.app.beans.UserBean;
 import com.mandark.jira.app.dto.UserDTO;
 import com.mandark.jira.app.service.UserService;
+import com.mandark.jira.spi.app.query.Criteria;
+import com.mandark.jira.spi.web.PageResult;
+import com.mandark.jira.spi.web.Pagination;
 import com.mandark.jira.spi.web.Responses;
 import com.mandark.jira.web.WebConstants;
 
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/orgs/{orgId}/users")
 public class UserAPI extends AbstractAPI {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganisationAPI.class);
@@ -35,12 +38,12 @@ public class UserAPI extends AbstractAPI {
     // User :: Create
     // ------------------------------------------------------------------------
 
-    @RequestMapping(value = "/user", method = RequestMethod.POST)
+    @RequestMapping(value = "", method = RequestMethod.POST)
     public ResponseEntity<?> create(@RequestBody UserBean userBean) {
 
         final int userId = userService.create(userBean);
 
-        String msg = String.format("Successfully created a new User having id:- %s", userId);
+        final String msg = String.format("Successfully created a new User having id:- %s", userId);
         LOGGER.info(msg);
         return Responses.ok(msg);
     }
@@ -48,7 +51,7 @@ public class UserAPI extends AbstractAPI {
     // User :: Update
     // ------------------------------------------------------------------------
 
-    @RequestMapping(value = "/users/{userId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{userId}", method = RequestMethod.PUT)
     public ResponseEntity<?> updateUser(@PathVariable("userId") Integer userId, @RequestBody UserBean userBean) {
 
         userService.update(userId, userBean);
@@ -61,21 +64,28 @@ public class UserAPI extends AbstractAPI {
     // User :: Add User to an existing Organisation
     // ------------------------------------------------------------------------
 
-    @RequestMapping(value = "/orgs/{orgId}/users", method = RequestMethod.PUT)
-    public ResponseEntity<?> addUser(@PathVariable("orgId") Integer orgId, @RequestParam String userMail) {
+    @RequestMapping(value = "", method = RequestMethod.PUT)
+    public ResponseEntity<?> addUser(@PathVariable("orgId") Integer orgId, @RequestParam String userEmail) {
 
-        userService.addUserToOrgByMail(orgId, userMail);
+        userService.addUserToOrgByMail(orgId, userEmail);
 
-        return Responses.ok();
+        final String msg = String.format(
+                "Successfully Added the User with email : {} , into the organisation with ID : {}", userEmail, orgId);
+        LOGGER.info(msg);
+
+        return Responses.ok(msg);
     }
 
     // Users :: Read the Users by UserID
     // ------------------------------------------------------------------------
 
-    @RequestMapping(value = "/users/{userId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{userId}", method = RequestMethod.GET)
     public ResponseEntity<?> getUser(@PathVariable("userId") Integer userId) {
 
         final UserDTO user = userService.read(userId);
+
+        final String msg = String.format("Successfully fetched User with ID : {}", userId);
+        LOGGER.info(msg);
 
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
@@ -83,7 +93,7 @@ public class UserAPI extends AbstractAPI {
     // Users :: Read all the Users
     // ------------------------------------------------------------------------
 
-    @RequestMapping(value = "/users", method = RequestMethod.GET)
+    @RequestMapping(value = "/admin", method = RequestMethod.GET)
     public ResponseEntity<?> getUsers(
             @RequestParam(name = WebConstants.REQ_PARAM_PAGE_NO,
                     defaultValue = WebConstants.DEFAULT_PAGE_NO) int pageNo,
@@ -92,13 +102,17 @@ public class UserAPI extends AbstractAPI {
 
         final List<UserDTO> users = userService.read(pageNo, pageSize);
 
-        return new ResponseEntity<>(users, HttpStatus.OK);
+        final int count = userService.count();
+        final Pagination pagination = Pagination.with(count, pageNo, pageSize);
+        final PageResult pageResult = PageResult.with(pagination, users);
+
+        return new ResponseEntity<>(pageResult, HttpStatus.OK);
     }
 
     // Users :: Read the Users in the particular Organisation
     // ------------------------------------------------------------------------
 
-    @RequestMapping(value = "/orgs/{orgId}/users", method = RequestMethod.GET)
+    @RequestMapping(value = "", method = RequestMethod.GET)
     public ResponseEntity<?> getUsersOfOrg(@PathVariable("orgId") Integer orgId,
             @RequestParam(name = WebConstants.REQ_PARAM_PAGE_NO,
                     defaultValue = WebConstants.DEFAULT_PAGE_NO) int pageNo,
@@ -107,17 +121,24 @@ public class UserAPI extends AbstractAPI {
 
         final List<UserDTO> users = userService.getUsersByOrgId(orgId, pageNo, pageSize);
 
-        return new ResponseEntity<>(users, HttpStatus.OK);
+        final int count = userService.count(orgId);
+        final Pagination pagination = Pagination.with(count, pageNo, pageSize);
+        final PageResult pageResult = PageResult.with(pagination, users);
+
+        return new ResponseEntity<>(pageResult, HttpStatus.OK);
     }
 
-    // Users :: Delete
+    // Users :: Remove from Organisation
     // ------------------------------------------------------------------------
 
-    @RequestMapping(value = "/users/{userId}", method = RequestMethod.DELETE)
-    public ResponseEntity<?> deleteUser(@PathVariable("userId") Integer userId) {
+    @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
+    public ResponseEntity<?> removeFromOrg(@PathVariable("userId") Integer userId, @RequestParam Integer orgId) {
 
-        userService.delete(userId);
-        final String msg = String.format("Successfully Deleted User with Id :- %s", userId);
+        userService.removeFromOrg(orgId, userId);
+
+        final String msg =
+                String.format("Successfully Removed User with Id :- %s, from Organisation with ID :- %s", userId);
+        LOGGER.info(msg);
 
         return Responses.ok(msg);
     }

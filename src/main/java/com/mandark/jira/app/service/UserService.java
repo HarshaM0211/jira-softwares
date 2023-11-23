@@ -14,10 +14,12 @@ public interface UserService extends EntityService<Integer, User, UserDTO> {
 
     void update(final Integer userId, final UserBean userBean);
 
-    List<UserDTO> getUsersByOrgId(final Integer orgId, int pageNo, int pageSize);
+    List<UserDTO> getUsersByOrgId(final Integer orgId, final int pageNo, final int pageSize);
 
-    void delete(final Integer userId);
+    void removeFromOrg(final Integer orgId, final Integer userId);
 
     void addUserToOrgByMail(final Integer orgId, final String userMail);
+
+    int count(final Integer orgId);
 
 }
