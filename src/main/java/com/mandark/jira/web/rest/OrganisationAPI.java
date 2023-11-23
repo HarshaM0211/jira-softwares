@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.mandark.jira.app.beans.OrganisationBean;
 import com.mandark.jira.app.dto.OrganisationDTO;
 import com.mandark.jira.app.service.OrganisationService;
+import com.mandark.jira.spi.web.PageResult;
+import com.mandark.jira.spi.web.Pagination;
 import com.mandark.jira.spi.web.Responses;
 import com.mandark.jira.web.WebConstants;
 
@@ -52,7 +54,7 @@ public class OrganisationAPI extends AbstractAPI {
     // ------------------------------------------------------------------------
 
     @RequestMapping(value = "/{orgId}", method = RequestMethod.GET)
-    public ResponseEntity<?> read(@PathVariable("orgId") Integer orgId) {
+    public ResponseEntity<?> getOrgInfo(@PathVariable("orgId") Integer orgId) {
 
         final OrganisationDTO orgDto = orgService.read(orgId);
 
@@ -61,7 +63,7 @@ public class OrganisationAPI extends AbstractAPI {
 
 
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public ResponseEntity<?> readAll(
+    public ResponseEntity<?> getAllOrgsInfo(
             @RequestParam(name = WebConstants.REQ_PARAM_PAGE_NO,
                     defaultValue = WebConstants.DEFAULT_PAGE_NO) Integer pageNo,
             @RequestParam(name = WebConstants.REQ_PARAM_PAGE_SIZE,
@@ -72,7 +74,11 @@ public class OrganisationAPI extends AbstractAPI {
         final String msg = String.format("Successfully fetched list of all Organisations");
         LOGGER.info(msg);
 
-        return new ResponseEntity<>(organisations, HttpStatus.OK);
+        int count = orgService.count();
+        Pagination pagination = Pagination.with(count, pageNo, pageSize);
+        PageResult pageResult = PageResult.with(pagination, organisations);
+
+        return new ResponseEntity<>(pageResult, HttpStatus.OK);
     }
 
     // Organisation :: Update
