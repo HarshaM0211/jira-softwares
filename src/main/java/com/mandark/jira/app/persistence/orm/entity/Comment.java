@@ -93,8 +93,8 @@ public class Comment extends JpaAuditEntity {
 
     @Override
     public String toString() {
-        return "Comments [issue=" + issue.getId() + ", org_member=" + commenter.getUserName() + ", comment=" + comment
-                + "]";
+        return "Comments [issue=" + issue.getId() + ", org_member=" + commenter.getFirstName() + commenter.getLastName()
+                + ", comment=" + comment + "]";
     }
 
 

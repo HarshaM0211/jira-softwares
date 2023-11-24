@@ -25,8 +25,6 @@ public class UserDTO extends EntityDTO<User> {
 
     private final UserRole role;
 
-    private final OrganisationDTO org;
-
     private final String phone;
 
     // Constructors
@@ -45,7 +43,6 @@ public class UserDTO extends EntityDTO<User> {
         this.projects = projectsDTO;
 
         this.role = e.getRole();
-        this.org = Objects.isNull(e.getOrganisation()) ? null : new OrganisationDTO(e.getOrganisation());
         this.phone = e.getPhone();
     }
 
@@ -68,10 +65,6 @@ public class UserDTO extends EntityDTO<User> {
         return role;
     }
 
-    public OrganisationDTO getOrg() {
-        return org;
-    }
-
     public String getPhone() {
         return phone;
     }
@@ -81,7 +74,7 @@ public class UserDTO extends EntityDTO<User> {
 
     @Override
     public String toString() {
-        return "UserDTO [userName=" + userName + ", email=" + email + ", projects=" + projects + ", teams=" + teams
-                + ", role=" + role + ", organisation=" + org.getId() + ", phone=" + phone + "]";
+        return "UserDTO [userName=" + userName + ", email=" + email + ", projects=" + projects + ", role=" + role
+                + ", phone=" + phone + "]";
     }
 }
