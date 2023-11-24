@@ -25,8 +25,6 @@ public class ProjectDTO extends EntityDTO<Project> {
 
     private final List<SprintDTO> sprints;
 
-    private final List<UserDTO> users;
-
     private final List<IssueDTO> issues;
 
     // Constructors
@@ -45,13 +43,6 @@ public class ProjectDTO extends EntityDTO<Project> {
             sprintDTOs.add(sprintDto);
         }
         this.sprints = sprintDTOs;
-
-        List<UserDTO> userDTOs = new ArrayList<>();
-        for (User u : e.getUsers()) {
-            UserDTO userDto = Objects.isNull(u) ? null : new UserDTO(u);
-            userDTOs.add(userDto);
-        }
-        this.users = userDTOs;
 
         List<IssueDTO> issueDTOs = new ArrayList<>();
         for (Issue i : e.getIssues()) {
@@ -72,10 +63,6 @@ public class ProjectDTO extends EntityDTO<Project> {
         return name;
     }
 
-    public List<UserDTO> getUsers() {
-        return users;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -94,6 +81,6 @@ public class ProjectDTO extends EntityDTO<Project> {
     @Override
     public String toString() {
         return "ProjectDTO [projectKey=" + projectKey + ", name=" + name + ", description=" + description + ", sprints="
-                + sprints + ", users=" + users + ", issues=" + issues + "]";
+                + sprints + ", issues=" + issues + "]";
     }
 }

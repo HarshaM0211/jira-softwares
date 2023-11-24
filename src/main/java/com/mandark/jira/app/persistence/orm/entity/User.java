@@ -13,6 +13,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mandark.jira.app.enums.UserRole;
 import com.mandark.jira.app.persistence.orm.JpaAuditEntity;
 import com.mandark.jira.spi.lang.ValidationException;
@@ -68,14 +69,6 @@ public class User extends JpaAuditEntity {
 
         if (Objects.isNull(email)) {
             throw new ValidationException("#validate :: mail is BLANK");
-        }
-
-        if (Objects.isNull(organisation)) {
-            throw new ValidationException("#validate :: organisation is BLANK");
-        }
-
-        if (Objects.isNull(role)) {
-            throw new ValidationException("#validate :: role is BLANK");
         }
 
         if (Objects.isNull(phone)) {
@@ -161,7 +154,7 @@ public class User extends JpaAuditEntity {
         this.teams = teams;
     }
 
-    @Column(name = "role", nullable = false)
+    @Column(name = "role")
     public UserRole getRole() {
         return role;
     }

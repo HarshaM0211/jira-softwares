@@ -13,6 +13,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mandark.jira.app.persistence.orm.JpaAuditEntity;
 import com.mandark.jira.spi.lang.ValidationException;
 

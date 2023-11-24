@@ -23,11 +23,9 @@ public class UserDTO extends EntityDTO<User> {
 
     private final List<ProjectDTO> projects;
 
-    private final List<TeamDTO> teams;
-
     private final UserRole role;
 
-    private final Organisation org;
+    private final OrganisationDTO org;
 
     private final String phone;
 
@@ -46,15 +44,8 @@ public class UserDTO extends EntityDTO<User> {
         }
         this.projects = projectsDTO;
 
-        List<TeamDTO> teamsDTO = new ArrayList<>();
-        for (Team t : e.getTeams()) {
-            TeamDTO projDto = Objects.isNull(t) ? null : new TeamDTO(t);
-            teamsDTO.add(projDto);
-        }
-        this.teams = teamsDTO;
-
         this.role = e.getRole();
-        this.org = e.getOrganisation();
+        this.org = Objects.isNull(e.getOrganisation()) ? null : new OrganisationDTO(e.getOrganisation());
         this.phone = e.getPhone();
     }
 
@@ -73,15 +64,11 @@ public class UserDTO extends EntityDTO<User> {
         return email;
     }
 
-    public List<TeamDTO> getTeams() {
-        return teams;
-    }
-
     public UserRole getRole() {
         return role;
     }
 
-    public Organisation getOrg() {
+    public OrganisationDTO getOrg() {
         return org;
     }
 

@@ -22,7 +22,7 @@ public class IssueDTO extends EntityDTO<Issue> {
 
     private final String issueKey;
 
-    private final String description;// (name)
+    private final String summary;// (name)
 
     private final IssueType type;
 
@@ -56,7 +56,7 @@ public class IssueDTO extends EntityDTO<Issue> {
     public IssueDTO(Issue e) {
         super(e);
         this.issueKey = e.getIssueKey();
-        this.description = e.getDescription();
+        this.summary = e.getSummary();
         this.type = e.getType();
         this.assignee = Objects.isNull(e.getAssignee()) ? null : new UserDTO(e.getAssignee());
         this.status = e.getStatus();
@@ -98,7 +98,7 @@ public class IssueDTO extends EntityDTO<Issue> {
     }
 
     public String getDescription() {
-        return description;
+        return summary;
     }
 
     public IssueType getType() {
@@ -159,8 +159,8 @@ public class IssueDTO extends EntityDTO<Issue> {
 
     @Override
     public String toString() {
-        return "IssueDTO [issueKey=" + issueKey + ", description=" + description + ", type=" + type + ", assignee="
-                + assignee + ", status=" + status + ", parentIssueId=" + parentIssueId + ", reportedBy=" + reportedBy
+        return "IssueDTO [issueKey=" + issueKey + ", summary=" + summary + ", type=" + type + ", assignee=" + assignee
+                + ", status=" + status + ", parentIssueId=" + parentIssueId + ", reportedBy=" + reportedBy
                 + ", startDate=" + startDate + ", endDate=" + endDate + ", versionStr=" + versionStr + ", priority="
                 + priority + ", label=" + label + "]";
     }

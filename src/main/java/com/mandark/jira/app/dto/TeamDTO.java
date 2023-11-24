@@ -34,7 +34,6 @@ public class TeamDTO extends EntityDTO<Team> {
             UserDTO userDto = Objects.isNull(n) ? null : new UserDTO(n);
             userDTOs.add(userDto);
         }
-
         this.users = userDTOs;
     }
 

@@ -34,13 +34,24 @@ import com.mandark.jira.spi.lang.ValidationException;
         uniqueConstraints = {@UniqueConstraint(columnNames = {"project_id", "issue_key"})})
 public class Issue extends JpaAuditEntity {
 
+    // Info
     private Project project;
-
     private String issueKey;
-
     private String summary;
 
+    // Dates
+    private Date startDate;
+    private Date endDate;
+
+    // Tags
     private IssueType type;
+    private String versionStr;
+    private IssuePriority priority;
+    private String label;
+
+    // Extra contents
+    private List<Attachment> attachments;
+    private List<Comment> comments;
 
     private User assignee;// (mem_id)
 
@@ -51,21 +62,6 @@ public class Issue extends JpaAuditEntity {
     private List<Sprint> sprint;
 
     private User reportedBy;// (user_id)
-
-    private Date startDate;
-
-    private Date endDate;
-
-    private String versionStr;
-
-    private IssuePriority priority;
-
-    private String label;
-
-    private List<Attachment> attachments;
-
-    private List<Comment> comments;
-
 
     // Constructors
     // ------------------------------------------------------------------------
