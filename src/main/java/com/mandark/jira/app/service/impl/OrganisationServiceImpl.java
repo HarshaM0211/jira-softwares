@@ -1,9 +1,7 @@
 package com.mandark.jira.app.service.impl;
 
 
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -24,6 +22,7 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
 
     // Fields
     // ------------------------------------------------------------------------
+
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganisationServiceImpl.class);
 
     // Constructor
@@ -33,7 +32,7 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
         super(dao);
     }
 
-    // AbstractJpaEntity Service methods
+    // Super Class implementations
     // ------------------------------------------------------------------------
 
     @Override
@@ -72,42 +71,13 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
 
     @Override
     @Transactional
-    public int create(OrganisationBean bean) {
-
-        // Sanity Checks
-        Verify.notNull(bean);
-
-        final Organisation organisation = createFromBean(bean);
-
-        final int id = dao.save(organisation);
-
-        LOGGER.info("#Create :: Organisation is created for the {} with the ID : {}", organisation.getName(), id);
+    public int create(final OrganisationBean bean) {
+        if (Objects.isNull(bean)) {
+            throw new IllegalArgumentException("[failed] - bean must not null");
+        }
+        final int id = super.save(bean);
 
         return id;
-
-    }
-
-    // Read
-    // ------------------------------------------------------------------------
-
-    @Override
-    public OrganisationDTO read(Integer orgId) {
-
-        Verify.notNull(orgId, "Organisation Id is NULL");
-
-        OrganisationDTO orgDTO = super.read(orgId);
-        return orgDTO;
-    }
-
-    @Override
-    public List<OrganisationDTO> read(int pageNo, int pageSize) {
-
-        List<Organisation> orgEntities = dao.read(Organisation.class, pageNo, pageSize);
-        List<OrganisationDTO> orgDtos = orgEntities.stream().map(e -> new OrganisationDTO(e))
-                .sorted((e1, e2) -> e1.getId().toString().compareTo(e2.getId().toString()))
-                .collect(Collectors.toList());
-
-        return orgDtos;
     }
 
     // Update
@@ -120,7 +90,7 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
         Verify.notNull(orgId, "Organisation Id is NULL");
         Verify.notNull(orgBean, "Organisation Bean is NULL");
 
-        this.update(orgId, orgBean);
+        super.update(orgId, orgBean);
     }
 
 }
