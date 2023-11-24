@@ -3,6 +3,7 @@ package com.mandark.jira.app.dto;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import com.mandark.jira.app.enums.IssuePriority;
 import com.mandark.jira.app.enums.IssueStatus;
@@ -57,13 +58,14 @@ public class IssueDTO extends EntityDTO<Issue> {
         this.issueKey = e.getIssueKey();
         this.description = e.getDescription();
         this.type = e.getType();
-        this.assignee = new UserDTO(e.getAssignee());
+        this.assignee = Objects.isNull(e.getAssignee()) ? null : new UserDTO(e.getAssignee());
         this.status = e.getStatus();
         this.parentIssueId = e.getParentIssueId();
 
         List<SprintDTO> sprintDTOs = new ArrayList<>();
         for (Sprint s : e.getSprint()) {
-            sprintDTOs.add(new SprintDTO(s));
+            SprintDTO sprintDto = Objects.isNull(s) ? null : new SprintDTO(s);
+            sprintDTOs.add(sprintDto);
         }
         this.sprints = sprintDTOs;
         this.reportedBy = new UserDTO(e.getReportedBy());
@@ -75,13 +77,15 @@ public class IssueDTO extends EntityDTO<Issue> {
 
         List<AttachmentDTO> attachmentsDTO = new ArrayList<>();
         for (Attachment a : e.getAttachments()) {
-            attachmentsDTO.add(new AttachmentDTO(a));
+            AttachmentDTO attDto = Objects.isNull(a) ? null : new AttachmentDTO(a);
+            attachmentsDTO.add(attDto);
         }
         this.attachments = attachmentsDTO;
 
         List<CommentDTO> commentsDTO = new ArrayList<>();
         for (Comment c : e.getComments()) {
-            commentsDTO.add(new CommentDTO(c));
+            CommentDTO cmntDto = Objects.isNull(c) ? null : new CommentDTO(c);
+            commentsDTO.add(cmntDto);
         }
         this.comments = commentsDTO;
     }

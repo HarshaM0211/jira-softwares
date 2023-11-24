@@ -2,6 +2,7 @@ package com.mandark.jira.app.dto;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import com.mandark.jira.app.persistence.orm.entity.Team;
 import com.mandark.jira.app.persistence.orm.entity.User;
@@ -26,11 +27,12 @@ public class TeamDTO extends EntityDTO<Team> {
     public TeamDTO(Team e) {
         super(e);
         this.name = e.getName();
-        this.teamLeader = new UserDTO(e.getTeamLeader());
+        this.teamLeader = Objects.isNull(e.getTeamLeader()) ? null : new UserDTO(e.getTeamLeader());
 
         List<UserDTO> userDTOs = new ArrayList<UserDTO>();
         for (User n : e.getUsers()) {
-            userDTOs.add(new UserDTO(n));
+            UserDTO userDto = Objects.isNull(n) ? null : new UserDTO(n);
+            userDTOs.add(userDto);
         }
 
         this.users = userDTOs;

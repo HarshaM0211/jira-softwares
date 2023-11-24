@@ -2,6 +2,7 @@ package com.mandark.jira.app.dto;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import com.mandark.jira.app.enums.UserRole;
 import com.mandark.jira.app.persistence.orm.entity.Organisation;
@@ -16,7 +17,7 @@ public class UserDTO extends EntityDTO<User> {
     // Fields
     // ------------------------------------------------------------------------
 
-    private final String userName;
+    private final String userName; // firstName + lastName
 
     private final String email;
 
@@ -28,6 +29,8 @@ public class UserDTO extends EntityDTO<User> {
 
     private final Organisation org;
 
+    private final String phone;
+
     // Constructors
     // ------------------------------------------------------------------------
 
@@ -38,18 +41,21 @@ public class UserDTO extends EntityDTO<User> {
 
         List<ProjectDTO> projectsDTO = new ArrayList<>();
         for (Project p : e.getProjects()) {
-            projectsDTO.add(new ProjectDTO(p));
+            ProjectDTO projDto = Objects.isNull(p) ? null : new ProjectDTO(p);
+            projectsDTO.add(projDto);
         }
         this.projects = projectsDTO;
 
         List<TeamDTO> teamsDTO = new ArrayList<>();
         for (Team t : e.getTeams()) {
-            teamsDTO.add(new TeamDTO(t));
+            TeamDTO projDto = Objects.isNull(t) ? null : new TeamDTO(t);
+            teamsDTO.add(projDto);
         }
         this.teams = teamsDTO;
 
         this.role = e.getRole();
         this.org = e.getOrganisation();
+        this.phone = e.getPhone();
     }
 
     // Getters
@@ -79,13 +85,16 @@ public class UserDTO extends EntityDTO<User> {
         return org;
     }
 
+    public String getPhone() {
+        return phone;
+    }
+
     // Object Methods
     // ------------------------------------------------------------------------
-
 
     @Override
     public String toString() {
         return "UserDTO [userName=" + userName + ", email=" + email + ", projects=" + projects + ", teams=" + teams
-                + ", role=" + role + ", organisation=" + org.getId() + "]";
+                + ", role=" + role + ", organisation=" + org.getId() + ", phone=" + phone + "]";
     }
 }

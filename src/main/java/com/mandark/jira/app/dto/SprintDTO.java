@@ -3,6 +3,7 @@ package com.mandark.jira.app.dto;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import com.mandark.jira.app.enums.SprintStatus;
 import com.mandark.jira.app.persistence.orm.entity.Issue;
@@ -37,7 +38,8 @@ public class SprintDTO extends EntityDTO<Sprint> {
 
         List<IssueDTO> issuesDTO = new ArrayList<>();
         for (Issue n : e.getIssues()) {
-            issuesDTO.add(new IssueDTO(n));
+            IssueDTO issueDto = Objects.isNull(n) ? null : new IssueDTO(n);
+            issuesDTO.add(issueDto);
         }
 
         this.issues = issuesDTO;

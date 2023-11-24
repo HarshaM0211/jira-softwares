@@ -2,6 +2,7 @@ package com.mandark.jira.app.dto;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import com.mandark.jira.app.persistence.orm.entity.Issue;
 import com.mandark.jira.app.persistence.orm.entity.Project;
@@ -40,19 +41,22 @@ public class ProjectDTO extends EntityDTO<Project> {
 
         List<SprintDTO> sprintDTOs = new ArrayList<>();
         for (Sprint s : e.getSprints()) {
-            sprintDTOs.add(new SprintDTO(s));
+            SprintDTO sprintDto = Objects.isNull(s) ? null : new SprintDTO(s);
+            sprintDTOs.add(sprintDto);
         }
         this.sprints = sprintDTOs;
 
         List<UserDTO> userDTOs = new ArrayList<>();
-        for (User om : e.getUsers()) {
-            userDTOs.add(new UserDTO(om));
+        for (User u : e.getUsers()) {
+            UserDTO userDto = Objects.isNull(u) ? null : new UserDTO(u);
+            userDTOs.add(userDto);
         }
         this.users = userDTOs;
 
         List<IssueDTO> issueDTOs = new ArrayList<>();
         for (Issue i : e.getIssues()) {
-            issueDTOs.add(new IssueDTO(i));
+            IssueDTO issueDto = Objects.isNull(i) ? null : new IssueDTO(i);
+            issueDTOs.add(issueDto);
         }
         this.issues = issueDTOs;
     }
