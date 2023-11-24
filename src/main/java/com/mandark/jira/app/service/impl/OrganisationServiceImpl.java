@@ -14,6 +14,7 @@ import com.mandark.jira.app.persistence.orm.entity.Organisation;
 import com.mandark.jira.app.service.OrganisationService;
 import com.mandark.jira.spi.app.persistence.IDao;
 import com.mandark.jira.spi.app.service.AbstractJpaEntityService;
+import com.mandark.jira.spi.util.Verify;
 
 
 public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisation, OrganisationBean, OrganisationDTO>
@@ -41,7 +42,6 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
 
     @Override
     protected OrganisationDTO toDTO(Organisation entityObj) {
-
         return Objects.isNull(entityObj) ? null : new OrganisationDTO(entityObj);
     }
 
@@ -62,6 +62,9 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
         return exEntity;
     }
 
+    // APIs
+    // ------------------------------------------------------------------------
+
 
     // Create
     // ------------------------------------------------------------------------
@@ -69,12 +72,10 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
     @Override
     @Transactional
     public int create(final OrganisationBean bean) {
+        // Sanity Checks
+        Verify.notNull(bean);
 
-        if (Objects.isNull(bean)) {
-            throw new IllegalArgumentException("[failed] - bean must not null");
-        }
         final int id = super.save(bean);
-
         return id;
     }
 
@@ -84,6 +85,10 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
     @Override
     @Transactional
     public void update(final Integer orgId, final OrganisationBean orgBean) {
+
+        // Sanity Checks
+        Verify.notNull(orgId, "Organisation Id is NULL");
+        Verify.notNull(orgBean, "Organisation Bean is NULL");
 
         super.update(orgId, orgBean);
     }

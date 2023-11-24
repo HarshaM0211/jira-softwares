@@ -168,6 +168,9 @@
     <bean id="organisationService" class="com.mandark.jira.app.service.impl.OrganisationServiceImpl">
         <constructor-arg name="dao" ref="genericJpaDao" />
     </bean>
+    <bean id="userService" class="com.mandark.jira.app.service.impl.UserServiceImpl">
+        <constructor-arg name="dao" ref="genericJpaDao" />
+    </bean>
  
 
 
@@ -187,6 +190,9 @@
     </bean>
     <bean id="organisationAPI" class="com.mandark.jira.web.rest.OrganisationAPI">
     <property name="orgService" ref="organisationService"/>
+    </bean>
+    <bean id="userAPI" class="com.mandark.jira.web.rest.UserAPI">
+    <property name="userService" ref="userService"/>
     </bean>
 
 
