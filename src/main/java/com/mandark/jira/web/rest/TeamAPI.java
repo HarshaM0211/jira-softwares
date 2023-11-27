@@ -57,15 +57,23 @@ public class TeamAPI extends AbstractAPI {
     }
 
     @RequestMapping(value = "/{teamId}/users", method = RequestMethod.PUT)
-    public ResponseEntity<?> addTeamMember(@RequestParam Integer userId, @PathVariable("teamId") Integer teamId) {
+    public ResponseEntity<?> addTeamMember(@RequestParam Integer userId, @PathVariable("teamId") Integer teamId,
+            @PathVariable("orgId") Integer orgId) {
 
-        teamService.addMember(userId, teamId);
+        if (teamService.isUserInOrg(userId, orgId)) {
+            teamService.addMember(userId, teamId);
+            final String msg =
+                    String.format("Successfully added User with ID :- %s to the Team with ID :- %s", userId, teamId);
+            LOGGER.info(msg);
+            return Responses.ok(msg);
+        }
 
-        String msg = String.format("Successfully added User with ID :- %s to the Team with ID :- %s", userId, teamId);
+        final String msg = String.format(
+                "UnSuccessfull! First, Add User with ID :- %s to the Organisation with ID :- %s", userId, orgId);
         LOGGER.info(msg);
-        return Responses.ok(msg);
-    }
+        return Responses.badRequest(msg);
 
+    }
 
     // Getters and Setters
     // ------------------------------------------------------------------------

@@ -60,7 +60,7 @@ public class User extends JpaAuditEntity {
     public void validate() {
 
         if (Objects.isNull(firstName)) {
-            throw new ValidationException("#validate :: userName is BLANK");
+            throw new ValidationException("#validate :: firstName is BLANK");
         }
 
         if (Objects.isNull(password)) {

@@ -4,8 +4,8 @@ import java.util.List;
 
 import com.mandark.jira.app.beans.TeamBean;
 import com.mandark.jira.app.dto.TeamDTO;
+import com.mandark.jira.app.dto.UserDTO;
 import com.mandark.jira.app.persistence.orm.entity.Team;
-import com.mandark.jira.spi.app.query.Criteria;
 import com.mandark.jira.spi.app.service.EntityService;
 
 
@@ -16,7 +16,9 @@ public interface TeamService extends EntityService<Integer, Team, TeamDTO> {
     void addMember(Integer userId, Integer teamId);
 
     List<TeamDTO> getTeamsByOrgId(final Integer orgId, final int pageNo, final int pageSize);
-    
+
+    boolean isUserInOrg(final Integer userId, final Integer orgId);
+
     int count(Integer orgId);
-    
+
 }
