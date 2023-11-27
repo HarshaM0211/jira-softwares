@@ -27,6 +27,8 @@ public class ProjectDTO extends EntityDTO<Project> {
 
     private final List<IssueDTO> issues;
 
+    private final List<UserDTO> users;
+
     // Constructors
     // ------------------------------------------------------------------------
 
@@ -50,6 +52,13 @@ public class ProjectDTO extends EntityDTO<Project> {
             issueDTOs.add(issueDto);
         }
         this.issues = issueDTOs;
+
+        List<UserDTO> userDTOs = new ArrayList<>();
+        for (User u : e.getUsers()) {
+            UserDTO userDto = Objects.isNull(u) ? null : new UserDTO(u);
+            userDTOs.add(userDto);
+        }
+        this.users = userDTOs;
     }
 
     // Getters and Setters
@@ -75,12 +84,16 @@ public class ProjectDTO extends EntityDTO<Project> {
         return issues;
     }
 
+    public List<UserDTO> getUsers() {
+        return users;
+    }
     // Object Methods
     // ------------------------------------------------------------------------
+
 
     @Override
     public String toString() {
         return "ProjectDTO [projectKey=" + projectKey + ", name=" + name + ", description=" + description + ", sprints="
-                + sprints + ", issues=" + issues + "]";
+                + sprints + ", issues=" + issues + ", users=" + users + "]";
     }
 }

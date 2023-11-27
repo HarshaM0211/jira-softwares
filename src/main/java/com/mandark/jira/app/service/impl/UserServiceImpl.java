@@ -176,7 +176,7 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
     public int count(final Integer orgId) {
 
         // Sanity Checks
-        Verify.notNull(orgId, "$count :: Organisation ID : orgId must be nonn NULL");
+        Verify.notNull(orgId, "$count :: Organisation ID : orgId must be non NULL");
 
         final int count = super.count(this.getOrgCriteria(orgId));
 
@@ -189,10 +189,10 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
     // Criteria
     // ------------------------------------------------------------------------
 
-    private Criteria getOrgCriteria(final Integer orgId) {
+    public Criteria getOrgCriteria(final Integer orgId) {
 
         // Sanity Checks
-        Verify.notNull(orgId, "$getOrgCriteria :: Organisation ID : orgId must be nonn NULL");
+        Verify.notNull(orgId, "$getOrgCriteria :: Organisation ID : orgId must be non NULL");
 
         final Organisation organisation = dao.read(Organisation.class, orgId, true);
         final Criteria criteria = Criteria.equal("organisation", organisation);

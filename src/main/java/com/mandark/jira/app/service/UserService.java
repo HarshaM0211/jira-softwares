@@ -5,6 +5,7 @@ import java.util.List;
 import com.mandark.jira.app.beans.UserBean;
 import com.mandark.jira.app.dto.UserDTO;
 import com.mandark.jira.app.persistence.orm.entity.User;
+import com.mandark.jira.spi.app.query.Criteria;
 import com.mandark.jira.spi.app.service.EntityService;
 
 
@@ -22,4 +23,5 @@ public interface UserService extends EntityService<Integer, User, UserDTO> {
 
     int count(final Integer orgId);
 
+    Criteria getOrgCriteria(final Integer orgId);
 }

@@ -1,13 +1,6 @@
 package com.mandark.jira.app.dto;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 import com.mandark.jira.app.enums.UserRole;
-import com.mandark.jira.app.persistence.orm.entity.Organisation;
-import com.mandark.jira.app.persistence.orm.entity.Project;
-import com.mandark.jira.app.persistence.orm.entity.Team;
 import com.mandark.jira.app.persistence.orm.entity.User;
 import com.mandark.jira.spi.app.EntityDTO;
 
@@ -21,11 +14,11 @@ public class UserDTO extends EntityDTO<User> {
 
     private final String email;
 
-    private final List<ProjectDTO> projects;
-
     private final UserRole role;
 
     private final String phone;
+
+    // private final List<ProjectDTO> projects;
 
     // Constructors
     // ------------------------------------------------------------------------
@@ -35,12 +28,12 @@ public class UserDTO extends EntityDTO<User> {
         this.userName = e.getFirstName() + e.getLastName();
         this.email = e.getEmail();
 
-        List<ProjectDTO> projectsDTO = new ArrayList<>();
-        for (Project p : e.getProjects()) {
-            ProjectDTO projDto = Objects.isNull(p) ? null : new ProjectDTO(p);
-            projectsDTO.add(projDto);
-        }
-        this.projects = projectsDTO;
+        // List<ProjectDTO> projectsDTO = new ArrayList<>();
+        // for (Project p : e.getProjects()) {
+        // ProjectDTO projDto = Objects.isNull(p) ? null : new ProjectDTO(p);
+        // projectsDTO.add(projDto);
+        // }
+        // this.projects = projectsDTO;
 
         this.role = e.getRole();
         this.phone = e.getPhone();
@@ -49,9 +42,9 @@ public class UserDTO extends EntityDTO<User> {
     // Getters
     // ------------------------------------------------------------------------
 
-    public List<ProjectDTO> getProjects() {
-        return projects;
-    }
+    // public List<ProjectDTO> getProjects() {
+    // return projects;
+    // }
 
     public String getUserName() {
         return userName;
@@ -74,7 +67,6 @@ public class UserDTO extends EntityDTO<User> {
 
     @Override
     public String toString() {
-        return "UserDTO [userName=" + userName + ", email=" + email + ", projects=" + projects + ", role=" + role
-                + ", phone=" + phone + "]";
+        return "UserDTO [userName=" + userName + ", email=" + email + ", role=" + role + ", phone=" + phone + "]";
     }
 }
