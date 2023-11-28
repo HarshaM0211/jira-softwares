@@ -17,8 +17,6 @@ public interface TeamService extends EntityService<Integer, Team, TeamDTO> {
 
     List<TeamDTO> getTeamsByOrgId(final Integer orgId, final int pageNo, final int pageSize);
 
-    boolean isUserInOrg(final Integer userId, final Integer orgId);
-
     int count(Integer orgId);
 
 }

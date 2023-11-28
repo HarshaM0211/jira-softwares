@@ -199,6 +199,7 @@
     </bean>
     <bean id="teamAPI" class="com.mandark.jira.web.rest.TeamAPI">
     <property name="teamService" ref="teamService"/>
+    <property name="userService" ref="userService"></property>
     </bean>
 
 

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.mandark.jira.app.beans.TeamBean;
 import com.mandark.jira.app.dto.TeamDTO;
 import com.mandark.jira.app.service.TeamService;
+import com.mandark.jira.app.service.UserService;
 import com.mandark.jira.spi.web.PageResult;
 import com.mandark.jira.spi.web.Pagination;
 import com.mandark.jira.spi.web.Responses;
@@ -29,6 +30,8 @@ public class TeamAPI extends AbstractAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(TeamAPI.class);
 
     private TeamService teamService;
+
+    private UserService userService;
 
 
     @RequestMapping(value = "", method = RequestMethod.POST)
@@ -60,7 +63,7 @@ public class TeamAPI extends AbstractAPI {
     public ResponseEntity<?> addTeamMember(@RequestParam Integer userId, @PathVariable("teamId") Integer teamId,
             @PathVariable("orgId") Integer orgId) {
 
-        if (teamService.isUserInOrg(userId, orgId)) {
+        if (userService.isUserInOrg(userId, orgId)) {
             teamService.addMember(userId, teamId);
             final String msg =
                     String.format("Successfully added User with ID :- %s to the Team with ID :- %s", userId, teamId);
@@ -80,6 +83,10 @@ public class TeamAPI extends AbstractAPI {
 
     public void setTeamService(TeamService teamService) {
         this.teamService = teamService;
+    }
+
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 
 }

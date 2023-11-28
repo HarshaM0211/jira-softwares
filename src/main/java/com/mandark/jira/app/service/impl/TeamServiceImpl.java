@@ -128,16 +128,4 @@ public class TeamServiceImpl extends AbstractJpaEntityService<Team, TeamBean, Te
         return criteria;
     }
 
-    @Override
-    public boolean isUserInOrg(final Integer userId, final Integer orgId) {
-
-        // Sanity Checks
-        Verify.notNull(userId);
-        Verify.notNull(orgId);
-
-        final User userEntity = dao.read(User.class, userId, true);
-
-        return orgId.equals(userEntity.getOrganisation().getId());
-    }
-
 }
