@@ -18,8 +18,6 @@ public class UserDTO extends EntityDTO<User> {
 
     private final String phone;
 
-    // private final List<ProjectDTO> projects;
-
     // Constructors
     // ------------------------------------------------------------------------
 
@@ -27,24 +25,12 @@ public class UserDTO extends EntityDTO<User> {
         super(e);
         this.userName = e.getFirstName() + e.getLastName();
         this.email = e.getEmail();
-
-        // List<ProjectDTO> projectsDTO = new ArrayList<>();
-        // for (Project p : e.getProjects()) {
-        // ProjectDTO projDto = Objects.isNull(p) ? null : new ProjectDTO(p);
-        // projectsDTO.add(projDto);
-        // }
-        // this.projects = projectsDTO;
-
         this.role = e.getRole();
         this.phone = e.getPhone();
     }
 
     // Getters
     // ------------------------------------------------------------------------
-
-    // public List<ProjectDTO> getProjects() {
-    // return projects;
-    // }
 
     public String getUserName() {
         return userName;
