@@ -72,10 +72,12 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
     @Override
     @Transactional
     public int create(final OrganisationBean bean) {
+
         // Sanity Checks
         Verify.notNull(bean);
 
         final int id = super.save(bean);
+
         return id;
     }
 
