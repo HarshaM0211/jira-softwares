@@ -2,14 +2,12 @@ package com.mandark.jira.app.dto;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import com.mandark.jira.app.enums.UserRole;
-import com.mandark.jira.app.persistence.orm.entity.Organisation;
 import com.mandark.jira.app.persistence.orm.entity.Project;
-import com.mandark.jira.app.persistence.orm.entity.Team;
 import com.mandark.jira.app.persistence.orm.entity.User;
 import com.mandark.jira.spi.app.EntityDTO;
+import com.mandark.jira.spi.util.Values;
 
 
 public class UserDTO extends EntityDTO<User> {
@@ -37,7 +35,7 @@ public class UserDTO extends EntityDTO<User> {
 
         List<ProjectDTO> projectsDTO = new ArrayList<>();
         for (Project p : e.getProjects()) {
-            ProjectDTO projDto = Objects.isNull(p) ? null : new ProjectDTO(p);
+            ProjectDTO projDto = Values.get(p, i -> new ProjectDTO(i));
             projectsDTO.add(projDto);
         }
         this.projects = projectsDTO;

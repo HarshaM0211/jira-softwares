@@ -2,13 +2,12 @@ package com.mandark.jira.app.dto;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import com.mandark.jira.app.persistence.orm.entity.Issue;
 import com.mandark.jira.app.persistence.orm.entity.Project;
 import com.mandark.jira.app.persistence.orm.entity.Sprint;
-import com.mandark.jira.app.persistence.orm.entity.User;
 import com.mandark.jira.spi.app.EntityDTO;
+import com.mandark.jira.spi.util.Values;
 
 
 
@@ -39,14 +38,14 @@ public class ProjectDTO extends EntityDTO<Project> {
 
         List<SprintDTO> sprintDTOs = new ArrayList<>();
         for (Sprint s : e.getSprints()) {
-            SprintDTO sprintDto = Objects.isNull(s) ? null : new SprintDTO(s);
+            SprintDTO sprintDto = Values.get(s, i -> new SprintDTO(i));
             sprintDTOs.add(sprintDto);
         }
         this.sprints = sprintDTOs;
 
         List<IssueDTO> issueDTOs = new ArrayList<>();
-        for (Issue i : e.getIssues()) {
-            IssueDTO issueDto = Objects.isNull(i) ? null : new IssueDTO(i);
+        for (Issue iss : e.getIssues()) {
+            IssueDTO issueDto = Values.get(iss, i -> new IssueDTO(i));
             issueDTOs.add(issueDto);
         }
         this.issues = issueDTOs;

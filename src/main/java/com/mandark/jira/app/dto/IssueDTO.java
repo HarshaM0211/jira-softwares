@@ -3,7 +3,6 @@ package com.mandark.jira.app.dto;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 import com.mandark.jira.app.enums.IssuePriority;
 import com.mandark.jira.app.enums.IssueStatus;
@@ -13,6 +12,7 @@ import com.mandark.jira.app.persistence.orm.entity.Comment;
 import com.mandark.jira.app.persistence.orm.entity.Issue;
 import com.mandark.jira.app.persistence.orm.entity.Sprint;
 import com.mandark.jira.spi.app.EntityDTO;
+import com.mandark.jira.spi.util.Values;
 
 
 public class IssueDTO extends EntityDTO<Issue> {
@@ -58,13 +58,13 @@ public class IssueDTO extends EntityDTO<Issue> {
         this.issueKey = e.getIssueKey();
         this.summary = e.getSummary();
         this.type = e.getType();
-        this.assignee = Objects.isNull(e.getAssignee()) ? null : new UserDTO(e.getAssignee());
+        this.assignee = Values.get(e.getAssignee(), i -> new UserDTO(i));
         this.status = e.getStatus();
         this.parentIssueId = e.getParentIssueId();
 
         List<SprintDTO> sprintDTOs = new ArrayList<>();
         for (Sprint s : e.getSprint()) {
-            SprintDTO sprintDto = Objects.isNull(s) ? null : new SprintDTO(s);
+            SprintDTO sprintDto = Values.get(s, i -> new SprintDTO(i));
             sprintDTOs.add(sprintDto);
         }
         this.sprints = sprintDTOs;
@@ -77,14 +77,14 @@ public class IssueDTO extends EntityDTO<Issue> {
 
         List<AttachmentDTO> attachmentsDTO = new ArrayList<>();
         for (Attachment a : e.getAttachments()) {
-            AttachmentDTO attDto = Objects.isNull(a) ? null : new AttachmentDTO(a);
+            AttachmentDTO attDto = Values.get(a, i -> new AttachmentDTO(i));
             attachmentsDTO.add(attDto);
         }
         this.attachments = attachmentsDTO;
 
         List<CommentDTO> commentsDTO = new ArrayList<>();
         for (Comment c : e.getComments()) {
-            CommentDTO cmntDto = Objects.isNull(c) ? null : new CommentDTO(c);
+            CommentDTO cmntDto = Values.get(c, i -> new CommentDTO(i));
             commentsDTO.add(cmntDto);
         }
         this.comments = commentsDTO;
