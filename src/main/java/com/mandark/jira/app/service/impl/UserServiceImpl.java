@@ -223,4 +223,16 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
         throw new IllegalArgumentException(msg);
     }
 
+    @Override
+    public boolean isUserInOrg(final Integer userId, final Integer orgId) {
+
+        // Sanity Checks
+        Verify.notNull(userId);
+        Verify.notNull(orgId);
+
+        final User userEntity = dao.read(User.class, userId, true);
+
+        return orgId.equals(userEntity.getOrganisation().getId());
+    }
+
 }

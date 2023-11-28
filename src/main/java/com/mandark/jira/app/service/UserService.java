@@ -22,4 +22,5 @@ public interface UserService extends EntityService<Integer, User, UserDTO> {
 
     int count(final Integer orgId);
 
+    boolean isUserInOrg(final Integer userId, final Integer orgId);
 }
