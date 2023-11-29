@@ -38,8 +38,6 @@ public class User extends JpaAuditEntity {
 
     private List<Project> projects;
 
-    private List<Team> teams;
-
     private UserRole role;
 
     private String phone;
@@ -142,15 +140,6 @@ public class User extends JpaAuditEntity {
 
     public void setProjects(List<Project> projects) {
         this.projects = projects;
-    }
-
-    @ManyToMany(mappedBy = "users")
-    public List<Team> getTeams() {
-        return teams;
-    }
-
-    public void setTeams(List<Team> teams) {
-        this.teams = teams;
     }
 
     @Column(name = "role")

@@ -1,13 +1,11 @@
 package com.mandark.jira.app.persistence.orm.entity;
 
-import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -28,8 +26,6 @@ public class Team extends JpaAuditEntity {
     private Organisation organisation;
 
     private User teamLeader; // (user_id)
-
-    private List<User> users; // (team_members)
 
     // Constructors
     // ------------------------------------------------------------------------
@@ -86,23 +82,13 @@ public class Team extends JpaAuditEntity {
         this.teamLeader = team_leader;
     }
 
-    @ManyToMany
-    @JoinColumn(name = "user_id")
-    public List<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(List<User> org_members) {
-        this.users = org_members;
-    }
-
     // Object Methods
     // ------------------------------------------------------------------------
 
     @Override
     public String toString() {
         return "Teams [name=" + name + ", organisation=" + organisation.getId() + ", team_leader=" + teamLeader.getId()
-                + ", team_members=" + users + "]";
+                + "]";
     }
 
 
