@@ -11,12 +11,14 @@ import com.mandark.jira.spi.app.service.EntityService;
 
 public interface TeamService extends EntityService<Integer, Team, TeamDTO> {
 
-    int create(Integer orgId, TeamBean teamBean);
-
-    void addMember(Integer userId, Integer teamId);
+    int create(final Integer orgId, TeamBean teamBean);
 
     List<TeamDTO> getTeamsByOrgId(final Integer orgId, final int pageNo, final int pageSize);
 
-    int count(Integer orgId);
+    List<UserDTO> getUsersByTeamId(final Integer teamId, int pageNo, int pageSize);
+
+    int count(final Integer orgId);
+
+    void addMember(final Integer userId, final Integer teamId);
 
 }

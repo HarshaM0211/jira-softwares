@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.mandark.jira.app.beans.TeamBean;
 import com.mandark.jira.app.dto.TeamDTO;
+import com.mandark.jira.app.dto.UserDTO;
 import com.mandark.jira.app.service.TeamService;
 import com.mandark.jira.app.service.UserService;
 import com.mandark.jira.spi.web.PageResult;
@@ -76,6 +77,21 @@ public class TeamAPI extends AbstractAPI {
         LOGGER.info(msg);
         return Responses.badRequest(msg);
 
+    }
+
+    @RequestMapping(value = "/{teamId}/users", method = RequestMethod.GET)
+    public ResponseEntity<?> getUsersByTeamId(@PathVariable("teamId") Integer teamId,
+            @RequestParam(name = WebConstants.REQ_PARAM_PAGE_NO,
+                    defaultValue = WebConstants.DEFAULT_PAGE_NO) int pageNo,
+            @RequestParam(name = WebConstants.REQ_PARAM_PAGE_SIZE,
+                    defaultValue = WebConstants.DEFAULT_PAGE_SIZE) int pageSize) {
+
+        List<UserDTO> userDtos = teamService.getUsersByTeamId(teamId, pageNo, pageSize);
+
+        Pagination pagination = Pagination.with(userDtos.size(), pageNo, pageSize);
+        PageResult pageResult = PageResult.with(pagination, userDtos);
+
+        return new ResponseEntity<>(pageResult, HttpStatus.OK);
     }
 
     // Getters and Setters
