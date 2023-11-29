@@ -12,7 +12,7 @@ import com.mandark.jira.spi.lang.ValidationException;
 
 
 @Entity
-@Table(name = "teams_users_test")
+@Table(name = "teams_users")
 public class TeamUser extends JpaAuditEntity {
 
     // Fields
