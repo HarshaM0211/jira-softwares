@@ -20,6 +20,7 @@
 		<class>com.mandark.jira.app.persistence.orm.entity.Sprint</class>
 		<class>com.mandark.jira.app.persistence.orm.entity.Team</class>
 		<class>com.mandark.jira.app.persistence.orm.entity.User</class>
+		<class>com.mandark.jira.app.persistence.orm.entity.TeamUser</class>
 
 
 		<!-- Meta -->

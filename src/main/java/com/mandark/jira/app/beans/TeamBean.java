@@ -11,8 +11,6 @@ public class TeamBean implements EntityBean<Team> {
     // ------------------------------------------------------------------------
     private String name;
 
-    private Organisation organisation;
-
     // Constructors
     // ------------------------------------------------------------------------
 
@@ -23,7 +21,6 @@ public class TeamBean implements EntityBean<Team> {
     public TeamBean(String name, Organisation organisation) {
         super();
         this.name = name;
-        this.organisation = organisation;
     }
 
     // Getters and Setters
@@ -37,19 +34,11 @@ public class TeamBean implements EntityBean<Team> {
         this.name = name;
     }
 
-    public Organisation getOrganisation() {
-        return organisation;
-    }
-
-    public void setOrganisation(Organisation organisation) {
-        this.organisation = organisation;
-    }
-
     // Object Methods
     // ------------------------------------------------------------------------
 
     @Override
     public String toString() {
-        return "TeamBean [name=" + name + ", organisation=" + organisation + "]";
+        return "TeamBean [name=" + name + "]";
     }
 }
