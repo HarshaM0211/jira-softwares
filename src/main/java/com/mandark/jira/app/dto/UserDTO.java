@@ -35,7 +35,7 @@ public class UserDTO extends EntityDTO<User> {
 
         List<ProjectDTO> projectsDTO = new ArrayList<>();
         for (Project p : e.getProjects()) {
-            ProjectDTO projDto = Values.get(p, i -> new ProjectDTO(i));
+            ProjectDTO projDto = Values.get(p, ProjectDTO::new);
             projectsDTO.add(projDto);
         }
         this.projects = projectsDTO;

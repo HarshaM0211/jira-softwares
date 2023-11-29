@@ -38,14 +38,14 @@ public class ProjectDTO extends EntityDTO<Project> {
 
         List<SprintDTO> sprintDTOs = new ArrayList<>();
         for (Sprint s : e.getSprints()) {
-            SprintDTO sprintDto = Values.get(s, i -> new SprintDTO(i));
+            SprintDTO sprintDto = Values.get(s, SprintDTO::new);
             sprintDTOs.add(sprintDto);
         }
         this.sprints = sprintDTOs;
 
         List<IssueDTO> issueDTOs = new ArrayList<>();
         for (Issue iss : e.getIssues()) {
-            IssueDTO issueDto = Values.get(iss, i -> new IssueDTO(i));
+            IssueDTO issueDto = Values.get(iss, IssueDTO::new);
             issueDTOs.add(issueDto);
         }
         this.issues = issueDTOs;

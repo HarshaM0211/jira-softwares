@@ -21,7 +21,7 @@ public class TeamDTO extends EntityDTO<Team> {
     public TeamDTO(Team e) {
         super(e);
         this.name = e.getName();
-        this.teamLeader = Values.get(e.getTeamLeader(), i -> new UserDTO(i));
+        this.teamLeader = Values.get(e.getTeamLeader(), UserDTO::new);
     }
 
     // Getters

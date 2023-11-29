@@ -38,7 +38,7 @@ public class SprintDTO extends EntityDTO<Sprint> {
 
         List<IssueDTO> issuesDTO = new ArrayList<>();
         for (Issue n : e.getIssues()) {
-            IssueDTO issueDto = Values.get(n, i -> new IssueDTO(i));
+            IssueDTO issueDto = Values.get(n, IssueDTO::new);
             issuesDTO.add(issueDto);
         }
 

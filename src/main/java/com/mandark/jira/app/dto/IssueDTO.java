@@ -58,13 +58,13 @@ public class IssueDTO extends EntityDTO<Issue> {
         this.issueKey = e.getIssueKey();
         this.summary = e.getSummary();
         this.type = e.getType();
-        this.assignee = Values.get(e.getAssignee(), i -> new UserDTO(i));
+        this.assignee = Values.get(e.getAssignee(), UserDTO::new);
         this.status = e.getStatus();
         this.parentIssueId = e.getParentIssueId();
 
         List<SprintDTO> sprintDTOs = new ArrayList<>();
         for (Sprint s : e.getSprint()) {
-            SprintDTO sprintDto = Values.get(s, i -> new SprintDTO(i));
+            SprintDTO sprintDto = Values.get(s, SprintDTO::new);
             sprintDTOs.add(sprintDto);
         }
         this.sprints = sprintDTOs;
@@ -77,14 +77,14 @@ public class IssueDTO extends EntityDTO<Issue> {
 
         List<AttachmentDTO> attachmentsDTO = new ArrayList<>();
         for (Attachment a : e.getAttachments()) {
-            AttachmentDTO attDto = Values.get(a, i -> new AttachmentDTO(i));
+            AttachmentDTO attDto = Values.get(a, AttachmentDTO::new);
             attachmentsDTO.add(attDto);
         }
         this.attachments = attachmentsDTO;
 
         List<CommentDTO> commentsDTO = new ArrayList<>();
         for (Comment c : e.getComments()) {
-            CommentDTO cmntDto = Values.get(c, i -> new CommentDTO(i));
+            CommentDTO cmntDto = Values.get(c, CommentDTO::new);
             commentsDTO.add(cmntDto);
         }
         this.comments = commentsDTO;
