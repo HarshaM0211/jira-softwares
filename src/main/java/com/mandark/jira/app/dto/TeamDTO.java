@@ -15,6 +15,8 @@ public class TeamDTO extends EntityDTO<Team> {
 
     private final UserDTO teamLeader; // (org_mem_id)
 
+    private final String description;
+
     // Constructors
     // ------------------------------------------------------------------------
 
@@ -22,6 +24,7 @@ public class TeamDTO extends EntityDTO<Team> {
         super(e);
         this.name = e.getName();
         this.teamLeader = Values.get(e.getTeamLeader(), UserDTO::new);
+        this.description = e.getDescription();
     }
 
     // Getters
@@ -35,12 +38,16 @@ public class TeamDTO extends EntityDTO<Team> {
         return teamLeader;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
     // Object Methods
     // ------------------------------------------------------------------------
 
     @Override
     public String toString() {
-        return "TeamDTO [name=" + name + ", teamLeader=" + teamLeader + "]";
+        return "TeamDTO [name=" + name + ", teamLeader=" + teamLeader + ", description=" + description + "]";
     }
 
 }

@@ -51,6 +51,7 @@ public class TeamServiceImpl extends AbstractJpaEntityService<Team, TeamBean, Te
             return exEntity;
         }
         exEntity.setName(entityBean.getName());
+        exEntity.setDescription(entityBean.getDescription());
 
         return exEntity;
     }

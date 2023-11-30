@@ -27,6 +27,8 @@ public class Team extends JpaAuditEntity {
 
     private User teamLeader; // (user_id)
 
+    private String description;
+
     // Constructors
     // ------------------------------------------------------------------------
 
@@ -82,12 +84,23 @@ public class Team extends JpaAuditEntity {
         this.teamLeader = team_leader;
     }
 
+    @Column(name = "description")
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     // Object Methods
     // ------------------------------------------------------------------------
 
+
     @Override
     public String toString() {
-        return "Teams [name=" + name + ", organisation=" + organisation.getId() + ", team_leader=" + teamLeader + "]";
+        return "Teams [name=" + name + ", organisation=" + organisation.getId() + ", team_leader=" + teamLeader
+                + ", description=" + description + "]";
     }
 
 
