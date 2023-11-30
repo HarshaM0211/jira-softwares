@@ -36,7 +36,7 @@ public class SprintDTO extends EntityDTO<Sprint> {
         this.startDate = e.getStartDate();
         this.endDate = e.getEndDate();
 
-        List<IssueDTO> issuesDTO = new ArrayList<>();
+        final List<IssueDTO> issuesDTO = new ArrayList<>();
         for (Issue n : e.getIssues()) {
             IssueDTO issueDto = Values.get(n, IssueDTO::new);
             issuesDTO.add(issueDto);

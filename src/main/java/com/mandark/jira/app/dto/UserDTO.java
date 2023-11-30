@@ -33,7 +33,7 @@ public class UserDTO extends EntityDTO<User> {
         this.userName = e.getFirstName() + e.getLastName();
         this.email = e.getEmail();
 
-        List<ProjectDTO> projectsDTO = new ArrayList<>();
+        final List<ProjectDTO> projectsDTO = new ArrayList<>();
         for (Project p : e.getProjects()) {
             ProjectDTO projDto = Values.get(p, ProjectDTO::new);
             projectsDTO.add(projDto);

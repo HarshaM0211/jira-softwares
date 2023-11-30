@@ -62,7 +62,7 @@ public class IssueDTO extends EntityDTO<Issue> {
         this.status = e.getStatus();
         this.parentIssueId = e.getParentIssueId();
 
-        List<SprintDTO> sprintDTOs = new ArrayList<>();
+        final List<SprintDTO> sprintDTOs = new ArrayList<>();
         for (Sprint s : e.getSprint()) {
             SprintDTO sprintDto = Values.get(s, SprintDTO::new);
             sprintDTOs.add(sprintDto);
@@ -75,14 +75,14 @@ public class IssueDTO extends EntityDTO<Issue> {
         this.priority = e.getPriority();
         this.label = e.getLabel();
 
-        List<AttachmentDTO> attachmentsDTO = new ArrayList<>();
+        final List<AttachmentDTO> attachmentsDTO = new ArrayList<>();
         for (Attachment a : e.getAttachments()) {
             AttachmentDTO attDto = Values.get(a, AttachmentDTO::new);
             attachmentsDTO.add(attDto);
         }
         this.attachments = attachmentsDTO;
 
-        List<CommentDTO> commentsDTO = new ArrayList<>();
+        final List<CommentDTO> commentsDTO = new ArrayList<>();
         for (Comment c : e.getComments()) {
             CommentDTO cmntDto = Values.get(c, CommentDTO::new);
             commentsDTO.add(cmntDto);
