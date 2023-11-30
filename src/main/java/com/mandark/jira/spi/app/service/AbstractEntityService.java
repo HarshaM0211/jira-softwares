@@ -15,10 +15,12 @@ import org.slf4j.LoggerFactory;
 
 import com.mandark.jira.spi.app.EntityBean;
 import com.mandark.jira.spi.app.EntityDTO;
+import com.mandark.jira.spi.app.SearchQuery;
 import com.mandark.jira.spi.app.persistence.IDao;
 import com.mandark.jira.spi.app.persistence.IEntity;
 import com.mandark.jira.spi.app.query.Criteria;
 import com.mandark.jira.spi.app.query.OrderBy;
+import com.mandark.jira.spi.lang.NotImplementedException;
 import com.mandark.jira.spi.lang.ObjectNotFoundException;
 
 
@@ -89,14 +91,15 @@ abstract class AbstractEntityService<K, E extends IEntity<K>, EB extends EntityB
 
     // Entity
 
-    protected E readEntity(final K id, final boolean errorIfNotFound) {
+    protected <IE extends IEntity<K>> IE readEntity(final Class<IE> entityCls, final K id,
+            final boolean errorIfNotFound) {
         // Sanity checks
         if (Objects.isNull(id)) {
-            throw new IllegalArgumentException("#readEntity :: Entity ID is BLANK");
+            return null;
         }
 
         // Read
-        final E entityObj = this.dao.read(this.getEntityClass(), id, false);
+        final IE entityObj = this.dao.read(entityCls, id, false);
         if (errorIfNotFound && Objects.isNull(entityObj)) {
             String entityName = this.getEntityName();
             String errMsg = String.format("#readEntity :: No Object found with id : %s - %s", entityName, id);
@@ -107,8 +110,7 @@ abstract class AbstractEntityService<K, E extends IEntity<K>, EB extends EntityB
         return entityObj;
     }
 
-
-    protected Map<K, E> readEntities(final Collection<K> inIds) {
+    protected <IE extends IEntity<K>> Map<K, IE> readEntities(final Class<IE> entityCls, final Collection<K> inIds) {
         // Sanity checks
         if (Objects.isNull(inIds) || inIds.isEmpty()) {
             return new HashMap<>();
@@ -116,19 +118,56 @@ abstract class AbstractEntityService<K, E extends IEntity<K>, EB extends EntityB
 
         // Read :: IDs
         final Set<K> ids = inIds.stream().filter(Objects::nonNull).collect(Collectors.toSet());
-        final List<E> entityObjs = this.dao.read(this.getEntityClass(), ids);
+        final List<IE> entityObjs = this.dao.read(entityCls, ids);
         if (Objects.isNull(entityObjs) || entityObjs.isEmpty()) {
             return new HashMap<>();
         }
 
         // asMap
-        final Map<K, E> entityIdMap = entityObjs.stream() //
+        final Map<K, IE> entityIdMap = entityObjs.stream() //
                 .filter(Objects::nonNull) //
-                .collect(Collectors.toMap(E::getId, Function.identity()));
+                .collect(Collectors.toMap(IE::getId, Function.identity()));
 
         return entityIdMap;
     }
 
+    // Find
+
+    protected int count(Criteria criteria) {
+        // Sanity checks
+        if (Objects.isNull(criteria)) {
+            throw new IllegalArgumentException("#count :: entity Criteria is NULL");
+        }
+
+        // Count
+        final int count = this.dao.count(this.getEntityClass(), criteria);
+        LOGGER.debug("# of entity objects found for critera :: {} - {} : {}", this.getEntityClass(), criteria, count);
+
+        return count;
+    }
+
+    protected List<ED> find(Criteria criteria, int pageNo, int pageSize) {
+        return this.find(criteria, null, pageNo, pageSize);
+    }
+
+    protected List<ED> find(Criteria criteria, OrderBy orderBy, int pageNo, int pageSize) {
+        // Sanity checks
+        if (Objects.isNull(criteria)) {
+            throw new IllegalArgumentException("#find :: entity Criteria is NULL");
+        }
+
+        // Find
+        final List<E> entityObjs = this.dao.find(this.getEntityClass(), criteria, orderBy, pageNo, pageSize);
+        return this.toDTOs(entityObjs);
+    }
+
+    // Search
+
+    protected Criteria asCriteria(final SearchQuery<? extends E> searchQuery) {
+        final String errMsg = String.format("Search is not Implemented for : %s", this.getEntityName());
+        LOGGER.error(errMsg);
+        throw new NotImplementedException(errMsg);
+    }
 
 
     // EntityService Methods
@@ -204,39 +243,35 @@ abstract class AbstractEntityService<K, E extends IEntity<K>, EB extends EntityB
     }
 
 
-
-    // Other Methods
-    // ------------------------------------------------------------------------
-
-    // Find / Search
-
-    protected int count(Criteria criteria) {
+    @Override
+    public int count(final SearchQuery<? extends E> searchQuery) {
         // Sanity checks
-        if (Objects.isNull(criteria)) {
-            throw new IllegalArgumentException("#count :: entity Criteria is NULL");
+        if (Objects.isNull(searchQuery)) {
+            throw new IllegalArgumentException("#count :: SearchQuery object is NULL");
         }
+
+        // SearchQuery as Criteria
+        final Criteria criteria = this.asCriteria(searchQuery);
 
         // Count
         final int count = this.dao.count(this.getEntityClass(), criteria);
-        LOGGER.debug("# of entity objects found for critera :: {} - {} : {}", this.getEntityClass(), criteria, count);
+        LOGGER.debug("# of objects found for search :: {} - {} : {}", this.getEntityClass(), criteria, count);
 
         return count;
     }
 
-    protected List<ED> find(Criteria criteria, int pageNo, int pageSize) {
-        return this.find(criteria, null, pageNo, pageSize);
-    }
-
-    protected List<ED> find(Criteria criteria, OrderBy orderBy, int pageNo, int pageSize) {
+    @Override
+    public List<ED> search(final SearchQuery<? extends E> searchQuery, final int pageNo, final int pageSize) {
         // Sanity checks
-        if (Objects.isNull(criteria)) {
-            throw new IllegalArgumentException("#find :: entity Criteria is NULL");
+        if (Objects.isNull(searchQuery)) {
+            throw new IllegalArgumentException("#search :: SearchQuery object is NULL");
         }
 
+        // SearchQuery as Criteria
+        final Criteria criteria = this.asCriteria(searchQuery);
+
         // Find
-        final List<E> entityObjs = this.dao.find(this.getEntityClass(), criteria, orderBy, pageNo, pageSize);
+        final List<E> entityObjs = this.dao.find(this.getEntityClass(), criteria, pageNo, pageSize);
         return this.toDTOs(entityObjs);
     }
-
-
 }
