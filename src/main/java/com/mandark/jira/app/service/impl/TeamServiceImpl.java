@@ -61,17 +61,15 @@ public class TeamServiceImpl extends AbstractJpaEntityService<Team, TeamBean, Te
 
     @Override
     @Transactional
-    public int create(final Integer orgId, final String teamName) {
+    public int create(final Integer orgId, final TeamBean teamBean) {
 
         // Sanity Checks
         Verify.notNull(orgId, "$create :: orgId must be non NULL");
-        Verify.notNull(teamName, "$create :: teamName must be non NULL");
+        Verify.notNull(teamBean, "$create :: teamBean must be non NULL");
 
         final Organisation organisation = dao.read(Organisation.class, orgId, true);
 
-        final Team team = new Team();
-        team.setName(teamName);
-        team.setOrganisation(organisation);
+        final Team team = this.createFromBean(teamBean);
 
         final int teamId = dao.save(team);
 
