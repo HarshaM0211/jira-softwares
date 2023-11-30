@@ -42,7 +42,6 @@ public class TeamUser extends JpaAuditEntity {
         if (Objects.isNull(user)) {
             throw new ValidationException("#validate :: user is BLANK");
         }
-
     }
 
     // Getters and Setters
@@ -75,7 +74,4 @@ public class TeamUser extends JpaAuditEntity {
     public String toString() {
         return "TeamUser [team=" + team + ", user=" + user + "]";
     }
-
-
-
 }
