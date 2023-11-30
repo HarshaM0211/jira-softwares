@@ -24,7 +24,7 @@ import com.mandark.jira.web.WebConstants;
 
 
 @RestController
-@RequestMapping("/api/v1/{orgId}/teams")
+@RequestMapping("/api/v1/orgs/{orgId}/teams")
 public class TeamAPI extends AbstractAPI {
 
     // Fields
