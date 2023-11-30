@@ -126,6 +126,14 @@ public class TeamUserServiceImpl implements TeamUserService {
         final Criteria teamAndUserCriteria = this.getTeamAndUserCriteria(teamId, userId);
         final TeamUser teamUserEntity = dao.findOne(this.getEntityClass(), teamAndUserCriteria);
 
+        if (Objects.isNull(teamUserEntity)) {
+
+            final String msg = String.format("UnSuccessful! Cannot find User with Id : %s, in the Team with Id : %s",
+                    userId, teamId);
+            LOGGER.info(msg);
+
+            return;
+        }
         dao.purge(this.getEntityClass(), teamUserEntity.getId());
 
         final String msg =
