@@ -267,8 +267,8 @@ public class Issue extends JpaAuditEntity {
     @Override
     public String toString() {
         return "Issues [project=" + project.getId() + ", issue_key=" + issueKey + ", summary=" + summary + ", type="
-                + type + ", assignee=" + assignee.getFirstName() + assignee.getLastName() + ", status=" + status
-                + ", parent_issue_id=" + parentIssueId + ", reported_by=" + reportedBy.getId() + "]";
+                + type + ", assignee=" + assignee + ", status=" + status + ", parent_issue_id=" + parentIssueId
+                + ", reported_by=" + reportedBy.getId() + "]";
     }
 
 

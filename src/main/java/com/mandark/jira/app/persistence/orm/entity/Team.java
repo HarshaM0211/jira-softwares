@@ -87,8 +87,7 @@ public class Team extends JpaAuditEntity {
 
     @Override
     public String toString() {
-        return "Teams [name=" + name + ", organisation=" + organisation.getId() + ", team_leader=" + teamLeader.getId()
-                + "]";
+        return "Teams [name=" + name + ", organisation=" + organisation.getId() + ", team_leader=" + teamLeader + "]";
     }
 
 

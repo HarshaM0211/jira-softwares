@@ -167,8 +167,8 @@ public class User extends JpaAuditEntity {
 
     @Override
     public String toString() {
-        return "Users [user_name=" + firstName + lastName + ", user_email=" + email + ", organisation="
-                + organisation.getName() + ", role=" + role + "]";
+        return "Users [user_name=" + firstName + lastName + ", user_email=" + email + ", organisation=" + organisation
+                + ", role=" + role + "]";
     }
 
 
