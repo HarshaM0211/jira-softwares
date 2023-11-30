@@ -7,7 +7,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -35,10 +34,6 @@ public class User extends JpaAuditEntity {
     private Organisation organisation;
 
     private List<Comment> comments;
-
-    private List<Project> projects;
-
-    private List<Team> teams;
 
     private UserRole role;
 
@@ -73,9 +68,7 @@ public class User extends JpaAuditEntity {
         if (Objects.isNull(phone)) {
             throw new ValidationException("#validate :: phone is BLANK");
         }
-
     }
-
 
     // Getters and Setters
     // ------------------------------------------------------------------------
@@ -135,24 +128,6 @@ public class User extends JpaAuditEntity {
         this.comments = comments;
     }
 
-    @ManyToMany(mappedBy = "users")
-    public List<Project> getProjects() {
-        return projects;
-    }
-
-    public void setProjects(List<Project> projects) {
-        this.projects = projects;
-    }
-
-    @ManyToMany(mappedBy = "users")
-    public List<Team> getTeams() {
-        return teams;
-    }
-
-    public void setTeams(List<Team> teams) {
-        this.teams = teams;
-    }
-
     @Column(name = "role")
     public UserRole getRole() {
         return role;
@@ -174,14 +149,10 @@ public class User extends JpaAuditEntity {
     // Object Methods
     // ------------------------------------------------------------------------
 
-
-
     @Override
     public String toString() {
-        return "Users [user_name=" + firstName + lastName + ", user_email=" + email + ", organisation="
-                + organisation.getName() + ", role=" + role + "]";
+        return "Users [user_name=" + firstName + lastName + ", user_email=" + email + ", organisation=" + organisation
+                + ", role=" + role + "]";
     }
-
-
 
 }
