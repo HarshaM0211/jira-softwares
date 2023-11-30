@@ -1,6 +1,5 @@
 package com.mandark.jira.app.service.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -11,11 +10,8 @@ import org.slf4j.LoggerFactory;
 
 import com.mandark.jira.app.beans.TeamBean;
 import com.mandark.jira.app.dto.TeamDTO;
-import com.mandark.jira.app.dto.UserDTO;
 import com.mandark.jira.app.persistence.orm.entity.Organisation;
 import com.mandark.jira.app.persistence.orm.entity.Team;
-import com.mandark.jira.app.persistence.orm.entity.TeamUser;
-import com.mandark.jira.app.persistence.orm.entity.User;
 import com.mandark.jira.app.service.TeamService;
 import com.mandark.jira.spi.app.persistence.IDao;
 import com.mandark.jira.spi.app.query.Criteria;
@@ -40,7 +36,7 @@ public class TeamServiceImpl extends AbstractJpaEntityService<Team, TeamBean, Te
 
     @Override
     protected TeamDTO toDTO(Team entityObj) {
-        return new TeamDTO(entityObj);
+        return Objects.isNull(entityObj) ? null : new TeamDTO(entityObj);
     }
 
     @Override
@@ -59,13 +55,21 @@ public class TeamServiceImpl extends AbstractJpaEntityService<Team, TeamBean, Te
         return exEntity;
     }
 
+    // Create new Team
+    // ------------------------------------------------------------------------
+
     @Override
     @Transactional
-    public int create(final Integer orgId, TeamBean teamBean) {
+    public int create(final Integer orgId, final String teamName) {
 
-        Organisation organisation = dao.read(Organisation.class, orgId, false);
+        // Sanity Checks
+        Verify.notNull(orgId, "$create :: orgId must be non NULL");
+        Verify.notNull(teamName, "$create :: teamName must be non NULL");
 
-        Team team = this.createFromBean(teamBean);
+        final Organisation organisation = dao.read(Organisation.class, orgId, true);
+
+        final Team team = new Team();
+        team.setName(teamName);
         team.setOrganisation(organisation);
 
         final int teamId = dao.save(team);
@@ -73,75 +77,30 @@ public class TeamServiceImpl extends AbstractJpaEntityService<Team, TeamBean, Te
         return teamId;
     }
 
-    @Override
-    @Transactional
-    public void addMember(final Integer userId, final Integer teamId) {
-
-        // Sanity Checks
-        Verify.notNull(userId, "[failed] :: userId must be non NULL");
-        Verify.notNull(teamId, "[failed] :: teamId must be non NULL");
-
-        final User userEntity = dao.read(User.class, userId, false);
-        final Team teamEntity = dao.read(Team.class, teamId, false);
-
-        final Criteria teamcriteria = Criteria.equal("team", teamEntity);
-        final Criteria userCriteria = Criteria.equal("user", userEntity);
-
-        List<Criteria> criteriaList = new ArrayList<Criteria>();
-        criteriaList.add(teamcriteria);
-        criteriaList.add(userCriteria);
-
-        final Criteria teamAndUserCriteria = Criteria.and(criteriaList);
-        final TeamUser teamUsers = dao.findOne(TeamUser.class, teamAndUserCriteria);
-
-        if (!Objects.isNull(teamUsers)) {
-            LOGGER.info("User with Id : %s, already Exists in the specified Team with Id : %s", userId, teamId);
-            return;
-        }
-
-        TeamUser teamUser = new TeamUser();
-        teamUser.setTeam(teamEntity);
-        teamUser.setUser(userEntity);
-        dao.save(teamUser);
-    }
+    // Read List of Teams in Org by Org Id
+    // ------------------------------------------------------------------------
 
     @Override
     public List<TeamDTO> getTeamsByOrgId(final Integer orgId, final int pageNo, final int pageSize) {
 
         // Sanity Checks
-        Verify.notNull(orgId, "[failed] orgId must be non NULL");
+        Verify.notNull(orgId, "$getTeamsByOrgId :: orgId must be non NULL");
 
         final Organisation organisation = dao.read(Organisation.class, orgId, true);
         final Criteria teamOrgCriteria = Criteria.equal("organisation", organisation);
 
-        List<Team> teamEntities = dao.find(this.getEntityClass(), teamOrgCriteria, pageNo, pageSize);
+        final List<Team> teamEntities = dao.find(this.getEntityClass(), teamOrgCriteria, pageNo, pageSize);
 
-        List<TeamDTO> teamDTOs = super.toDTOs(teamEntities);
+        final List<TeamDTO> teamDTOs = super.toDTOs(teamEntities);
 
         return teamDTOs;
     }
 
     @Override
-    public List<UserDTO> getUsersByTeamId(final Integer teamId, final int pageNo, final int pageSize) {
-
-        // Sanity checks
-        Verify.notNull(teamId);
-
-        final Team teamEntity = dao.read(this.getEntityClass(), teamId, true);
-        final Criteria teamcriteria = Criteria.equal("team", teamEntity);
-        final List<TeamUser> teamUsers = dao.find(TeamUser.class, teamcriteria, pageNo, pageSize);
-
-        List<UserDTO> userDtos = new ArrayList<>();
-        for (TeamUser tu : teamUsers) {
-            User user = tu.getUser();
-            UserDTO userDto = new UserDTO(user);
-            userDtos.add(userDto);
-        }
-        return userDtos;
-    }
-
-    @Override
     public int count(final Integer orgId) {
+
+        // Sanity Checks
+        Verify.notNull(orgId, "$count :: orgId must be non NULL");
 
         final int count = super.count(this.getOrgCriteria(orgId));
 
@@ -154,13 +113,11 @@ public class TeamServiceImpl extends AbstractJpaEntityService<Team, TeamBean, Te
     public Criteria getOrgCriteria(final Integer orgId) {
 
         // Sanity Checks
-        Verify.notNull(orgId);
+        Verify.notNull(orgId, "$count :: orgId must be non NULL");
 
         final Organisation organisation = dao.read(Organisation.class, orgId, true);
         final Criteria criteria = Criteria.equal("organisation", organisation);
 
         return criteria;
     }
-
-
 }
