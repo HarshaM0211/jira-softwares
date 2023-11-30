@@ -24,7 +24,7 @@ import com.mandark.jira.web.WebConstants;
 
 
 @RestController
-@RequestMapping("/api/v1/teams")
+@RequestMapping("/api/v1/{orgId}/teams")
 public class TeamAPI extends AbstractAPI {
 
     // Fields
@@ -81,7 +81,7 @@ public class TeamAPI extends AbstractAPI {
             @PathVariable("orgId") Integer orgId) {
 
         if (userService.isUserInOrg(userId, orgId)) {
-            teamUserService.addMember(userId, teamId);
+            teamUserService.addMember(teamId, userId);
             final String msg =
                     String.format("Successfully added User with ID :- %s to the Team with ID :- %s", userId, teamId);
             LOGGER.info(msg);
@@ -127,7 +127,7 @@ public class TeamAPI extends AbstractAPI {
         return Responses.ok(msg);
     }
 
-    // Team :: Reag List of Teams a User Included in by User Id
+    // Team :: Read List of Teams a User Included in by User Id
     // ------------------------------------------------------------------------
 
     @RequestMapping(value = "/users/{userId}", method = RequestMethod.GET)

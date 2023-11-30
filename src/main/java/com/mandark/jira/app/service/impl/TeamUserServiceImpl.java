@@ -53,6 +53,7 @@ public class TeamUserServiceImpl implements TeamUserService {
             LOGGER.info("User with Id : %s, already Exists in the specified Team with Id : %s", userId, teamId);
             return;
         }
+
         final User userEntity = dao.read(User.class, userId, true);
         final Team teamEntity = dao.read(Team.class, teamId, true);
 
@@ -60,6 +61,7 @@ public class TeamUserServiceImpl implements TeamUserService {
         teamUser.setTeam(teamEntity);
         teamUser.setUser(userEntity);
         dao.save(teamUser);
+
 
         final String msg =
                 String.format("Successfully Added User with Id : %s, to the Team with Id : %s", userId, teamId);
@@ -114,6 +116,7 @@ public class TeamUserServiceImpl implements TeamUserService {
     // ------------------------------------------------------------------------
 
     @Override
+    @Transactional
     public void removeMember(final Integer teamId, final Integer userId) {
 
         // Sanity Checks
