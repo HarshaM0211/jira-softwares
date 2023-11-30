@@ -1,5 +1,6 @@
 package com.mandark.jira.app.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -12,6 +13,8 @@ import com.mandark.jira.app.beans.ProjectBean;
 import com.mandark.jira.app.dto.ProjectDTO;
 import com.mandark.jira.app.persistence.orm.entity.Organisation;
 import com.mandark.jira.app.persistence.orm.entity.Project;
+import com.mandark.jira.app.persistence.orm.entity.ProjectUser;
+import com.mandark.jira.app.persistence.orm.entity.Team;
 import com.mandark.jira.app.persistence.orm.entity.User;
 import com.mandark.jira.app.service.ProjectService;
 import com.mandark.jira.app.service.UserService;
@@ -68,7 +71,7 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
 
     @Override
     @Transactional
-    public int create(final Integer orgId, ProjectBean entityBean) {
+    public int create(final Integer orgId, final ProjectBean entityBean) {
 
         // Sanity Checks
         Verify.notNull(entityBean, "$create :: entityBean must be Non NULL");
@@ -88,7 +91,7 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
 
     @Override
     @Transactional
-    public void update(final Integer projectId, ProjectBean projectBean) {
+    public void update(final Integer projectId, final ProjectBean projectBean) {
 
         // Sanity Checks
         Verify.notNull(projectId, "$update :: projectId must be non NULL");
@@ -105,18 +108,24 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
         Verify.notNull(userId, "$addUser :: userId must be non NULL");
         Verify.notNull(projectId, "$addUser :: projectId must be non NULL");
 
-        Project project = dao.read(this.getEntityClass(), projectId, true);
-        final User user = dao.read(User.class, userId, true);
+        final ProjectUser projectUser =
+                dao.findOne(ProjectUser.class, this.getProjectAndUserCriteria(projectId, userId));
 
-        List<User> exUsers = project.getUsers();
-        exUsers.add(user);
+        if (!Objects.isNull(projectUser)) {
+            LOGGER.info("User with Id : %s, already Exists in the specified Team with Id : %s", userId, projectId);
+            return;
+        }
 
-        project.setUsers(exUsers);
-        dao.update(projectId, project);
+        final User userEntity = dao.read(User.class, userId, true);
+        final Project projectEntity = dao.read(Project.class, projectId, true);
+
+        final ProjectUser projectUserEntity = new ProjectUser();
+        projectUserEntity.setProject(projectEntity);
+        projectUserEntity.setUser(userEntity);
+        dao.save(projectUserEntity);
 
         final String msg =
-                String.format("$ServiceImpl :: Successfully added User with Id : %s , into the project with Id : %s",
-                        userId, projectId);
+                String.format("Successfully Added User with Id : %s, to the Project with Id : %s", userId, projectId);
         LOGGER.info(msg);
     }
 
@@ -129,7 +138,7 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
         final Organisation organisation = dao.read(Organisation.class, orgId, true);
         final Criteria projOrgCriteria = Criteria.equal("organisation", organisation);
 
-        List<Project> projects = dao.find(this.getEntityClass(), projOrgCriteria, pageNo, pageSize);
+        final List<Project> projects = dao.find(this.getEntityClass(), projOrgCriteria, pageNo, pageSize);
 
         final List<ProjectDTO> projectDTOs = super.toDTOs(projects);
         return projectDTOs;
@@ -139,13 +148,47 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
     public List<ProjectDTO> getProjectsByUserId(final Integer userId, final int pageNo, final int pageSize) {
 
         // Sanity Checks
-        Verify.notNull(userId);
+        Verify.notNull(userId, "$getProjectsByUserId :: userId must be non NULL");
 
         final User user = dao.read(User.class, userId, true);
-        List<Project> projects = user.getProjects();
+        final Criteria criteria = Criteria.equal("user", user);
 
-        final List<ProjectDTO> projectDTOs = super.toDTOs(projects);
-        return projectDTOs;
+        final List<ProjectUser> projectUser = dao.find(ProjectUser.class, criteria, pageNo, pageSize);
+
+        final List<ProjectDTO> projectDtos = new ArrayList<ProjectDTO>();
+        for (ProjectUser pu : projectUser) {
+            Project project = pu.getProject();
+            ProjectDTO projectDto = new ProjectDTO(project);
+            projectDtos.add(projectDto);
+        }
+        return projectDtos;
+    }
+
+    @Override
+    @Transactional
+    public void removeUser(final Integer projectId, final Integer userId) {
+
+        // Sanity Checks
+        Verify.notNull(projectId, "$removeUser :: projectId must be non NULL");
+        Verify.notNull(userId, "$removeUser :: userId must be non NULL");
+
+        final ProjectUser projectUser =
+                dao.findOne(ProjectUser.class, this.getProjectAndUserCriteria(projectId, userId));
+
+        if (Objects.isNull(projectUser)) {
+
+            final String msg = String.format(
+                    "UnSuccessfull! Cannot find User with Id : %s, in the Project with Id : %s", userId, projectId);
+            LOGGER.info(msg);
+
+            return;
+        }
+        dao.purge(ProjectUser.class, projectUser.getId());
+
+        final String msg = String.format("Successfully removed User with Id : %s, from the Project with Id : %s",
+                userId, projectId);
+        LOGGER.info(msg);
+
     }
 
     @Override
@@ -158,9 +201,31 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
         return count;
     }
 
+    // Criteria
+    // ------------------------------------------------------------------------
+
+    public Criteria getProjectAndUserCriteria(final Integer projectId, final Integer userId) {
+
+        final User userEntity = dao.read(User.class, userId, true);
+        final Project projectEntity = dao.read(Project.class, projectId, true);
+
+        final Criteria projectcriteria = Criteria.equal("project", projectEntity);
+        final Criteria userCriteria = Criteria.equal("user", userEntity);
+
+        final List<Criteria> criteriaList = new ArrayList<Criteria>();
+        criteriaList.add(projectcriteria);
+        criteriaList.add(userCriteria);
+
+        final Criteria projectAndUserCriteria = Criteria.and(criteriaList);
+
+        return projectAndUserCriteria;
+    }
+
+
     // Getters and Setters
     // ------------------------------------------------------------------------
     public void setUserService(UserService userService) {
         this.userService = userService;
     }
+
 }

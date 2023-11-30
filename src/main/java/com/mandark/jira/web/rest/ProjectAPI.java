@@ -66,8 +66,8 @@ public class ProjectAPI extends AbstractAPI {
         final int count = projectService.count(orgId);
         final List<ProjectDTO> projetDtos = projectService.getProjectsByOrgId(orgId, pageNo, pageSize);
 
-        Pagination pagination = Pagination.with(count, pageNo, pageSize);
-        PageResult pageResult = PageResult.with(pagination, projetDtos);
+        final Pagination pagination = Pagination.with(count, pageNo, pageSize);
+        final PageResult pageResult = PageResult.with(pagination, projetDtos);
 
         return new ResponseEntity<>(pageResult, HttpStatus.OK);
     }
@@ -84,8 +84,8 @@ public class ProjectAPI extends AbstractAPI {
 
         final List<ProjectDTO> projectDtos = projectService.getProjectsByUserId(userId, pageNo, pageSize);
 
-        Pagination pagination = Pagination.with(projectDtos.size(), pageNo, pageSize);
-        PageResult pageResult = PageResult.with(pagination, projectDtos);
+        final Pagination pagination = Pagination.with(projectDtos.size(), pageNo, pageSize);
+        final PageResult pageResult = PageResult.with(pagination, projectDtos);
 
         return new ResponseEntity<>(pageResult, HttpStatus.OK);
     }
@@ -120,9 +120,20 @@ public class ProjectAPI extends AbstractAPI {
 
         return Responses.ok(msg);
     }
-    // Project ::
+    // Project :: Remove User
+    // ------------------------------------------------------------------------
 
+    @RequestMapping(value = "/{projectId}/users", method = RequestMethod.DELETE)
+    public ResponseEntity<?> removeProjectUser(@PathVariable("projectId") Integer projectId,
+            @RequestParam Integer userId) {
 
+        projectService.removeUser(projectId, userId);
+
+        final String msg = String.format("Successfully removed User with Id : %s, from the Project with Id : %s",
+                userId, projectId);
+
+        return Responses.ok(msg);
+    }
 
     // Getters and Setters
     // ------------------------------------------------------------------------

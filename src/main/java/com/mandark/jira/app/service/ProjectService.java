@@ -10,14 +10,16 @@ import com.mandark.jira.spi.app.service.EntityService;
 
 public interface ProjectService extends EntityService<Integer, Project, ProjectDTO> {
 
-    int create(final Integer orgId, ProjectBean entityBean);
+    int create(final Integer orgId, final ProjectBean entityBean);
 
-    void update(final Integer ProjectId, ProjectBean projectBean);
+    void update(final Integer ProjectId, final ProjectBean projectBean);
 
     void addUser(final Integer userId, final Integer projectId);
 
+    void removeUser(final Integer projectId, final Integer userId);
+
     List<ProjectDTO> getProjectsByOrgId(final Integer orgId, final int pageNo, final int pageSize);
-    
+
     List<ProjectDTO> getProjectsByUserId(final Integer userId, final int pageNo, final int pageSize);
 
     int count(final Integer orgId);
