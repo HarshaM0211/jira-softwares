@@ -1,7 +1,7 @@
 package com.mandark.jira.app.dto;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import com.mandark.jira.app.enums.SprintStatus;
@@ -18,9 +18,9 @@ public class SprintDTO extends EntityDTO<Sprint> {
 
     private final String sprintKey;
 
-    private final Date startDate;
+    private final LocalDateTime startDate;
 
-    private final Date endDate;
+    private final LocalDateTime endDate;
 
     private final List<IssueDTO> issues;
 
@@ -53,11 +53,11 @@ public class SprintDTO extends EntityDTO<Sprint> {
         return sprintKey;
     }
 
-    public Date getStartDate() {
+    public LocalDateTime getStartDate() {
         return startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDateTime getEndDate() {
         return endDate;
     }
 

@@ -1,5 +1,6 @@
 package com.mandark.jira.app.persistence.orm.entity;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -40,8 +41,8 @@ public class Issue extends JpaAuditEntity {
     private String summary;
 
     // Dates
-    private Date startDate;
-    private Date endDate;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
 
     // Tags
     private IssueType type;
@@ -207,20 +208,20 @@ public class Issue extends JpaAuditEntity {
     }
 
     @Column(name = "strat_date")
-    public Date getStartDate() {
+    public LocalDateTime getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date start_date) {
+    public void setStartDate(LocalDateTime start_date) {
         this.startDate = start_date;
     }
 
     @Column(name = "end_date")
-    public Date getEndDate() {
+    public LocalDateTime getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date end_date) {
+    public void setEndDate(LocalDateTime end_date) {
         this.endDate = end_date;
     }
 

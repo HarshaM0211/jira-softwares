@@ -1,7 +1,7 @@
 package com.mandark.jira.app.dto;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import com.mandark.jira.app.enums.IssuePriority;
@@ -36,9 +36,9 @@ public class IssueDTO extends EntityDTO<Issue> {
 
     private final UserDTO reportedBy;// (mem_id)
 
-    private final Date startDate;
+    private final LocalDateTime startDate;
 
-    private final Date endDate;
+    private final LocalDateTime endDate;
 
     private final String versionStr;
 
@@ -125,11 +125,11 @@ public class IssueDTO extends EntityDTO<Issue> {
         return reportedBy;
     }
 
-    public Date getStartDate() {
+    public LocalDateTime getStartDate() {
         return startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDateTime getEndDate() {
         return endDate;
     }
 
