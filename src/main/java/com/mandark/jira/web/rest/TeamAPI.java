@@ -157,7 +157,7 @@ public class TeamAPI extends AbstractAPI {
         this.userService = userService;
     }
 
-    public void setteamMemberService(TeamMemberService teamMemberService) {
+    public void setTeamMemberService(TeamMemberService teamMemberService) {
         this.teamMemberService = teamMemberService;
     }
 
