@@ -2,7 +2,6 @@ package com.mandark.jira.app.dto;
 
 
 import com.mandark.jira.app.persistence.orm.entity.Attachment;
-import com.mandark.jira.app.persistence.orm.entity.Issue;
 import com.mandark.jira.spi.app.EntityDTO;
 
 
@@ -16,8 +15,6 @@ public class AttachmentDTO extends EntityDTO<Attachment> {
 
     private final byte[] fileData;
 
-    private final Issue issue;
-
     private final String description;
 
     // Constructors
@@ -27,7 +24,6 @@ public class AttachmentDTO extends EntityDTO<Attachment> {
         super(e);
         this.fileName = e.getFileName();
         this.fileData = e.getFileData();
-        this.issue = e.getIssue();
         this.description = e.getDescription();
     }
 
@@ -42,10 +38,6 @@ public class AttachmentDTO extends EntityDTO<Attachment> {
         return fileData;
     }
 
-    public Issue getIssue() {
-        return issue;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -55,7 +47,7 @@ public class AttachmentDTO extends EntityDTO<Attachment> {
 
     @Override
     public String toString() {
-        return "AttachmentsDTO [fileName=" + fileName + ", issue=" + issue + ", description=" + description + "]";
+        return "AttachmentsDTO [fileName=" + fileName + ", description=" + description + "]";
     }
 
 }

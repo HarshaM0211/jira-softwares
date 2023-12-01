@@ -2,14 +2,12 @@ package com.mandark.jira.app.dto;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import com.mandark.jira.app.enums.UserRole;
-import com.mandark.jira.app.persistence.orm.entity.Organisation;
 import com.mandark.jira.app.persistence.orm.entity.Project;
-import com.mandark.jira.app.persistence.orm.entity.Team;
 import com.mandark.jira.app.persistence.orm.entity.User;
 import com.mandark.jira.spi.app.EntityDTO;
+import com.mandark.jira.spi.util.Values;
 
 
 public class UserDTO extends EntityDTO<User> {
@@ -23,11 +21,7 @@ public class UserDTO extends EntityDTO<User> {
 
     private final List<ProjectDTO> projects;
 
-    private final List<TeamDTO> teams;
-
     private final UserRole role;
-
-    private final Organisation org;
 
     private final String phone;
 
@@ -39,22 +33,14 @@ public class UserDTO extends EntityDTO<User> {
         this.userName = e.getFirstName() + e.getLastName();
         this.email = e.getEmail();
 
-        List<ProjectDTO> projectsDTO = new ArrayList<>();
+        final List<ProjectDTO> projectsDTO = new ArrayList<>();
         for (Project p : e.getProjects()) {
-            ProjectDTO projDto = Objects.isNull(p) ? null : new ProjectDTO(p);
+            ProjectDTO projDto = Values.get(p, ProjectDTO::new);
             projectsDTO.add(projDto);
         }
         this.projects = projectsDTO;
 
-        List<TeamDTO> teamsDTO = new ArrayList<>();
-        for (Team t : e.getTeams()) {
-            TeamDTO projDto = Objects.isNull(t) ? null : new TeamDTO(t);
-            teamsDTO.add(projDto);
-        }
-        this.teams = teamsDTO;
-
         this.role = e.getRole();
-        this.org = e.getOrganisation();
         this.phone = e.getPhone();
     }
 
@@ -73,16 +59,8 @@ public class UserDTO extends EntityDTO<User> {
         return email;
     }
 
-    public List<TeamDTO> getTeams() {
-        return teams;
-    }
-
     public UserRole getRole() {
         return role;
-    }
-
-    public Organisation getOrg() {
-        return org;
     }
 
     public String getPhone() {
@@ -94,7 +72,7 @@ public class UserDTO extends EntityDTO<User> {
 
     @Override
     public String toString() {
-        return "UserDTO [userName=" + userName + ", email=" + email + ", projects=" + projects + ", teams=" + teams
-                + ", role=" + role + ", organisation=" + org.getId() + ", phone=" + phone + "]";
+        return "UserDTO [userName=" + userName + ", email=" + email + ", projects=" + projects + ", role=" + role
+                + ", phone=" + phone + "]";
     }
 }

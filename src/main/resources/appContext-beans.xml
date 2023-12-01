@@ -171,6 +171,12 @@
     <bean id="userService" class="com.mandark.jira.app.service.impl.UserServiceImpl">
         <constructor-arg name="dao" ref="genericJpaDao" />
     </bean>
+    <bean id="teamService" class="com.mandark.jira.app.service.impl.TeamServiceImpl">
+        <constructor-arg name="dao" ref="genericJpaDao" />
+    </bean>
+    <bean id="teamMemberService" class="com.mandark.jira.app.service.impl.TeamMemberServiceImpl">
+        <property name="dao" ref="genericJpaDao" />
+    </bean>
  
 
 
@@ -193,6 +199,11 @@
     </bean>
     <bean id="userAPI" class="com.mandark.jira.web.rest.UserAPI">
     <property name="userService" ref="userService"/>
+    </bean>
+    <bean id="teamAPI" class="com.mandark.jira.web.rest.TeamAPI">
+    <property name="teamService" ref="teamService"/>
+    <property name="userService" ref="userService"/>
+    <property name="teamMemberService" ref="teamMemberService"/>
     </bean>
 
 

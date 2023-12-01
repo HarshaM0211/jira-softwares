@@ -1,5 +1,6 @@
 package com.mandark.jira.app.persistence.orm.entity;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -34,13 +35,24 @@ import com.mandark.jira.spi.lang.ValidationException;
         uniqueConstraints = {@UniqueConstraint(columnNames = {"project_id", "issue_key"})})
 public class Issue extends JpaAuditEntity {
 
+    // Info
     private Project project;
-
     private String issueKey;
-
     private String summary;
 
+    // Dates
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
+
+    // Tags
     private IssueType type;
+    private String versionStr;
+    private IssuePriority priority;
+    private String label;
+
+    // Extra contents
+    private List<Attachment> attachments;
+    private List<Comment> comments;
 
     private User assignee;// (mem_id)
 
@@ -51,21 +63,6 @@ public class Issue extends JpaAuditEntity {
     private List<Sprint> sprint;
 
     private User reportedBy;// (user_id)
-
-    private Date startDate;
-
-    private Date endDate;
-
-    private String versionStr;
-
-    private IssuePriority priority;
-
-    private String label;
-
-    private List<Attachment> attachments;
-
-    private List<Comment> comments;
-
 
     // Constructors
     // ------------------------------------------------------------------------
@@ -211,20 +208,20 @@ public class Issue extends JpaAuditEntity {
     }
 
     @Column(name = "strat_date")
-    public Date getStartDate() {
+    public LocalDateTime getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date start_date) {
+    public void setStartDate(LocalDateTime start_date) {
         this.startDate = start_date;
     }
 
     @Column(name = "end_date")
-    public Date getEndDate() {
+    public LocalDateTime getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date end_date) {
+    public void setEndDate(LocalDateTime end_date) {
         this.endDate = end_date;
     }
 
@@ -271,8 +268,8 @@ public class Issue extends JpaAuditEntity {
     @Override
     public String toString() {
         return "Issues [project=" + project.getId() + ", issue_key=" + issueKey + ", summary=" + summary + ", type="
-                + type + ", assignee=" + assignee.getUserName() + ", status=" + status + ", parent_issue_id="
-                + parentIssueId + ", reported_by=" + reportedBy.getId() + "]";
+                + type + ", assignee=" + assignee + ", status=" + status + ", parent_issue_id=" + parentIssueId
+                + ", reported_by=" + reportedBy.getId() + "]";
     }
 
 

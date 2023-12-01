@@ -38,8 +38,6 @@ public class User extends JpaAuditEntity {
 
     private List<Project> projects;
 
-    private List<Team> teams;
-
     private UserRole role;
 
     private String phone;
@@ -59,7 +57,7 @@ public class User extends JpaAuditEntity {
     public void validate() {
 
         if (Objects.isNull(firstName)) {
-            throw new ValidationException("#validate :: userName is BLANK");
+            throw new ValidationException("#validate :: firstName is BLANK");
         }
 
         if (Objects.isNull(password)) {
@@ -68,14 +66,6 @@ public class User extends JpaAuditEntity {
 
         if (Objects.isNull(email)) {
             throw new ValidationException("#validate :: mail is BLANK");
-        }
-
-        if (Objects.isNull(organisation)) {
-            throw new ValidationException("#validate :: organisation is BLANK");
-        }
-
-        if (Objects.isNull(role)) {
-            throw new ValidationException("#validate :: role is BLANK");
         }
 
         if (Objects.isNull(phone)) {
@@ -152,16 +142,7 @@ public class User extends JpaAuditEntity {
         this.projects = projects;
     }
 
-    @ManyToMany(mappedBy = "users")
-    public List<Team> getTeams() {
-        return teams;
-    }
-
-    public void setTeams(List<Team> teams) {
-        this.teams = teams;
-    }
-
-    @Column(name = "role", nullable = false)
+    @Column(name = "role")
     public UserRole getRole() {
         return role;
     }
@@ -186,8 +167,8 @@ public class User extends JpaAuditEntity {
 
     @Override
     public String toString() {
-        return "Users [user_name=" + firstName + lastName + ", user_email=" + email + ", organisation="
-                + organisation.getName() + ", role=" + role + "]";
+        return "Users [user_name=" + firstName + lastName + ", user_email=" + email + ", organisation=" + organisation
+                + ", role=" + role + "]";
     }
 
 
