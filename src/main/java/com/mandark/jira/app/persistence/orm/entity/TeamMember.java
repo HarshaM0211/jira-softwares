@@ -12,8 +12,8 @@ import com.mandark.jira.spi.lang.ValidationException;
 
 
 @Entity
-@Table(name = "teams_users")
-public class TeamUser extends JpaAuditEntity {
+@Table(name = "team_users")
+public class TeamMember extends JpaAuditEntity {
 
     // Fields
     // ------------------------------------------------------------------------
@@ -25,7 +25,7 @@ public class TeamUser extends JpaAuditEntity {
     // Constructor
     // ------------------------------------------------------------------------
 
-    public TeamUser() {
+    public TeamMember() {
         super();
     }
 
@@ -72,6 +72,6 @@ public class TeamUser extends JpaAuditEntity {
 
     @Override
     public String toString() {
-        return "TeamUser [team=" + team + ", user=" + user + "]";
+        return "TeamMember [team=" + team + ", user=" + user + "]";
     }
 }

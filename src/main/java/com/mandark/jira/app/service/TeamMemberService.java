@@ -6,7 +6,7 @@ import com.mandark.jira.app.dto.TeamDTO;
 import com.mandark.jira.app.dto.UserDTO;
 
 
-public interface TeamUserService {
+public interface TeamMemberService {
 
     List<UserDTO> getUsersByTeamId(final Integer teamId, final int pageNo, final int pageSize);
 

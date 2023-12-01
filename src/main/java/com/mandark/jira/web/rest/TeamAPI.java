@@ -12,10 +12,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mandark.jira.app.beans.TeamBean;
 import com.mandark.jira.app.dto.TeamDTO;
 import com.mandark.jira.app.dto.UserDTO;
 import com.mandark.jira.app.service.TeamService;
-import com.mandark.jira.app.service.TeamUserService;
+import com.mandark.jira.app.service.TeamMemberService;
 import com.mandark.jira.app.service.UserService;
 import com.mandark.jira.spi.web.PageResult;
 import com.mandark.jira.spi.web.Pagination;
@@ -36,7 +37,7 @@ public class TeamAPI extends AbstractAPI {
 
     private UserService userService;
 
-    private TeamUserService teamUserService;
+    private TeamMemberService teamMemberService;
 
     // APIs
     // ------------------------------------------------------------------------
@@ -48,7 +49,7 @@ public class TeamAPI extends AbstractAPI {
     @RequestMapping(value = "", method = RequestMethod.POST)
     public ResponseEntity<?> create(@RequestParam String teamName, @PathVariable("orgId") Integer orgId) {
 
-        final int teamId = teamService.create(orgId, teamName);
+        final int teamId = teamService.create(orgId, new TeamBean());
         final String msg = String.format("Successfully created a Team with ID :- %s", teamId);
         LOGGER.info(msg);
         return Responses.ok(msg);
@@ -81,7 +82,7 @@ public class TeamAPI extends AbstractAPI {
             @PathVariable("orgId") Integer orgId) {
 
         if (userService.isUserInOrg(userId, orgId)) {
-            teamUserService.addMember(teamId, userId);
+            teamMemberService.addMember(teamId, userId);
             final String msg =
                     String.format("Successfully added User with ID :- %s to the Team with ID :- %s", userId, teamId);
             LOGGER.info(msg);
@@ -105,7 +106,7 @@ public class TeamAPI extends AbstractAPI {
             @RequestParam(name = WebConstants.REQ_PARAM_PAGE_SIZE,
                     defaultValue = WebConstants.DEFAULT_PAGE_SIZE) int pageSize) {
 
-        final List<UserDTO> userDtos = teamUserService.getUsersByTeamId(teamId, pageNo, pageSize);
+        final List<UserDTO> userDtos = teamMemberService.getUsersByTeamId(teamId, pageNo, pageSize);
 
         final Pagination pagination = Pagination.with(userDtos.size(), pageNo, pageSize);
         final PageResult pageResult = PageResult.with(pagination, userDtos);
@@ -119,7 +120,7 @@ public class TeamAPI extends AbstractAPI {
     @RequestMapping(value = "/{teamId}/users", method = RequestMethod.DELETE)
     public ResponseEntity<?> removeTeamMember(@PathVariable("teamId") Integer teamId, @RequestParam Integer userId) {
 
-        teamUserService.removeMember(teamId, userId);
+        teamMemberService.removeMember(teamId, userId);
 
         final String msg =
                 String.format("Successfully removed User with Id : %s, from the Team with Id : %s", userId, teamId);
@@ -137,7 +138,7 @@ public class TeamAPI extends AbstractAPI {
             @RequestParam(name = WebConstants.REQ_PARAM_PAGE_SIZE,
                     defaultValue = WebConstants.DEFAULT_PAGE_SIZE) int pageSize) {
 
-        final List<TeamDTO> teamDtos = teamUserService.getTeamsByUserId(userId, pageNo, pageSize);
+        final List<TeamDTO> teamDtos = teamMemberService.getTeamsByUserId(userId, pageNo, pageSize);
 
         final Pagination pagination = Pagination.with(teamDtos.size(), pageNo, pageSize);
         final PageResult pageResult = PageResult.with(pagination, teamDtos);
@@ -156,8 +157,8 @@ public class TeamAPI extends AbstractAPI {
         this.userService = userService;
     }
 
-    public void setTeamUserService(TeamUserService teamUserService) {
-        this.teamUserService = teamUserService;
+    public void setteamMemberService(TeamMemberService teamMemberService) {
+        this.teamMemberService = teamMemberService;
     }
 
 }
