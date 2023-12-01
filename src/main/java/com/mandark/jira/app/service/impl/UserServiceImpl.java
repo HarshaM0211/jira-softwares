@@ -227,12 +227,15 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
     public boolean isUserInOrg(final Integer userId, final Integer orgId) {
 
         // Sanity Checks
-        Verify.notNull(userId);
-        Verify.notNull(orgId);
+        Verify.notNull(userId, "$isUserInOrg :: userId must be non NULL");
+        Verify.notNull(orgId, "$isUserInOrg :: orgId must be non NULL");
 
         final User userEntity = dao.read(User.class, userId, true);
 
+        final String msg = String.format("Status : User Existence in the Organisation : ",
+                orgId.equals(userEntity.getOrganisation().getId()));
+        LOGGER.info(msg);
+
         return orgId.equals(userEntity.getOrganisation().getId());
     }
-
 }
