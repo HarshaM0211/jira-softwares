@@ -43,7 +43,7 @@ public class ProjectAPI extends AbstractAPI {
     @RequestMapping(value = "", method = RequestMethod.POST)
     public ResponseEntity<?> create(@RequestBody ProjectBean projectBean, @PathVariable("orgId") Integer orgId) {
 
-        int projectId = projectService.create(orgId, projectBean);
+        final int projectId = projectService.create(orgId, projectBean);
 
         final String msg = String.format(
                 "$API :: Successfully created the Project with Id : %s , in the Organisation with Id : %s", projectId,

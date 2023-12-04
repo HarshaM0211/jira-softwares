@@ -14,7 +14,6 @@ import com.mandark.jira.app.dto.ProjectDTO;
 import com.mandark.jira.app.persistence.orm.entity.Organisation;
 import com.mandark.jira.app.persistence.orm.entity.Project;
 import com.mandark.jira.app.persistence.orm.entity.ProjectUser;
-import com.mandark.jira.app.persistence.orm.entity.Team;
 import com.mandark.jira.app.persistence.orm.entity.User;
 import com.mandark.jira.app.service.ProjectService;
 import com.mandark.jira.app.service.UserService;
@@ -79,7 +78,7 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
 
         final Organisation organisation = dao.read(Organisation.class, orgId, true);
 
-        Project project = this.createFromBean(entityBean);
+        final Project project = this.createFromBean(entityBean);
         project.setOrganisation(organisation);
 
         final int projectId = dao.save(project);
@@ -157,8 +156,8 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
 
         final List<ProjectDTO> projectDtos = new ArrayList<ProjectDTO>();
         for (ProjectUser pu : projectUser) {
-            Project project = pu.getProject();
-            ProjectDTO projectDto = new ProjectDTO(project);
+            final Project project = pu.getProject();
+            final ProjectDTO projectDto = new ProjectDTO(project);
             projectDtos.add(projectDto);
         }
         return projectDtos;

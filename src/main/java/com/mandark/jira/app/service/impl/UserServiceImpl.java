@@ -2,7 +2,6 @@ package com.mandark.jira.app.service.impl;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -207,7 +206,7 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
     @Transactional
     public void removeFromOrg(final Integer orgId, final Integer userId) {
 
-        User user = this.dao.read(this.getEntityClass(), userId, true);
+        final User user = this.dao.read(this.getEntityClass(), userId, true);
 
         if (orgId.equals(user.getOrganisation().getId())) {
             user.setOrganisation(null);
