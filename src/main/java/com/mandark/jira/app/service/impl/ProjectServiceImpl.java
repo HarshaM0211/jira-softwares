@@ -111,7 +111,7 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
                 dao.findOne(ProjectUser.class, this.getProjectAndUserCriteria(projectId, userId));
 
         if (!Objects.isNull(projectUser)) {
-            LOGGER.info("User with Id : %s, already Exists in the specified Team with Id : %s", userId, projectId);
+            LOGGER.info("User with Id : %s, already Exists in the specified Project with Id : %s", userId, projectId);
             return;
         }
 
