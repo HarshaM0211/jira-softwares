@@ -1,7 +1,6 @@
 package com.mandark.jira.app.persistence.orm.entity;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,6 +33,36 @@ import com.mandark.jira.spi.lang.ValidationException;
                 @Index(columnList = "version_str", name = "version_str")},
         uniqueConstraints = {@UniqueConstraint(columnNames = {"project_id", "issue_key"})})
 public class Issue extends JpaAuditEntity {
+
+    // Fields Lables
+    // ------------------------------------------------------------------------
+
+    public static final String PROP_PROJECT = "project";
+
+    public static final String PROP_ISSUE_KEY = "issueKey";
+
+    public static final String PROP_TYPE = "type";
+
+    public static final String PROP_ASSIGNEE = "assignee";
+
+    public static final String PROP_STATUS = "status";
+
+    public static final String PROP_PARENT_ISSUE_ID = "parentIssueId";
+
+    public static final String PROP_SPRINT = "sprint";
+
+    public static final String PROP_REPORTED_BY = "reportedBy";
+
+    public static final String PROP_START_DATE = "startDate";
+
+    public static final String PROP_END_DATE = "endDate";
+
+    public static final String PROP_VERSION_STR = "versionStr";
+
+    public static final String PROP_PRIORITY = "priority";
+
+    // Fields
+    // ------------------------------------------------------------------------
 
     // Info
     private Project project;

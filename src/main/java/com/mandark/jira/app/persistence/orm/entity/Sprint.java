@@ -28,6 +28,22 @@ import com.mandark.jira.spi.lang.ValidationException;
         uniqueConstraints = {@UniqueConstraint(columnNames = {"project_id", "sprint_key"})})
 public class Sprint extends JpaAuditEntity {
 
+    // Field Lables
+    // ------------------------------------------------------------------------
+
+    public static final String PROP_PROJECT = "project";
+
+    public static final String PROP_SPRINT_KEY = "sprintKey";
+
+    public static final String PROP_START_DATE = "startDate";
+
+    public static final String PROP_END_DATE = "endDate";
+
+    public static final String PROP_STATUS = "status";
+
+    // Fields
+    // ------------------------------------------------------------------------
+
     private Project project;
 
     private String sprintKey;
