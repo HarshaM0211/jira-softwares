@@ -19,6 +19,16 @@ import com.mandark.jira.spi.lang.ValidationException;
         @Index(columnList = "commenter_id", name = "commenter_id")})
 public class Comment extends JpaAuditEntity {
 
+    // Field Lables
+    // ------------------------------------------------------------------------
+
+    public static final String PROP_ISSUE = "issue";
+
+    public static final String PROP_COMMENTER = "commenter";
+
+    // Fields
+    // ------------------------------------------------------------------------
+
     private Issue issue;
 
     private User commenter;// (user)

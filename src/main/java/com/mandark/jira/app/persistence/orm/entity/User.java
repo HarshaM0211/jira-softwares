@@ -24,6 +24,22 @@ import com.mandark.jira.spi.lang.ValidationException;
         uniqueConstraints = {@UniqueConstraint(columnNames = {"email"})})
 public class User extends JpaAuditEntity {
 
+    // Field Lables
+    // ------------------------------------------------------------------------
+
+    public static final String PROP_FIRST_NAME = "firstName";
+
+    public static final String PROP_EMAIL = "email";
+
+    public static final String PROP_ORGANISATION = "organisation";
+
+    public static final String PROP_PHONE = "phone";
+
+    public static final String PROP_ROLE = "role";
+
+    // Fields
+    // ------------------------------------------------------------------------
+
     private String firstName;
 
     private String lastName;

@@ -23,6 +23,18 @@ import com.mandark.jira.spi.lang.ValidationException;
         uniqueConstraints = {@UniqueConstraint(columnNames = {"org_id", "name"})})
 public class Project extends JpaAuditEntity {
 
+    // Field Lables
+    // ------------------------------------------------------------------------
+
+    public static final String PROP_ORGANISATION = "organisation";
+
+    public static final String PROP_PROJECT_KEY = "projectKey";
+
+    public static final String PROP_NAME = "name";
+
+    // Fields
+    // ------------------------------------------------------------------------
+
     private Organisation organisation;
 
     private String projectKey;

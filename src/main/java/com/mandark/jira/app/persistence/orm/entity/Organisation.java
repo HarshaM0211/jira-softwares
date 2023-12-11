@@ -18,6 +18,14 @@ import com.mandark.jira.spi.lang.ValidationException;
 @Table(name = "organisations", indexes = {@Index(columnList = "name", name = "name")})
 public class Organisation extends JpaAuditEntity {
 
+    // Field Lables
+    // ------------------------------------------------------------------------
+
+    public static final String PROP_NAME = "name";
+
+    // Fields
+    // ------------------------------------------------------------------------
+
     private String name;
 
     private String description;

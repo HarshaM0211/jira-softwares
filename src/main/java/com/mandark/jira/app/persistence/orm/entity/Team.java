@@ -23,6 +23,18 @@ import com.mandark.jira.spi.lang.ValidationException;
         uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "org_id"})})
 public class Team extends JpaAuditEntity {
 
+    // Field Lables
+    // ------------------------------------------------------------------------
+
+    public static final String PROP_NAME = "name";
+
+    public static final String PROP_ORGANISATION = "organisation";
+
+    public static final String PROP_TEAM_LEADER = "teamLeader";
+
+    // Fields
+    // ------------------------------------------------------------------------
+
     private String name;
 
     private Organisation organisation;
