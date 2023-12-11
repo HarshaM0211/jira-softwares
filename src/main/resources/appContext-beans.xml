@@ -174,8 +174,14 @@
     <bean id="teamService" class="com.mandark.jira.app.service.impl.TeamServiceImpl">
         <constructor-arg name="dao" ref="genericJpaDao" />
     </bean>
+<<<<<<< HEAD
     <bean id="teamMemberService" class="com.mandark.jira.app.service.impl.TeamMemberServiceImpl">
         <property name="dao" ref="genericJpaDao" />
+=======
+    <bean id="projectService" class="com.mandark.jira.app.service.impl.ProjectServiceImpl">
+        <constructor-arg name="dao" ref="genericJpaDao" />
+        <property name="userService" ref="userService"></property>
+>>>>>>> js5-project-bean-service-apis
     </bean>
  
 
@@ -204,6 +210,9 @@
     <property name="teamService" ref="teamService"/>
     <property name="userService" ref="userService"/>
     <property name="teamMemberService" ref="teamMemberService"/>
+    </bean>
+    <bean id="projectAPI" class="com.mandark.jira.web.rest.ProjectAPI">
+    <property name="projectService" ref="projectService"/>
     </bean>
 
 

@@ -2,7 +2,6 @@ package com.mandark.jira.app.service.impl;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -116,7 +115,7 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
         Verify.notNull(orgId, "Organisation ID is NULL");
         Verify.notNull(userEntity, "UserEntity is NULL");
 
-        if (!Objects.isNull(userEntity.getOrganisation())) {
+        if (Objects.nonNull(userEntity.getOrganisation())) {
             // TODO throw new Exception ?
             final String msg = String.format(
                     "Not Successfull. User with ID :- %s is already a member in the Organisation with ID :- %s",
@@ -176,7 +175,7 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
     public int count(final Integer orgId) {
 
         // Sanity Checks
-        Verify.notNull(orgId, "$count :: Organisation ID : orgId must be nonn NULL");
+        Verify.notNull(orgId, "$count :: Organisation ID : orgId must be non NULL");
 
         final int count = super.count(this.getOrgCriteria(orgId));
 
@@ -189,10 +188,10 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
     // Criteria
     // ------------------------------------------------------------------------
 
-    private Criteria getOrgCriteria(final Integer orgId) {
+    public Criteria getOrgCriteria(final Integer orgId) {
 
         // Sanity Checks
-        Verify.notNull(orgId, "$getOrgCriteria :: Organisation ID : orgId must be nonn NULL");
+        Verify.notNull(orgId, "$getOrgCriteria :: Organisation ID : orgId must be non NULL");
 
         final Organisation organisation = dao.read(Organisation.class, orgId, true);
         final Criteria criteria = Criteria.equal("organisation", organisation);
@@ -207,7 +206,7 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
     @Transactional
     public void removeFromOrg(final Integer orgId, final Integer userId) {
 
-        User user = this.dao.read(this.getEntityClass(), userId, true);
+        final User user = this.dao.read(this.getEntityClass(), userId, true);
 
         if (orgId.equals(user.getOrganisation().getId())) {
             user.setOrganisation(null);

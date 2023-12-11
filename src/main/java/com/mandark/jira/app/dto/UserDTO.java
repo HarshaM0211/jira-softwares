@@ -1,13 +1,8 @@
 package com.mandark.jira.app.dto;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.mandark.jira.app.enums.UserRole;
-import com.mandark.jira.app.persistence.orm.entity.Project;
 import com.mandark.jira.app.persistence.orm.entity.User;
 import com.mandark.jira.spi.app.EntityDTO;
-import com.mandark.jira.spi.util.Values;
 
 
 public class UserDTO extends EntityDTO<User> {
@@ -18,8 +13,6 @@ public class UserDTO extends EntityDTO<User> {
     private final String userName; // firstName + lastName
 
     private final String email;
-
-    private final List<ProjectDTO> projects;
 
     private final UserRole role;
 
@@ -32,24 +25,12 @@ public class UserDTO extends EntityDTO<User> {
         super(e);
         this.userName = e.getFirstName() + e.getLastName();
         this.email = e.getEmail();
-
-        final List<ProjectDTO> projectsDTO = new ArrayList<>();
-        for (Project p : e.getProjects()) {
-            ProjectDTO projDto = Values.get(p, ProjectDTO::new);
-            projectsDTO.add(projDto);
-        }
-        this.projects = projectsDTO;
-
         this.role = e.getRole();
         this.phone = e.getPhone();
     }
 
     // Getters
     // ------------------------------------------------------------------------
-
-    public List<ProjectDTO> getProjects() {
-        return projects;
-    }
 
     public String getUserName() {
         return userName;
@@ -72,7 +53,6 @@ public class UserDTO extends EntityDTO<User> {
 
     @Override
     public String toString() {
-        return "UserDTO [userName=" + userName + ", email=" + email + ", projects=" + projects + ", role=" + role
-                + ", phone=" + phone + "]";
+        return "UserDTO [userName=" + userName + ", email=" + email + ", role=" + role + ", phone=" + phone + "]";
     }
 }

@@ -7,7 +7,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -44,8 +43,6 @@ public class Project extends JpaAuditEntity {
     private String description;
 
     private List<Sprint> sprints;
-
-    private List<User> users;
 
     private List<Issue> issues;
 
@@ -126,16 +123,6 @@ public class Project extends JpaAuditEntity {
         this.sprints = sprints;
     }
 
-    @ManyToMany
-    @JoinColumn(name = "user_id")
-    public List<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(List<User> org_members) {
-        this.users = org_members;
-    }
-
     @OneToMany(mappedBy = "project")
     public List<Issue> getIssues() {
         return issues;
@@ -153,7 +140,4 @@ public class Project extends JpaAuditEntity {
         return "Projects [organisation=" + organisation.getId() + ", project_key=" + projectKey + ", project_name="
                 + name + ", project_description=" + "]";
     }
-
-
-
 }
