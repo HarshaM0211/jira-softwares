@@ -18,9 +18,9 @@ public interface ProjectService extends EntityService<Integer, Project, ProjectD
 
     void removeUser(final Integer projectId, final Integer userId);
 
-    List<ProjectDTO> getProjectsByOrgId(final Integer orgId, final int pageNo, final int pageSize);
+    List<ProjectDTO> findByOrgId(final Integer orgId, final int pageNo, final int pageSize);
 
-    List<ProjectDTO> getProjectsByUserId(final Integer userId, final int pageNo, final int pageSize);
+    List<ProjectDTO> findByUserId(final Integer userId, final int pageNo, final int pageSize);
 
     int count(final Integer orgId);
 

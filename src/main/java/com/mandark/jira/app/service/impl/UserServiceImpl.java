@@ -115,7 +115,7 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
         Verify.notNull(orgId, "Organisation ID is NULL");
         Verify.notNull(userEntity, "UserEntity is NULL");
 
-        if (!Objects.isNull(userEntity.getOrganisation())) {
+        if (Objects.nonNull(userEntity.getOrganisation())) {
             // TODO throw new Exception ?
             final String msg = String.format(
                     "Not Successfull. User with ID :- %s is already a member in the Organisation with ID :- %s",

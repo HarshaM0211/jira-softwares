@@ -64,7 +64,7 @@ public class ProjectAPI extends AbstractAPI {
                     defaultValue = WebConstants.DEFAULT_PAGE_SIZE) int pageSize) {
 
         final int count = projectService.count(orgId);
-        final List<ProjectDTO> projetDtos = projectService.getProjectsByOrgId(orgId, pageNo, pageSize);
+        final List<ProjectDTO> projetDtos = projectService.findByOrgId(orgId, pageNo, pageSize);
 
         final Pagination pagination = Pagination.with(count, pageNo, pageSize);
         final PageResult pageResult = PageResult.with(pagination, projetDtos);
@@ -82,7 +82,7 @@ public class ProjectAPI extends AbstractAPI {
             @RequestParam(name = WebConstants.REQ_PARAM_PAGE_SIZE,
                     defaultValue = WebConstants.DEFAULT_PAGE_SIZE) int pageSize) {
 
-        final List<ProjectDTO> projectDtos = projectService.getProjectsByUserId(userId, pageNo, pageSize);
+        final List<ProjectDTO> projectDtos = projectService.findByUserId(userId, pageNo, pageSize);
 
         final Pagination pagination = Pagination.with(projectDtos.size(), pageNo, pageSize);
         final PageResult pageResult = PageResult.with(pagination, projectDtos);

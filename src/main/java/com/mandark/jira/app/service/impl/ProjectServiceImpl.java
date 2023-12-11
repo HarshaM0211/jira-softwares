@@ -107,10 +107,9 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
         Verify.notNull(userId, "$addUser :: userId must be non NULL");
         Verify.notNull(projectId, "$addUser :: projectId must be non NULL");
 
-        final ProjectUser projectUser =
-                dao.findOne(ProjectUser.class, this.getProjectAndUserCriteria(projectId, userId));
+        final ProjectUser projectUser = dao.findOne(ProjectUser.class, this.getProjectUsersCriteria(projectId, userId));
 
-        if (!Objects.isNull(projectUser)) {
+        if (Objects.nonNull(projectUser)) {
             LOGGER.info("User with Id : %s, already Exists in the specified Project with Id : %s", userId, projectId);
             return;
         }
@@ -129,7 +128,7 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
     }
 
     @Override
-    public List<ProjectDTO> getProjectsByOrgId(final Integer orgId, final int pageNo, final int pageSize) {
+    public List<ProjectDTO> findByOrgId(final Integer orgId, final int pageNo, final int pageSize) {
 
         // Sanity Checks
         Verify.notNull(orgId);
@@ -144,7 +143,7 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
     }
 
     @Override
-    public List<ProjectDTO> getProjectsByUserId(final Integer userId, final int pageNo, final int pageSize) {
+    public List<ProjectDTO> findByUserId(final Integer userId, final int pageNo, final int pageSize) {
 
         // Sanity Checks
         Verify.notNull(userId, "$getProjectsByUserId :: userId must be non NULL");
@@ -152,12 +151,12 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
         final User user = dao.read(User.class, userId, true);
         final Criteria criteria = Criteria.equal("user", user);
 
-        final List<ProjectUser> projectUser = dao.find(ProjectUser.class, criteria, pageNo, pageSize);
+        final List<ProjectUser> userProjects = dao.find(ProjectUser.class, criteria, pageNo, pageSize);
 
         final List<ProjectDTO> projectDtos = new ArrayList<ProjectDTO>();
-        for (ProjectUser pu : projectUser) {
+        for (ProjectUser pu : userProjects) {
             final Project project = pu.getProject();
-            final ProjectDTO projectDto = new ProjectDTO(project);
+            final ProjectDTO projectDto = this.toDTO(project);
             projectDtos.add(projectDto);
         }
         return projectDtos;
@@ -171,8 +170,7 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
         Verify.notNull(projectId, "$removeUser :: projectId must be non NULL");
         Verify.notNull(userId, "$removeUser :: userId must be non NULL");
 
-        final ProjectUser projectUser =
-                dao.findOne(ProjectUser.class, this.getProjectAndUserCriteria(projectId, userId));
+        final ProjectUser projectUser = dao.findOne(ProjectUser.class, this.getProjectUsersCriteria(projectId, userId));
 
         if (Objects.isNull(projectUser)) {
 
@@ -203,7 +201,7 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
     // Criteria
     // ------------------------------------------------------------------------
 
-    public Criteria getProjectAndUserCriteria(final Integer projectId, final Integer userId) {
+    public Criteria getProjectUsersCriteria(final Integer projectId, final Integer userId) {
 
         final User userEntity = dao.read(User.class, userId, true);
         final Project projectEntity = dao.read(Project.class, projectId, true);
