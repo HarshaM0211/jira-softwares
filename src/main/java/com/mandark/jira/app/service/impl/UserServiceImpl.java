@@ -177,10 +177,10 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
         // Sanity Checks
         Verify.notNull(orgId, "$count :: Organisation ID : orgId must be non NULL");
 
-        final int count = super.count(this.getOrgCriteria(orgId));
+        final int count = super.count(this.getUserOrgCriteria(orgId));
 
         LOGGER.info("# of entity objects found for critera :: {} - {} : {}", this.getEntityClass(),
-                this.getOrgCriteria(orgId), count);
+                this.getUserOrgCriteria(orgId), count);
         return count;
 
     }
@@ -188,7 +188,7 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
     // Criteria
     // ------------------------------------------------------------------------
 
-    public Criteria getOrgCriteria(final Integer orgId) {
+    public Criteria getUserOrgCriteria(final Integer orgId) {
 
         // Sanity Checks
         Verify.notNull(orgId, "$getOrgCriteria :: Organisation ID : orgId must be non NULL");

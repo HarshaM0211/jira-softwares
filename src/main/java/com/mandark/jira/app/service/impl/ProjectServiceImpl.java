@@ -194,7 +194,7 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
         // Sanity Checks
         Verify.notNull(orgId, "$count :: orgId must be non NULL");
 
-        final int count = super.count(userService.getOrgCriteria(orgId));
+        final int count = super.count(userService.getUserOrgCriteria(orgId));
         return count;
     }
 
