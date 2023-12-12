@@ -134,7 +134,7 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
         Verify.notNull(orgId);
 
         final Organisation organisation = dao.read(Organisation.class, orgId, true);
-        final Criteria projOrgCriteria = Criteria.equal("organisation", organisation);
+        final Criteria projOrgCriteria = Criteria.equal(Project.PROP_ORGANISATION, organisation);
 
         final List<Project> projects = dao.find(this.getEntityClass(), projOrgCriteria, pageNo, pageSize);
 
@@ -149,7 +149,7 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
         Verify.notNull(userId, "$getProjectsByUserId :: userId must be non NULL");
 
         final User user = dao.read(User.class, userId, true);
-        final Criteria criteria = Criteria.equal("user", user);
+        final Criteria criteria = Criteria.equal(ProjectUser.PROP_USER, user);
 
         final List<ProjectUser> userProjects = dao.find(ProjectUser.class, criteria, pageNo, pageSize);
 
@@ -206,8 +206,8 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
         final User userEntity = dao.read(User.class, userId, true);
         final Project projectEntity = dao.read(Project.class, projectId, true);
 
-        final Criteria projectcriteria = Criteria.equal("project", projectEntity);
-        final Criteria userCriteria = Criteria.equal("user", userEntity);
+        final Criteria projectcriteria = Criteria.equal(ProjectUser.PROP_PROJECT, projectEntity);
+        final Criteria userCriteria = Criteria.equal(ProjectUser.PROP_USER, userEntity);
 
         final List<Criteria> criteriaList = new ArrayList<Criteria>();
         criteriaList.add(projectcriteria);

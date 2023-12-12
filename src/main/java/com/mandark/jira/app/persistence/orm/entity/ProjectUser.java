@@ -15,6 +15,13 @@ import com.mandark.jira.spi.lang.ValidationException;
 @Table(name = "projects_users")
 public class ProjectUser extends JpaAuditEntity {
 
+    // Field Lables
+    // ------------------------------------------------------------------------
+
+    public static final String PROP_PROJECT = "project";
+
+    public static final String PROP_USER = "user";
+
     // Fields
     // ------------------------------------------------------------------------
 
