@@ -138,6 +138,6 @@ public class Project extends JpaAuditEntity {
     @Override
     public String toString() {
         return "Projects [organisation=" + organisation.getId() + ", project_key=" + projectKey + ", project_name="
-                + name + ", project_description=" + "]";
+                + name + ", project_description=" + description + "]";
     }
 }
