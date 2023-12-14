@@ -85,16 +85,9 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
         }
         if (Objects.isNull(entityBean.getProjectKey())) {
 
-            List<String> keyList = this.generateKeys(orgId, entityBean.getName());
-            for (String key : keyList) {
-                int projectsCount = this.count(orgId);
-                int pageNo = Integer.parseInt(WebConstants.DEFAULT_PAGE_NO);
-                if (this.isKeyUnique(key, orgId, pageNo, projectsCount)) {
-                    LOGGER.info("Key :{} is unique for given Project Name", key);
-                    project.setProjectKey(key);
-                    break;
-                }
-            }
+            final String key = this.getKeyAuto(orgId, entityBean.getName());
+
+            project.setProjectKey(key);
             project.setName(entityBean.getName());
             project.setDescription(entityBean.getDescription());
         }
@@ -105,6 +98,24 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
         LOGGER.info(msg);
 
         return projectId;
+    }
+
+    private String getKeyAuto(final Integer orgId, final String projectName) {
+
+        // Sanity Checks
+        Verify.notNull(orgId, "$getKeyAuto :: orgId must be non NULL");
+        Verify.notNull(projectName, "$getKeyAuto :: projectName must be non NULL");
+
+        final List<String> keyList = this.generateKeys(orgId, projectName);
+        for (String key : keyList) {
+            final int projectsCount = this.count(orgId);
+            final int pageNo = Integer.parseInt(WebConstants.DEFAULT_PAGE_NO);
+            if (this.isKeyUnique(key, orgId, pageNo, projectsCount)) {
+                LOGGER.info("Key :{} is unique for given Project Name", key);
+                return key;
+            }
+        }
+        return null;
     }
 
     @Override
