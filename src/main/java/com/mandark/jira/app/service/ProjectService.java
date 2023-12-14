@@ -22,6 +22,9 @@ public interface ProjectService extends EntityService<Integer, Project, ProjectD
 
     List<ProjectDTO> findByUserId(final Integer userId, final int pageNo, final int pageSize);
 
+    List<ProjectDTO> findByOrgIdAndKey(final Integer orgId, final String projectKey, final int pageNo,
+            final int pageSize);
+
     int count(final Integer orgId);
 
 }

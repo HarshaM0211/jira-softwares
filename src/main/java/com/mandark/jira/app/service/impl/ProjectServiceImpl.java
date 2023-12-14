@@ -21,6 +21,7 @@ import com.mandark.jira.spi.app.persistence.IDao;
 import com.mandark.jira.spi.app.query.Criteria;
 import com.mandark.jira.spi.app.service.AbstractJpaEntityService;
 import com.mandark.jira.spi.util.Verify;
+import com.mandark.jira.web.WebConstants;
 
 
 public class ProjectServiceImpl extends AbstractJpaEntityService<Project, ProjectBean, ProjectDTO>
@@ -78,7 +79,25 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
 
         final Organisation organisation = dao.read(Organisation.class, orgId, true);
 
-        final Project project = this.createFromBean(entityBean);
+        Project project = new Project();
+        if (Objects.nonNull(entityBean.getProjectKey())) {
+            project = this.createFromBean(entityBean);
+        }
+        if (Objects.isNull(entityBean.getProjectKey())) {
+
+            List<String> keyList = this.generateKeys(orgId, entityBean.getName());
+            for (String key : keyList) {
+                int projectsCount = this.count(orgId);
+                int pageNo = Integer.parseInt(WebConstants.DEFAULT_PAGE_NO);
+                if (this.isKeyUnique(key, orgId, pageNo, projectsCount)) {
+                    LOGGER.info("Key :{} is unique for given Project Name", key);
+                    project.setProjectKey(key);
+                    break;
+                }
+            }
+            project.setName(entityBean.getName());
+            project.setDescription(entityBean.getDescription());
+        }
         project.setOrganisation(organisation);
 
         final int projectId = dao.save(project);
@@ -86,6 +105,32 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
         LOGGER.info(msg);
 
         return projectId;
+    }
+
+    @Override
+    public List<ProjectDTO> findByOrgIdAndKey(final Integer orgId, final String projectKey, final int pageNo,
+            final int pageSize) {
+
+        // Sanity Checks
+        Verify.notNull(orgId, "$findByOrgIdAndKey :: orgId must be non NULL");
+        Verify.notNull(projectKey, "$findByOrgIdAndKey :: projectKey must be non NULL");
+
+        final Organisation organisation = dao.read(Organisation.class, orgId, true);
+
+        final Criteria orgCriteria = Criteria.equal(Project.PROP_ORGANISATION, organisation);
+        final Criteria keyCriteria = Criteria.equal(Project.PROP_PROJECT_KEY, projectKey);
+
+        final List<Criteria> criteriaList = new ArrayList<Criteria>();
+        criteriaList.add(orgCriteria);
+        criteriaList.add(keyCriteria);
+
+        final Criteria orgAndKeyCriteria = Criteria.and(criteriaList);
+
+        final List<Project> projects = this.dao.find(this.getEntityClass(), orgAndKeyCriteria, pageNo, pageSize);
+        final List<ProjectDTO> projectDtos = super.toDTOs(projects);
+
+        LOGGER.info("Projects found with given OrgId and Key: {}", projectDtos);
+        return projectDtos;
     }
 
     @Override
@@ -194,7 +239,7 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
         // Sanity Checks
         Verify.notNull(orgId, "$count :: orgId must be non NULL");
 
-        final int count = super.count(userService.getUserOrgCriteria(orgId));
+        final int count = super.count(userService.getOrgCriteria(orgId));
         return count;
     }
 
@@ -202,6 +247,10 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
     // ------------------------------------------------------------------------
 
     public Criteria getProjectUsersCriteria(final Integer projectId, final Integer userId) {
+
+        // Sanity Checks
+        Verify.notNull(projectId, "$getProjectUsersCriteria :: projectId must be non NULL");
+        Verify.notNull(userId, "$getProjectUsersCriteria :: userId must be non NULL");
 
         final User userEntity = dao.read(User.class, userId, true);
         final Project projectEntity = dao.read(Project.class, projectId, true);
@@ -216,6 +265,46 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
         final Criteria projectAndUserCriteria = Criteria.and(criteriaList);
 
         return projectAndUserCriteria;
+    }
+
+    // Private Methods for Key Generation
+    // ------------------------------------------------------------------------
+
+    private List<String> generateKeys(final Integer orgId, final String projectName) {
+
+        // Sanity Checks
+        Verify.notNull(projectName, "$generateKeys :: projectName must be non NULL");
+        Verify.notNull(orgId, "$generateKeys :: orgId must be non NULL");
+
+        final String[] subStrings = projectName.split(" ");
+        String key = "";
+        final List<String> keys = new ArrayList<String>();
+
+        for (String s : subStrings) {
+            for (int i = 2; i < s.length(); i++) {
+                keys.add(s.substring(0, i).toUpperCase());
+            }
+            key = key + s.charAt(0);
+        }
+        if (key.length() >= 2) {
+            keys.add(0, key);
+        }
+        LOGGER.info("$generateKeys :: Generated Keys : {}", keys);
+        return keys;
+    }
+
+    private boolean isKeyUnique(final String key, final Integer orgId, final int pageNo, final int pageSize) {
+
+        // Sanity Checks
+        Verify.notNull(key, "$isKeyUnique :: key must be non NULL");
+        Verify.notNull(orgId, "$isKeyUnique :: orgId must be non NULL");
+
+        final List<ProjectDTO> projectDtos = this.findByOrgIdAndKey(orgId, key, pageNo, pageSize);
+
+        if (projectDtos.isEmpty()) {
+            return true;
+        }
+        return false;
     }
 
 
