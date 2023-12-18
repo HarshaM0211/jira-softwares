@@ -25,5 +25,5 @@ public interface UserService extends EntityService<Integer, User, UserDTO> {
 
     boolean isUserInOrg(final Integer userId, final Integer orgId);
 
-    Criteria getUserOrgCriteria(final Integer orgId);
+    Criteria getOrgCriteria(final Integer orgId);
 }
