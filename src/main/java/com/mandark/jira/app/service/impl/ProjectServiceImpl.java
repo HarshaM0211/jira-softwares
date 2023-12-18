@@ -1,5 +1,11 @@
 package com.mandark.jira.app.service.impl;
 
+import static com.mandark.jira.app.persistence.orm.entity.Project.PROP_ORGANISATION;
+import static com.mandark.jira.app.persistence.orm.entity.Project.PROP_PROJECT_KEY;
+import static com.mandark.jira.app.persistence.orm.entity.ProjectUser.PROP_PROJECT;
+import static com.mandark.jira.app.persistence.orm.entity.ProjectUser.PROP_USER;
+import static com.mandark.jira.web.WebConstants.DEFAULT_PAGE_NO;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -22,7 +28,6 @@ import com.mandark.jira.spi.app.persistence.IDao;
 import com.mandark.jira.spi.app.query.Criteria;
 import com.mandark.jira.spi.app.service.AbstractJpaEntityService;
 import com.mandark.jira.spi.util.Verify;
-import com.mandark.jira.web.WebConstants;
 
 
 public class ProjectServiceImpl extends AbstractJpaEntityService<Project, ProjectBean, ProjectDTO>
@@ -100,7 +105,7 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
         final List<String> keyList = this.generateKeys(orgId, projectName);
         for (String key : keyList) {
             final int projectsCount = this.count(orgId);
-            final int pageNo = Integer.parseInt(WebConstants.DEFAULT_PAGE_NO);
+            final int pageNo = Integer.parseInt(DEFAULT_PAGE_NO);
             if (this.isKeyUnique(key, orgId, pageNo, projectsCount)) {
                 LOGGER.info("Key :{} is unique for given Project Name", key);
                 return key;
@@ -130,8 +135,8 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
 
         final Organisation organisation = dao.read(Organisation.class, orgId, true);
 
-        final Criteria orgCriteria = Criteria.equal(Project.PROP_ORGANISATION, organisation);
-        final Criteria keyCriteria = Criteria.equal(Project.PROP_PROJECT_KEY, projectKey);
+        final Criteria orgCriteria = Criteria.equal(PROP_ORGANISATION, organisation);
+        final Criteria keyCriteria = Criteria.equal(PROP_PROJECT_KEY, projectKey);
 
         final List<Criteria> criteriaList = new ArrayList<Criteria>();
         criteriaList.add(orgCriteria);
@@ -165,15 +170,16 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
         Verify.notNull(userId, "$addUser :: userId must be non NULL");
         Verify.notNull(projectId, "$addUser :: projectId must be non NULL");
 
-        final ProjectUser projectUser = dao.findOne(ProjectUser.class, this.getProjectUsersCriteria(projectId, userId));
+        final User userEntity = dao.read(User.class, userId, true);
+        final Project projectEntity = dao.read(Project.class, projectId, true);
+
+        final ProjectUser projectUser =
+                dao.findOne(ProjectUser.class, this.getProjectUsersCriteria(projectEntity, userEntity));
 
         if (Objects.nonNull(projectUser)) {
             LOGGER.info("User with Id : %s, already Exists in the specified Project with Id : %s", userId, projectId);
             return;
         }
-
-        final User userEntity = dao.read(User.class, userId, true);
-        final Project projectEntity = dao.read(Project.class, projectId, true);
 
         final ProjectUser projectUserEntity = new ProjectUser();
         projectUserEntity.setProject(projectEntity);
@@ -192,7 +198,7 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
         Verify.notNull(orgId);
 
         final Organisation organisation = dao.read(Organisation.class, orgId, true);
-        final Criteria projOrgCriteria = Criteria.equal(Project.PROP_ORGANISATION, organisation);
+        final Criteria projOrgCriteria = Criteria.equal(PROP_ORGANISATION, organisation);
 
         final List<Project> projects = dao.find(this.getEntityClass(), projOrgCriteria, pageNo, pageSize);
 
@@ -207,7 +213,7 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
         Verify.notNull(userId, "$getProjectsByUserId :: userId must be non NULL");
 
         final User user = dao.read(User.class, userId, true);
-        final Criteria criteria = Criteria.equal(ProjectUser.PROP_USER, user);
+        final Criteria criteria = Criteria.equal(PROP_USER, user);
 
         final List<ProjectUser> userProjects = dao.find(ProjectUser.class, criteria, pageNo, pageSize);
 
@@ -228,7 +234,11 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
         Verify.notNull(projectId, "$removeUser :: projectId must be non NULL");
         Verify.notNull(userId, "$removeUser :: userId must be non NULL");
 
-        final ProjectUser projectUser = dao.findOne(ProjectUser.class, this.getProjectUsersCriteria(projectId, userId));
+        final User userEntity = dao.read(User.class, userId, true);
+        final Project projectEntity = dao.read(Project.class, projectId, true);
+
+        final ProjectUser projectUser =
+                dao.findOne(ProjectUser.class, this.getProjectUsersCriteria(projectEntity, userEntity));
 
         if (Objects.isNull(projectUser)) {
 
@@ -259,17 +269,14 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
     // Criteria
     // ------------------------------------------------------------------------
 
-    public Criteria getProjectUsersCriteria(final Integer projectId, final Integer userId) {
+    public Criteria getProjectUsersCriteria(final Project projectEntity, final User userEntity) {
 
         // Sanity Checks
-        Verify.notNull(projectId, "$getProjectUsersCriteria :: projectId must be non NULL");
-        Verify.notNull(userId, "$getProjectUsersCriteria :: userId must be non NULL");
+        Verify.notNull(projectEntity, "$getProjectUsersCriteria :: projectEntity must be non NULL");
+        Verify.notNull(userEntity, "$getProjectUsersCriteria :: userEntity must be non NULL");
 
-        final User userEntity = dao.read(User.class, userId, true);
-        final Project projectEntity = dao.read(Project.class, projectId, true);
-
-        final Criteria projectcriteria = Criteria.equal(ProjectUser.PROP_PROJECT, projectEntity);
-        final Criteria userCriteria = Criteria.equal(ProjectUser.PROP_USER, userEntity);
+        final Criteria projectcriteria = Criteria.equal(PROP_PROJECT, projectEntity);
+        final Criteria userCriteria = Criteria.equal(PROP_USER, userEntity);
 
         final List<Criteria> criteriaList = new ArrayList<Criteria>();
         criteriaList.add(projectcriteria);
@@ -286,7 +293,7 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
     private List<String> generateKeys(final Integer orgId, final String projectName) {
 
         // Sanity Checks
-        Verify.notNull(projectName, "$generateKeys :: projectName must be non NULL");
+        Verify.hasLength(projectName, "$generateKeys :: projectName must have atleast a Single Character");
         Verify.notNull(orgId, "$generateKeys :: orgId must be non NULL");
 
         final String[] subStrings = projectName.split(" ");

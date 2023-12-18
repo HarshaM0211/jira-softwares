@@ -1,5 +1,10 @@
 package com.mandark.jira.web.rest;
 
+import static com.mandark.jira.web.WebConstants.DEFAULT_PAGE_NO;
+import static com.mandark.jira.web.WebConstants.DEFAULT_PAGE_SIZE;
+import static com.mandark.jira.web.WebConstants.REQ_PARAM_PAGE_NO;
+import static com.mandark.jira.web.WebConstants.REQ_PARAM_PAGE_SIZE;
+
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -19,7 +24,6 @@ import com.mandark.jira.app.service.ProjectService;
 import com.mandark.jira.spi.web.PageResult;
 import com.mandark.jira.spi.web.Pagination;
 import com.mandark.jira.spi.web.Responses;
-import com.mandark.jira.web.WebConstants;
 
 
 @RestController
@@ -69,10 +73,8 @@ public class ProjectAPI extends AbstractAPI {
 
     @RequestMapping(value = "", method = RequestMethod.GET)
     public ResponseEntity<?> getProjectsByOrgId(@PathVariable("orgId") Integer orgId,
-            @RequestParam(name = WebConstants.REQ_PARAM_PAGE_NO,
-                    defaultValue = WebConstants.DEFAULT_PAGE_NO) int pageNo,
-            @RequestParam(name = WebConstants.REQ_PARAM_PAGE_SIZE,
-                    defaultValue = WebConstants.DEFAULT_PAGE_SIZE) int pageSize) {
+            @RequestParam(name = REQ_PARAM_PAGE_NO, defaultValue = DEFAULT_PAGE_NO) int pageNo,
+            @RequestParam(name = REQ_PARAM_PAGE_SIZE, defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
 
         final int count = projectService.count(orgId);
         final List<ProjectDTO> projetDtos = projectService.findByOrgId(orgId, pageNo, pageSize);
@@ -88,10 +90,8 @@ public class ProjectAPI extends AbstractAPI {
 
     @RequestMapping(value = "/users/{userId}", method = RequestMethod.GET)
     public ResponseEntity<?> getProjectsByUserId(@PathVariable("userId") Integer userId,
-            @RequestParam(name = WebConstants.REQ_PARAM_PAGE_NO,
-                    defaultValue = WebConstants.DEFAULT_PAGE_NO) int pageNo,
-            @RequestParam(name = WebConstants.REQ_PARAM_PAGE_SIZE,
-                    defaultValue = WebConstants.DEFAULT_PAGE_SIZE) int pageSize) {
+            @RequestParam(name = REQ_PARAM_PAGE_NO, defaultValue = DEFAULT_PAGE_NO) int pageNo,
+            @RequestParam(name = REQ_PARAM_PAGE_SIZE, defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
 
         final List<ProjectDTO> projectDtos = projectService.findByUserId(userId, pageNo, pageSize);
 
@@ -131,6 +131,7 @@ public class ProjectAPI extends AbstractAPI {
 
         return Responses.ok(msg);
     }
+
     // Project :: Remove User
     // ------------------------------------------------------------------------
 
