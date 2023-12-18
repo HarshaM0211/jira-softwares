@@ -3,6 +3,7 @@ package com.mandark.jira.app.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 import javax.transaction.Transactional;
 
@@ -79,18 +80,7 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
 
         final Organisation organisation = dao.read(Organisation.class, orgId, true);
 
-        Project project = new Project();
-        if (Objects.nonNull(entityBean.getProjectKey())) {
-            project = this.createFromBean(entityBean);
-        }
-        if (Objects.isNull(entityBean.getProjectKey())) {
-
-            final String key = this.getKeyAuto(orgId, entityBean.getName());
-
-            project.setProjectKey(key);
-            project.setName(entityBean.getName());
-            project.setDescription(entityBean.getDescription());
-        }
+        final Project project = this.createFromBean(entityBean);
         project.setOrganisation(organisation);
 
         final int projectId = dao.save(project);
@@ -100,7 +90,8 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
         return projectId;
     }
 
-    private String getKeyAuto(final Integer orgId, final String projectName) {
+    @Override
+    public String getKeyAuto(final Integer orgId, final String projectName) {
 
         // Sanity Checks
         Verify.notNull(orgId, "$getKeyAuto :: orgId must be non NULL");
@@ -115,7 +106,18 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
                 return key;
             }
         }
-        return null;
+        return generateRandomString(4);
+    }
+
+    private String generateRandomString(final int length) {
+        final StringBuilder sb = new StringBuilder();
+        final Random random = new Random();
+
+        for (int i = 0; i < length; i++) {
+            final char randomChar = (char) (random.nextInt(26) + 'A');
+            sb.append(randomChar);
+        }
+        return sb.toString();
     }
 
     @Override
@@ -298,7 +300,7 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
             key = key + s.charAt(0);
         }
         if (key.length() >= 2) {
-            keys.add(0, key);
+            keys.add(0, key.toUpperCase());
         }
         LOGGER.info("$generateKeys :: Generated Keys : {}", keys);
         return keys;

@@ -53,6 +53,17 @@ public class ProjectAPI extends AbstractAPI {
         return Responses.ok(msg);
     }
 
+    // Project :: Generate Key
+    // ------------------------------------------------------------------------
+
+    @RequestMapping(value = "/key", method = RequestMethod.GET)
+    public ResponseEntity<?> getKey(@RequestParam String projectName, @PathVariable("orgId") Integer orgId) {
+
+        final String projectKey = projectService.getKeyAuto(orgId, projectName);
+
+        return Responses.ok(projectKey);
+    }
+
     // Project :: Read the Projects by OrgId
     // ------------------------------------------------------------------------
 
