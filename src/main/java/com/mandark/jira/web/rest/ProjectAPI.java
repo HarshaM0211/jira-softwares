@@ -6,6 +6,7 @@ import static com.mandark.jira.web.WebConstants.REQ_PARAM_PAGE_NO;
 import static com.mandark.jira.web.WebConstants.REQ_PARAM_PAGE_SIZE;
 
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +64,7 @@ public class ProjectAPI extends AbstractAPI {
     @RequestMapping(value = "/key", method = RequestMethod.GET)
     public ResponseEntity<?> getKey(@RequestParam String projectName, @PathVariable("orgId") Integer orgId) {
 
-        final String projectKey = projectService.getKeyAuto(orgId, projectName);
+        final Map<String, Object> projectKey = projectService.getKeyAuto(orgId, projectName);
 
         return Responses.ok(projectKey);
     }

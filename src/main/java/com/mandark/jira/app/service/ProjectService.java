@@ -1,6 +1,7 @@
 package com.mandark.jira.app.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.mandark.jira.app.beans.ProjectBean;
 import com.mandark.jira.app.dto.ProjectDTO;
@@ -18,7 +19,7 @@ public interface ProjectService extends EntityService<Integer, Project, ProjectD
 
     void removeUser(final Integer projectId, final Integer userId);
 
-    String getKeyAuto(final Integer orgId, final String projectName);
+    Map<String, Object> getKeyAuto(final Integer orgId, final String projectName);
 
     List<ProjectDTO> findByOrgId(final Integer orgId, final int pageNo, final int pageSize);
 
