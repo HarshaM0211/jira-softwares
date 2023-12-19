@@ -102,7 +102,7 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
         final User userEntity = dao.findOne(this.getEntityClass(), userEmailCriteria);
         this.addUserToOrg(orgId, userEntity);
 
-        final String msg = String.format("Successfully added User with mail : {} , into the Organisation with ID : {}",
+        final String msg = String.format("Successfully added User with mail : %s , into the Organisation with ID : %s",
                 userEmail, orgId);
         LOGGER.info(msg);
     }
@@ -205,22 +205,28 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
 
     @Override
     @Transactional
-    public void removeFromOrg(final Integer orgId, final Integer userId) {
+    public String removeFromOrg(final Integer orgId, final Integer userId) {
 
         User user = this.dao.read(this.getEntityClass(), userId, true);
 
+        if (Objects.isNull(user.getOrganisation())) {
+
+            final String msg = String.format("User with Id : %s, is not belongs to any Organisation", userId);
+            return msg;
+
+        }
         if (orgId.equals(user.getOrganisation().getId())) {
             user.setOrganisation(null);
             this.dao.update(userId, user);
-            String msg = String.format(
-                    "$removeFromOrg :: Successfully removed User with ID : {} , from Organisation with ID : {}", userId,
+            final String msg = String.format(
+                    "$removeFromOrg :: Successfully removed User with ID : %s , from Organisation with ID : %s", userId,
                     orgId);
             LOGGER.info(msg);
-            return;
+            return msg;
         }
-        final String msg = String.format("User with Id : {}, not belongs to Organisation with Id : {}", userId, orgId);
+        final String msg = String.format("User with Id : %s, not belongs to Organisation with Id : %s", userId, orgId);
 
-        throw new IllegalArgumentException(msg);
+        return msg;
     }
 
     @Override
@@ -231,6 +237,16 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
         Verify.notNull(orgId);
 
         final User userEntity = dao.read(User.class, userId, true);
+
+        if (Objects.isNull(userEntity.getOrganisation())) {
+
+            final String msg = String.format("User doesn't exist in the Organisation with Id : %s", orgId);
+            LOGGER.info(msg);
+            return false;
+        }
+        final String msg = String.format("Status : User Existence in the Organisation : ",
+                orgId.equals(userEntity.getOrganisation().getId()));
+        LOGGER.info(msg);
 
         return orgId.equals(userEntity.getOrganisation().getId());
     }

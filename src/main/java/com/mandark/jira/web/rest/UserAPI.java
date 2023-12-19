@@ -70,7 +70,7 @@ public class UserAPI extends AbstractAPI {
         userService.addUserToOrgByMail(orgId, userEmail);
 
         final String msg = String.format(
-                "Successfully Added the User with email : {} , into the organisation with ID : {}", userEmail, orgId);
+                "Successfully Added the User with email : %s , into the organisation with ID : %s", userEmail, orgId);
         LOGGER.info(msg);
 
         return Responses.ok(msg);
@@ -84,7 +84,7 @@ public class UserAPI extends AbstractAPI {
 
         final UserDTO user = userService.read(userId);
 
-        final String msg = String.format("Successfully fetched User with ID : {}", userId);
+        final String msg = String.format("Successfully fetched User with ID : %s", userId);
         LOGGER.info(msg);
 
         return new ResponseEntity<>(user, HttpStatus.OK);
@@ -132,12 +132,11 @@ public class UserAPI extends AbstractAPI {
     // ------------------------------------------------------------------------
 
     @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
-    public ResponseEntity<?> removeFromOrg(@PathVariable("userId") Integer userId, @RequestParam Integer orgId) {
+    public ResponseEntity<?> removeFromOrg(@PathVariable("userId") Integer userId,
+            @PathVariable("orgId") Integer orgId) {
 
-        userService.removeFromOrg(orgId, userId);
+        final String msg = userService.removeFromOrg(orgId, userId);
 
-        final String msg =
-                String.format("Successfully Removed User with Id :- %s, from Organisation with ID :- %s", userId);
         LOGGER.info(msg);
 
         return Responses.ok(msg);
