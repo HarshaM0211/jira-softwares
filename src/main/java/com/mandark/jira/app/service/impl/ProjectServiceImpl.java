@@ -7,7 +7,9 @@ import static com.mandark.jira.app.persistence.orm.entity.ProjectUser.PROP_USER;
 import static com.mandark.jira.web.WebConstants.DEFAULT_PAGE_NO;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 
@@ -96,11 +98,13 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
     }
 
     @Override
-    public String getKeyAuto(final Integer orgId, final String projectName) {
+    public Map<String, Object> getKeyAuto(final Integer orgId, final String projectName) {
 
         // Sanity Checks
         Verify.notNull(orgId, "$getKeyAuto :: orgId must be non NULL");
         Verify.notNull(projectName, "$getKeyAuto :: projectName must be non NULL");
+
+        Map<String, Object> keyMap = new HashMap<String, Object>();
 
         final List<String> keyList = this.generateKeys(orgId, projectName);
         for (String key : keyList) {
@@ -108,10 +112,12 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
             final int pageNo = Integer.parseInt(DEFAULT_PAGE_NO);
             if (this.isKeyUnique(key, orgId, pageNo, projectsCount)) {
                 LOGGER.info("Key :{} is unique for given Project Name", key);
-                return key;
+                keyMap.put(PROP_PROJECT_KEY, key);
+                return keyMap;
             }
         }
-        return generateRandomString(4);
+        keyMap.put(PROP_PROJECT_KEY, generateRandomString(4));
+        return keyMap;
     }
 
     private String generateRandomString(final int length) {
