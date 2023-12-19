@@ -17,6 +17,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import com.mandark.jira.app.enums.IsIssueDeleted;
 import com.mandark.jira.app.enums.IssuePriority;
 import com.mandark.jira.app.enums.IssueStatus;
 import com.mandark.jira.app.enums.IssueType;
@@ -87,11 +88,13 @@ public class Issue extends JpaAuditEntity {
 
     private IssueStatus status;
 
-    private int parentIssueId;// (Issue ID of this table)
+    private Integer parentIssueId;// (Issue ID of this table)
 
     private List<Sprint> sprint;
 
     private User reportedBy;// (user_id)
+
+    private IsIssueDeleted isDeleted;
 
     // Constructors
     // ------------------------------------------------------------------------
@@ -208,11 +211,11 @@ public class Issue extends JpaAuditEntity {
     }
 
     @Column(name = "parent_issue_id")
-    public int getParentIssueId() {
+    public Integer getParentIssueId() {
         return parentIssueId;
     }
 
-    public void setParentIssueId(int parent_issue_id) {
+    public void setParentIssueId(Integer parent_issue_id) {
         this.parentIssueId = parent_issue_id;
     }
 
@@ -289,6 +292,16 @@ public class Issue extends JpaAuditEntity {
 
     public void setComments(List<Comment> comments) {
         this.comments = comments;
+    }
+
+    @Column(name = "is_deleted", columnDefinition = "varchar(3) default 'NO'")
+    @Enumerated(EnumType.STRING)
+    public IsIssueDeleted getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(IsIssueDeleted isDeleted) {
+        this.isDeleted = isDeleted;
     }
 
     // Object Methods

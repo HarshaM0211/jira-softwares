@@ -1,5 +1,13 @@
 package com.mandark.jira.app.service.impl;
 
+import static com.mandark.jira.app.enums.IssueType.BUG;
+import static com.mandark.jira.app.enums.IssueType.STORY;
+import static com.mandark.jira.app.enums.IssueType.TASK;
+import static com.mandark.jira.app.persistence.orm.entity.Issue.PROP_PROJECT;
+import static com.mandark.jira.app.persistence.orm.entity.Issue.PROP_TYPE;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -56,20 +64,33 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
         if (Objects.isNull(exEntity) || Objects.isNull(entityBean)) {
             return exEntity;
         }
-        exEntity.setAssignee(entityBean.getAssignee());
-        exEntity.setEndDate(entityBean.getEndDate());
+
+        User beanAssignee = Objects.isNull(entityBean.getAssigneeId()) ? null
+                : this.dao.read(User.class, entityBean.getAssigneeId(), true);
+        exEntity.setAssignee(beanAssignee);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        LocalDateTime endDate = Objects.isNull(entityBean.getEndDate()) ? null
+                : LocalDateTime.parse(entityBean.getEndDate(), formatter);
+        exEntity.setEndDate(endDate);
+
+        LocalDateTime startDate = Objects.isNull(entityBean.getStartDate()) ? null
+                : LocalDateTime.parse(entityBean.getStartDate(), formatter);
+        exEntity.setStartDate(startDate);
+
         exEntity.setLabel(entityBean.getLabel());
         exEntity.setParentIssueId(entityBean.getParentIssueId());
 
         List<Sprint> sprints = new ArrayList<Sprint>();
-        sprints.add(entityBean.getSprint());
+        Sprint beanSprint = Objects.isNull(entityBean.getSprintId()) ? null
+                : this.dao.read(Sprint.class, entityBean.getSprintId(), true);
+        sprints.add(beanSprint);
         exEntity.setSprint(sprints);
 
-        exEntity.setPriority(entityBean.getPriority());
-        exEntity.setStartDate(entityBean.getStartDate());
-        exEntity.setStatus(entityBean.getStatus());
+        exEntity.setPriority(IssuePriority.valueOf(entityBean.getPriorityStr()));
+        exEntity.setStatus(IssueStatus.valueOf(entityBean.getStatusStr()));
         exEntity.setSummary(entityBean.getSummary());
-        exEntity.setType(entityBean.getType());
+        exEntity.setType(IssueType.valueOf(entityBean.getTypeStr()));
         exEntity.setVersionStr(entityBean.getVersionStr());
 
         return exEntity;
@@ -77,7 +98,7 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
 
     @Override
     @Transactional
-    public int create(final IssueBean issueBean, final Integer projectId, final Integer reporterId) {
+    public int create(final IssueBean issueBean, final int projectId, final int reporterId) {
 
         // Sanity Checks
         Verify.notNull(issueBean, "$create :: issueBean must be non NULL");
@@ -102,7 +123,7 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
 
     @Override
     @Transactional
-    public void update(Integer issueId, IssueBean issueBean) {
+    public void update(final Integer issueId, final IssueBean issueBean) {
 
         // Sanity Checks
         Verify.notNull(issueBean, "$update :: issueBean must be non NULL");
@@ -112,7 +133,7 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
     }
 
     @Override
-    public IssueDTO getById(final Integer issueId) {
+    public IssueDTO getById(final int issueId) {
 
         // Sanity Checks
         Verify.notNull(issueId, "$getById :: issueId must be non NULL");
@@ -124,17 +145,18 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
     }
 
     @Override
-    public List<IssueDTO> readAllByProjectId(Integer projectId, int pageNo, int pageSize) {
+    public List<IssueDTO> readAllByProjectId(final Integer projectId, final int pageNo, final int pageSize) {
 
         final Project project = this.dao.read(Project.class, projectId, true);
         final Criteria criteria = Criteria.equal(Issue.PROP_PROJECT, project);
 
-        List<IssueDTO> issueDtos = super.find(criteria, pageNo, pageSize);
+        final List<IssueDTO> issueDtos = super.find(criteria, pageNo, pageSize);
 
         return issueDtos;
     }
 
     @Override
+    @Transactional
     public void updateAssignee(final Integer issueId, final Integer userId) {
 
         final Issue issueEntity = this.dao.read(this.getEntityClass(), issueId, true);
@@ -151,7 +173,8 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
     }
 
     @Override
-    public void addExChildIssueToEpic(Integer exIssueId, int epicId) {
+    @Transactional
+    public void addExChildIssueToEpic(final Integer exIssueId, final int epicId) {
 
         final Issue exIssue = this.dao.read(Issue.class, exIssueId, true);
 
@@ -159,39 +182,78 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
 
         this.dao.update(exIssueId, exIssue);
 
-        LOGGER.info("$addExChildIssueToEpic :: Successfully Added Issue with Id : {} to the Epic with Id : {}",
+        LOGGER.info("$addExChildIssueToEpic :: Successfully added Issue with Id : {} to the Epic with Id : {}",
                 exIssueId, epicId);
+    }
 
+    @Override
+    public boolean isEpic(final int epicId) {
+        final Issue issue = this.dao.read(Issue.class, epicId, true);
+        return IssueType.EPIC.equals(issue.getType());
+    }
+
+    @Override
+    public List<IssueDTO> listValidChildsForEpic(final Integer projectId, final int pageNo, final int pageSize) {
+
+        final Project project = this.dao.read(Project.class, projectId, true);
+
+        final Criteria projectCriteria = Criteria.equal(PROP_PROJECT, project);
+
+        final List<IssueType> typeList = new ArrayList<IssueType>();
+        typeList.add(IssueType.STORY);
+        typeList.add(IssueType.BUG);
+        typeList.add(IssueType.TASK);
+        final Criteria typeInCriteria = Criteria.in(PROP_TYPE, typeList);
+
+        final List<IssueStatus> statusList = new ArrayList<IssueStatus>();
+        statusList.add(IssueStatus.TODO);
+        statusList.add(IssueStatus.IN_PROGRESS);
+        statusList.add(IssueStatus.IN_REVIEW);
+        final Criteria statusInCriteria = Criteria.in(Issue.PROP_STATUS, statusList);
+
+        final List<Criteria> criterias = new ArrayList<Criteria>();
+        criterias.add(projectCriteria);
+        criterias.add(typeInCriteria);
+        criterias.add(statusInCriteria);
+
+
+        final Criteria andCriteria = Criteria.and(criterias);
+
+        final List<Issue> issueList = this.dao.find(this.getEntityClass(), andCriteria, pageNo, pageSize);
+        final List<IssueDTO> issueDtos = this.toDTOs(issueList);
+
+        return issueDtos;
 
     }
-    
-    private void listExChildIssue(Integer projectId) {
-        
-        
+
+    @Override
+    public int count(final int projectId) {
+        final Project project = this.dao.read(Project.class, projectId, true);
+        final Criteria projectCriteria = Criteria.equal(PROP_PROJECT, project);
+        return super.count(projectCriteria);
     }
 
     @Override
     public void addPatrentEpic() {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void addExIssueToEpic() {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
     public void addChildIssueOfNonEpic() {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
     public void addExistingSubTask() {
         // TODO Auto-generated method stub
-        
+
     }
 
     // @Override
@@ -206,5 +268,6 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
     // final String msg = String.format("$delete :: Successfully deleted the Issue with Id : %s", issueId);
     // LOGGER.info(msg);
     // }
+
 
 }

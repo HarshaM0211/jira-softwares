@@ -1,13 +1,6 @@
 package com.mandark.jira.app.beans;
 
-import java.time.LocalDateTime;
-
-import com.mandark.jira.app.enums.IssuePriority;
-import com.mandark.jira.app.enums.IssueStatus;
-import com.mandark.jira.app.enums.IssueType;
 import com.mandark.jira.app.persistence.orm.entity.Issue;
-import com.mandark.jira.app.persistence.orm.entity.Sprint;
-import com.mandark.jira.app.persistence.orm.entity.User;
 import com.mandark.jira.spi.app.EntityBean;
 
 
@@ -15,35 +8,36 @@ public class IssueBean implements EntityBean<Issue> {
 
     private String summary;
 
-    private LocalDateTime startDate;
+    private String startDate;
 
-    private LocalDateTime endDate;
+    private String endDate;
 
-    private IssueType type;
+    private String typeStr;
 
     private String versionStr;
 
     private String label;
 
-    private User assignee;
+    private Integer assigneeId;
 
-    private IssueStatus status;
+    private String statusStr;
 
-    private int parentIssueId;
+    private Integer parentIssueId;
 
-    private Sprint sprint;
+    private Integer sprintId;
 
-    private IssuePriority priority;
+    private String priorityStr;
 
     // Constructors
+    // ------------------------------------------------------------------------
+
+
+    // Getters and Setters
     // ------------------------------------------------------------------------
 
     public IssueBean() {
         super();
     }
-
-    // Getters and Setters
-    // ------------------------------------------------------------------------
 
     public String getSummary() {
         return summary;
@@ -53,28 +47,28 @@ public class IssueBean implements EntityBean<Issue> {
         this.summary = summary;
     }
 
-    public LocalDateTime getStartDate() {
+    public String getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(LocalDateTime startDate) {
+    public void setStartDate(String startDate) {
         this.startDate = startDate;
     }
 
-    public LocalDateTime getEndDate() {
+    public String getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(LocalDateTime endDate) {
+    public void setEndDate(String endDate) {
         this.endDate = endDate;
     }
 
-    public IssueType getType() {
-        return type;
+    public String getTypeStr() {
+        return typeStr;
     }
 
-    public void setType(IssueType type) {
-        this.type = type;
+    public void setTypeStr(String typeStr) {
+        this.typeStr = typeStr;
     }
 
     public String getVersionStr() {
@@ -93,43 +87,43 @@ public class IssueBean implements EntityBean<Issue> {
         this.label = label;
     }
 
-    public User getAssignee() {
-        return assignee;
+    public Integer getAssigneeId() {
+        return assigneeId;
     }
 
-    public void setAssignee(User assignee) {
-        this.assignee = assignee;
+    public void setAssigneeId(Integer assigneeId) {
+        this.assigneeId = assigneeId;
     }
 
-    public IssueStatus getStatus() {
-        return status;
+    public String getStatusStr() {
+        return statusStr;
     }
 
-    public void setStatus(IssueStatus status) {
-        this.status = status;
+    public void setStatusStr(String statusStr) {
+        this.statusStr = statusStr;
     }
 
-    public int getParentIssueId() {
+    public Integer getParentIssueId() {
         return parentIssueId;
     }
 
-    public void setParentIssueId(int parentIssueId) {
+    public void setParentIssueId(Integer parentIssueId) {
         this.parentIssueId = parentIssueId;
     }
 
-    public Sprint getSprint() {
-        return sprint;
+    public Integer getSprintId() {
+        return sprintId;
     }
 
-    public void setSprint(Sprint sprint) {
-        this.sprint = sprint;
+    public void setSprintId(Integer sprintId) {
+        this.sprintId = sprintId;
     }
 
-    public IssuePriority getPriority() {
-        return priority;
+    public String getPriorityStr() {
+        return priorityStr;
     }
 
-    public void setPriority(IssuePriority priority) {
-        this.priority = priority;
+    public void setPriorityStr(String priorityStr) {
+        this.priorityStr = priorityStr;
     }
 }

@@ -181,6 +181,9 @@
         <constructor-arg name="dao" ref="genericJpaDao" />
         <property name="userService" ref="userService"></property>
     </bean>
+    <bean id="issueService" class="com.mandark.jira.app.service.impl.IssueServiceImpl">
+        <constructor-arg name="dao" ref="genericJpaDao" />
+    </bean>
  
 
 
@@ -211,6 +214,9 @@
     </bean>
     <bean id="projectAPI" class="com.mandark.jira.web.rest.ProjectAPI">
     <property name="projectService" ref="projectService"/>
+    </bean>
+    <bean id="issueAPI" class="com.mandark.jira.web.rest.IssueAPI">
+    <property name="issueService" ref="issueService"/>
     </bean>
 
 
