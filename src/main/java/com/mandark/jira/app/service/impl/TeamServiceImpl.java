@@ -70,6 +70,7 @@ public class TeamServiceImpl extends AbstractJpaEntityService<Team, TeamBean, Te
         final Organisation organisation = dao.read(Organisation.class, orgId, true);
 
         final Team team = this.createFromBean(teamBean);
+        team.setOrganisation(organisation);
 
         final int teamId = dao.save(team);
 

@@ -14,6 +14,6 @@ public interface TeamMemberService {
 
     List<TeamDTO> getTeamsByUserId(final Integer userId, final int pageNo, final int pageSize);
 
-    void removeMember(final Integer teamId, final Integer userId);
+    String removeMember(final Integer teamId, final Integer userId);
 
 }
