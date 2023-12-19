@@ -133,7 +133,7 @@ public class TeamMemberServiceImpl implements TeamMemberService {
 
     @Override
     @Transactional
-    public void removeMember(final Integer teamId, final Integer userId) {
+    public String removeMember(final Integer teamId, final Integer userId) {
 
         // Sanity Checks
         Verify.notNull(teamId, "$removeMember :: teamId must be non NULL");
@@ -148,13 +148,14 @@ public class TeamMemberServiceImpl implements TeamMemberService {
                     userId, teamId);
             LOGGER.info(msg);
 
-            return;
+            return msg;
         }
         dao.purge(this.getEntityClass(), teamMemberEntity.getId());
 
         final String msg =
                 String.format("Successfully removed User with Id : %s, from the Team with Id : %s", userId, teamId);
         LOGGER.info(msg);
+        return msg;
     }
 
     // Criteria

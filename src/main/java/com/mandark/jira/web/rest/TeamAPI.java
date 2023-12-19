@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.mandark.jira.app.beans.TeamBean;
 import com.mandark.jira.app.dto.TeamDTO;
 import com.mandark.jira.app.dto.UserDTO;
-import com.mandark.jira.app.service.TeamService;
 import com.mandark.jira.app.service.TeamMemberService;
+import com.mandark.jira.app.service.TeamService;
 import com.mandark.jira.app.service.UserService;
 import com.mandark.jira.spi.web.PageResult;
 import com.mandark.jira.spi.web.Pagination;
@@ -47,9 +48,9 @@ public class TeamAPI extends AbstractAPI {
     // ------------------------------------------------------------------------
 
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public ResponseEntity<?> create(@RequestParam String teamName, @PathVariable("orgId") Integer orgId) {
+    public ResponseEntity<?> create(@RequestBody TeamBean teamBean, @PathVariable("orgId") Integer orgId) {
 
-        final int teamId = teamService.create(orgId, new TeamBean());
+        final int teamId = teamService.create(orgId, teamBean);
         final String msg = String.format("Successfully created a Team with ID :- %s", teamId);
         LOGGER.info(msg);
         return Responses.ok(msg);
@@ -120,10 +121,7 @@ public class TeamAPI extends AbstractAPI {
     @RequestMapping(value = "/{teamId}/users", method = RequestMethod.DELETE)
     public ResponseEntity<?> removeTeamMember(@PathVariable("teamId") Integer teamId, @RequestParam Integer userId) {
 
-        teamMemberService.removeMember(teamId, userId);
-
-        final String msg =
-                String.format("Successfully removed User with Id : %s, from the Team with Id : %s", userId, teamId);
+        final String msg = teamMemberService.removeMember(teamId, userId);
 
         return Responses.ok(msg);
     }
