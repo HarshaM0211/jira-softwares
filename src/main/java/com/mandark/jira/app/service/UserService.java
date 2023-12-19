@@ -17,7 +17,7 @@ public interface UserService extends EntityService<Integer, User, UserDTO> {
 
     List<UserDTO> getUsersByOrgId(final Integer orgId, final int pageNo, final int pageSize);
 
-    void removeFromOrg(final Integer orgId, final Integer userId);
+    String removeFromOrg(final Integer orgId, final Integer userId);
 
     void addUserToOrgByMail(final Integer orgId, final String userMail);
 
