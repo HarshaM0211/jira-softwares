@@ -62,6 +62,8 @@ public class Issue extends JpaAuditEntity {
 
     public static final String PROP_PRIORITY = "priority";
 
+    public static final String PROP_IS_DELETED = "isDeleted";
+
     // Fields
     // ------------------------------------------------------------------------
 
