@@ -17,7 +17,6 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-import com.mandark.jira.app.enums.IsIssueDeleted;
 import com.mandark.jira.app.enums.IssuePriority;
 import com.mandark.jira.app.enums.IssueStatus;
 import com.mandark.jira.app.enums.IssueType;
@@ -62,7 +61,7 @@ public class Issue extends JpaAuditEntity {
 
     public static final String PROP_PRIORITY = "priority";
 
-    public static final String PROP_IS_DELETED = "isDeleted";
+    public static final String PROP_IS_ACTIVE = "isActive";
 
     // Fields
     // ------------------------------------------------------------------------
@@ -96,7 +95,7 @@ public class Issue extends JpaAuditEntity {
 
     private User reportedBy;// (user_id)
 
-    private IsIssueDeleted isDeleted;
+    private Boolean isActive;
 
     // Constructors
     // ------------------------------------------------------------------------
@@ -296,14 +295,13 @@ public class Issue extends JpaAuditEntity {
         this.comments = comments;
     }
 
-    @Column(name = "is_deleted", columnDefinition = "varchar(3) default 'NO'")
-    @Enumerated(EnumType.STRING)
-    public IsIssueDeleted getIsDeleted() {
-        return isDeleted;
+    @Column(name = "is_active", columnDefinition = "varchar(10) default 'true'")
+    public Boolean getIsActive() {
+        return isActive;
     }
 
-    public void setIsDeleted(IsIssueDeleted isDeleted) {
-        this.isDeleted = isDeleted;
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
     }
 
     // Object Methods
@@ -315,7 +313,4 @@ public class Issue extends JpaAuditEntity {
                 + type + ", assignee=" + assignee + ", status=" + status + ", parent_issue_id=" + parentIssueId
                 + ", reported_by=" + reportedBy.getId() + "]";
     }
-
-
-
 }
