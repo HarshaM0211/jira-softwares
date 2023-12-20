@@ -57,6 +57,17 @@ public class IssueAPI extends AbstractAPI {
         return Responses.ok(msg);
     }
 
+    @RequestMapping(value = "/{issueId}", method = RequestMethod.DELETE)
+    public ResponseEntity<?> delete(@PathVariable("issueId") Integer issueId) {
+
+        issueService.delete(issueId);
+
+        final String msg = String.format("$API :: Successfully Deleted the Issue with Id : %s", issueId);
+        LOGGER.info(msg);
+
+        return Responses.ok(msg);
+    }
+
     @RequestMapping(value = "/{issueId}", method = RequestMethod.GET)
     public ResponseEntity<?> getIssueById(@PathVariable("issueId") Integer issueId) {
 
@@ -96,7 +107,6 @@ public class IssueAPI extends AbstractAPI {
     public ResponseEntity<?> addExChildIssueToEpic(@PathVariable("epicId") Integer epicId,
             @RequestParam Integer issueId) {
 
-
         if (issueService.isEpic(epicId)) {
 
             issueService.addExChildIssueToEpic(issueId, epicId);
@@ -114,12 +124,40 @@ public class IssueAPI extends AbstractAPI {
         return Responses.badRequest(msg);
     }
 
-    @RequestMapping(value = "/validChilds", method = RequestMethod.GET)
+    @RequestMapping(value = "/nonEpics", method = RequestMethod.GET)
     public ResponseEntity<?> listExChildsForEpic(@PathVariable("projectId") Integer projectId,
             @RequestParam(name = REQ_PARAM_PAGE_NO, defaultValue = DEFAULT_PAGE_NO) int pageNo,
             @RequestParam(name = REQ_PARAM_PAGE_SIZE, defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
 
         final List<IssueDTO> issueDtos = issueService.listValidChildsForEpic(projectId, pageNo, pageSize);
+        final int count = issueDtos.size();
+
+        final Pagination pagination = Pagination.with(count, pageNo, pageSize);
+        final PageResult pageResult = PageResult.with(pagination, issueDtos);
+
+        return new ResponseEntity<>(pageResult, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/epics", method = RequestMethod.GET)
+    public ResponseEntity<?> listExEpicsInProject(@PathVariable("projectId") Integer projectId,
+            @RequestParam(name = REQ_PARAM_PAGE_NO, defaultValue = DEFAULT_PAGE_NO) int pageNo,
+            @RequestParam(name = REQ_PARAM_PAGE_SIZE, defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
+
+        final List<IssueDTO> issueDtos = issueService.listEpicsInProject(projectId, pageNo, pageSize);
+        final int count = issueDtos.size();
+
+        final Pagination pagination = Pagination.with(count, pageNo, pageSize);
+        final PageResult pageResult = PageResult.with(pagination, issueDtos);
+
+        return new ResponseEntity<>(pageResult, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/subTasks", method = RequestMethod.GET)
+    public ResponseEntity<?> listExSubTasksInProject(@PathVariable("projectId") Integer projectId,
+            @RequestParam(name = REQ_PARAM_PAGE_NO, defaultValue = DEFAULT_PAGE_NO) int pageNo,
+            @RequestParam(name = REQ_PARAM_PAGE_SIZE, defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
+
+        final List<IssueDTO> issueDtos = issueService.listSubTasks(projectId, pageNo, pageSize);
         final int count = issueDtos.size();
 
         final Pagination pagination = Pagination.with(count, pageNo, pageSize);

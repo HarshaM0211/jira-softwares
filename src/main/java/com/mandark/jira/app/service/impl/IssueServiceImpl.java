@@ -1,10 +1,20 @@
 package com.mandark.jira.app.service.impl;
 
+import static com.mandark.jira.app.enums.IsIssueDeleted.NO;
+import static com.mandark.jira.app.enums.IsIssueDeleted.YES;
+import static com.mandark.jira.app.enums.IssueStatus.IN_PROGRESS;
+import static com.mandark.jira.app.enums.IssueStatus.IN_REVIEW;
+import static com.mandark.jira.app.enums.IssueStatus.TODO;
 import static com.mandark.jira.app.enums.IssueType.BUG;
+import static com.mandark.jira.app.enums.IssueType.EPIC;
 import static com.mandark.jira.app.enums.IssueType.STORY;
+import static com.mandark.jira.app.enums.IssueType.SUB_TASK;
 import static com.mandark.jira.app.enums.IssueType.TASK;
+import static com.mandark.jira.app.persistence.orm.entity.Issue.PROP_IS_DELETED;
 import static com.mandark.jira.app.persistence.orm.entity.Issue.PROP_PROJECT;
+import static com.mandark.jira.app.persistence.orm.entity.Issue.PROP_STATUS;
 import static com.mandark.jira.app.persistence.orm.entity.Issue.PROP_TYPE;
+import static com.mandark.jira.spi.app.SearchQuery.DATE_FORMAT_STR;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -19,7 +29,6 @@ import org.slf4j.LoggerFactory;
 
 import com.mandark.jira.app.beans.IssueBean;
 import com.mandark.jira.app.dto.IssueDTO;
-import com.mandark.jira.app.dto.OrganisationDTO;
 import com.mandark.jira.app.enums.IssuePriority;
 import com.mandark.jira.app.enums.IssueStatus;
 import com.mandark.jira.app.enums.IssueType;
@@ -28,6 +37,7 @@ import com.mandark.jira.app.persistence.orm.entity.Project;
 import com.mandark.jira.app.persistence.orm.entity.Sprint;
 import com.mandark.jira.app.persistence.orm.entity.User;
 import com.mandark.jira.app.service.IssueService;
+import com.mandark.jira.spi.app.SearchQuery;
 import com.mandark.jira.spi.app.persistence.IDao;
 import com.mandark.jira.spi.app.query.Criteria;
 import com.mandark.jira.spi.app.service.AbstractJpaEntityService;
@@ -70,7 +80,7 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
                 : this.dao.read(User.class, entityBean.getAssigneeId(), true);
         exEntity.setAssignee(beanAssignee);
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT_STR);
         LocalDateTime endDate = Objects.isNull(entityBean.getEndDate()) ? null
                 : LocalDateTime.parse(entityBean.getEndDate(), formatter);
         exEntity.setEndDate(endDate);
@@ -107,7 +117,7 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
         final Project project = this.dao.read(Project.class, projectId, true);
         final User reportedBy = this.dao.read(User.class, reporterId, true);
 
-        final Criteria projectCriteria = Criteria.equal(Issue.PROP_PROJECT, project);
+        final Criteria projectCriteria = Criteria.equal(PROP_PROJECT, project);
         int count = super.count(projectCriteria);
         count++;
         final String issueKey = project.getProjectKey() + "-" + count;
@@ -124,20 +134,16 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
 
     @Override
     @Transactional
-    public void update(final Integer issueId, final IssueBean issueBean) {
+    public void update(final int issueId, final IssueBean issueBean) {
 
         // Sanity Checks
         Verify.notNull(issueBean, "$update :: issueBean must be non NULL");
-        Verify.notNull(issueId, "$update :: issueId must be non NULL");
 
         super.update(issueId, issueBean);
     }
 
     @Override
     public IssueDTO getById(final int issueId) {
-
-        // Sanity Checks
-        Verify.notNull(issueId, "$getById :: issueId must be non NULL");
 
         final Issue issue = this.dao.read(this.getEntityClass(), issueId, true);
         final IssueDTO issueDto = this.toDTO(issue);
@@ -146,19 +152,21 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
     }
 
     @Override
-    public List<IssueDTO> readAllByProjectId(final Integer projectId, final int pageNo, final int pageSize) {
+    public List<IssueDTO> readAllByProjectId(final int projectId, final int pageNo, final int pageSize) {
 
-        final Project project = this.dao.read(Project.class, projectId, true);
-        final Criteria criteria = Criteria.equal(Issue.PROP_PROJECT, project);
+        final Criteria projectCriteria = this.getProjectCriteria(projectId);
+        final Criteria deleteCriteria = Criteria.equal(PROP_IS_DELETED, NO);
 
-        final List<IssueDTO> issueDtos = super.find(criteria, pageNo, pageSize);
+        final Criteria andCriteria = Criteria.and(projectCriteria, deleteCriteria);
+
+        final List<IssueDTO> issueDtos = super.find(andCriteria, pageNo, pageSize);
 
         return issueDtos;
     }
 
     @Override
     @Transactional
-    public void updateAssignee(final Integer issueId, final Integer userId) {
+    public void updateAssignee(final int issueId, final int userId) {
 
         final Issue issueEntity = this.dao.read(this.getEntityClass(), issueId, true);
         final User newAssignee = this.dao.read(User.class, userId, true);
@@ -175,7 +183,7 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
 
     @Override
     @Transactional
-    public void addExChildIssueToEpic(final Integer exIssueId, final int epicId) {
+    public void addExChildIssueToEpic(final int exIssueId, final int epicId) {
 
         final Issue exIssue = this.dao.read(Issue.class, exIssueId, true);
 
@@ -194,81 +202,76 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
     }
 
     @Override
-    public List<IssueDTO> listValidChildsForEpic(final Integer projectId, final int pageNo, final int pageSize) {
-
-        final Project project = this.dao.read(Project.class, projectId, true);
-
-        final Criteria projectCriteria = Criteria.equal(PROP_PROJECT, project);
-
-        final List<IssueType> typeList = new ArrayList<IssueType>();
-        typeList.add(IssueType.STORY);
-        typeList.add(IssueType.BUG);
-        typeList.add(IssueType.TASK);
-        final Criteria typeInCriteria = Criteria.in(PROP_TYPE, typeList);
-
-        final List<IssueStatus> statusList = new ArrayList<IssueStatus>();
-        statusList.add(IssueStatus.TODO);
-        statusList.add(IssueStatus.IN_PROGRESS);
-        statusList.add(IssueStatus.IN_REVIEW);
-        final Criteria statusInCriteria = Criteria.in(Issue.PROP_STATUS, statusList);
-
-        final List<Criteria> criterias = new ArrayList<Criteria>();
-        criterias.add(projectCriteria);
-        criterias.add(typeInCriteria);
-        criterias.add(statusInCriteria);
-
-
-        final Criteria andCriteria = Criteria.and(criterias);
-
-        final List<Issue> issueList = this.dao.find(this.getEntityClass(), andCriteria, pageNo, pageSize);
-        final List<IssueDTO> issueDtos = this.toDTOs(issueList);
-
-        return issueDtos;
-
-    }
-
-    @Override
     public int count(final int projectId) {
-        final Project project = this.dao.read(Project.class, projectId, true);
-        final Criteria projectCriteria = Criteria.equal(PROP_PROJECT, project);
+        final Criteria projectCriteria = this.getProjectCriteria(projectId);
         return super.count(projectCriteria);
     }
 
     @Override
-    public void addPatrentEpic() {
-        // TODO Auto-generated method stub
+    @Transactional
+    public void delete(final int issueId) {
+
+        final Issue issue = this.dao.read(this.getEntityClass(), issueId, true);
+        issue.setIsDeleted(YES);
+
+        this.dao.update(issueId, issue);
+
+        final String msg = String.format("$delete :: Successfully deleted the Issue with Id : %s", issueId);
+        LOGGER.info(msg);
     }
 
     @Override
-    public void addExIssueToEpic() {
-        // TODO Auto-generated method stub
+    public List<IssueDTO> listEpicsInProject(final int projectId, final int pageNo, final int pageSize) {
 
+        final Criteria projectCriteria = this.getProjectCriteria(projectId);
+        final Criteria epicCriteria = Criteria.equal(PROP_TYPE, EPIC);
+
+        final Criteria andCriteria = Criteria.and(projectCriteria, epicCriteria);
+
+        final List<Issue> issues = this.dao.find(this.getEntityClass(), andCriteria, pageNo, pageSize);
+        return this.toDTOs(issues);
     }
 
     @Override
-    public void addChildIssueOfNonEpic() {
-        // TODO Auto-generated method stub
+    public List<IssueDTO> listSubTasks(final int projectId, final int pageNo, final int pageSize) {
 
+        final Criteria projectCriteria = this.getProjectCriteria(projectId);
+        final Criteria subTaskCriteria = Criteria.equal(PROP_TYPE, SUB_TASK);
+
+        final Criteria andCriteria = Criteria.and(projectCriteria, subTaskCriteria);
+
+        final List<Issue> issues = this.dao.find(this.getEntityClass(), andCriteria, pageNo, pageSize);
+        return this.toDTOs(issues);
     }
 
     @Override
-    public void addExistingSubTask() {
-        // TODO Auto-generated method stub
+    public List<IssueDTO> listValidChildsForEpic(final int projectId, final int pageNo, final int pageSize) {
 
+        final Criteria projectCriteria = this.getProjectCriteria(projectId);
+
+        final List<IssueType> typeList = new ArrayList<IssueType>();
+        typeList.add(STORY);
+        typeList.add(BUG);
+        typeList.add(TASK);
+        final Criteria typeInCriteria = Criteria.in(PROP_TYPE, typeList);
+
+        final List<IssueStatus> statusList = new ArrayList<IssueStatus>();
+        statusList.add(TODO);
+        statusList.add(IN_PROGRESS);
+        statusList.add(IN_REVIEW);
+        final Criteria statusInCriteria = Criteria.in(PROP_STATUS, statusList);
+
+        final Criteria andCriteria = Criteria.and(projectCriteria, typeInCriteria, statusInCriteria);
+
+        final List<Issue> issueList = this.dao.find(this.getEntityClass(), andCriteria, pageNo, pageSize);
+
+        return this.toDTOs(issueList);
     }
 
-    // @Override
-    // @Transactional
-    // public void delete(Integer issueId) {
-    //
-    // // Sanity Checks
-    // Verify.notNull(issueId, "$delete :: issueId miust be non NULL");
-    //
-    // super.purge(issueId);
-    //
-    // final String msg = String.format("$delete :: Successfully deleted the Issue with Id : %s", issueId);
-    // LOGGER.info(msg);
-    // }
-
+    private Criteria getProjectCriteria(final int projectId) {
+        final Project project = this.dao.read(Project.class, projectId, true);
+        final Criteria projectCriteria = Criteria.equal(PROP_PROJECT, project);
+        return projectCriteria;
+    }
 
 }

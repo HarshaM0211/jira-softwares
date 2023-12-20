@@ -12,36 +12,28 @@ public interface IssueService extends EntityService<Integer, Issue, IssueDTO> {
 
     int create(final IssueBean issueBean, final int projectId, final int reporterId);
 
-    void update(final Integer issueId, final IssueBean issueBean);
+    void update(final int issueId, final IssueBean issueBean);
 
     IssueDTO getById(final int issueId);
 
-    List<IssueDTO> readAllByProjectId(final Integer projectId, final int pageNo, final int pageSize);
+    List<IssueDTO> readAllByProjectId(final int projectId, final int pageNo, final int pageSize);
 
-    void updateAssignee(final Integer issueId, final Integer userId);
+    void updateAssignee(final int issueId, final int userId);
 
+    void addExChildIssueToEpic(final int exIssueId, final int epicId);
 
-    void addExChildIssueToEpic(final Integer exIssueId, final int epicId);
-
-    List<IssueDTO> listValidChildsForEpic(final Integer projectId, final int pageNo, final int pageSize);
-
-    // void createChildI
+    void delete(final int issueId);
 
 
+    List<IssueDTO> listValidChildsForEpic(final int projectId, final int pageNo, final int pageSize);
 
-    void addExIssueToEpic();
+    List<IssueDTO> listEpicsInProject(final int projectId, final int pageNo, final int pageSize);
 
-    void addChildIssueOfNonEpic();
+    List<IssueDTO> listSubTasks(final int projectId, final int pageNo, final int pageSize);
 
-    void addPatrentEpic();
-
-    void addExistingSubTask();
-
-    // void delete(Integer issueId);
 
     int count(final int projectId);
 
     boolean isEpic(final int epicId);
-
 
 }
