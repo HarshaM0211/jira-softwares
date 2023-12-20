@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import com.mandark.jira.app.beans.IssueBean;
 import com.mandark.jira.app.dto.IssueDTO;
+import com.mandark.jira.app.dto.OrganisationDTO;
 import com.mandark.jira.app.enums.IssuePriority;
 import com.mandark.jira.app.enums.IssueStatus;
 import com.mandark.jira.app.enums.IssueType;
@@ -50,7 +51,7 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
 
     @Override
     protected IssueDTO toDTO(Issue entityObj) {
-        return new IssueDTO(entityObj);
+        return Objects.isNull(entityObj) ? null : new IssueDTO(entityObj);
     }
 
     @Override
