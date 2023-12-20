@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.mandark.jira.app.beans.IssueBean;
 import com.mandark.jira.app.dto.IssueDTO;
+import com.mandark.jira.app.enums.IssueType;
+import com.mandark.jira.app.persistence.orm.entity.Issue;
+import com.mandark.jira.app.search.bean.IssueSearchQuery;
 import com.mandark.jira.app.service.IssueService;
 import com.mandark.jira.spi.web.PageResult;
 import com.mandark.jira.spi.web.Pagination;
@@ -60,7 +64,7 @@ public class IssueAPI extends AbstractAPI {
     @RequestMapping(value = "/{issueId}", method = RequestMethod.DELETE)
     public ResponseEntity<?> delete(@PathVariable("issueId") Integer issueId) {
 
-        issueService.delete(issueId);
+        issueService.purge(issueId);
 
         final String msg = String.format("$API :: Successfully Deleted the Issue with Id : %s", issueId);
         LOGGER.info(msg);
@@ -130,7 +134,7 @@ public class IssueAPI extends AbstractAPI {
             @RequestParam(name = REQ_PARAM_PAGE_SIZE, defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
 
         final List<IssueDTO> issueDtos = issueService.listValidChildsForEpic(projectId, pageNo, pageSize);
-        final int count = issueDtos.size();
+        final int count = issueService.nonEpicCount(projectId);
 
         final Pagination pagination = Pagination.with(count, pageNo, pageSize);
         final PageResult pageResult = PageResult.with(pagination, issueDtos);
@@ -144,7 +148,7 @@ public class IssueAPI extends AbstractAPI {
             @RequestParam(name = REQ_PARAM_PAGE_SIZE, defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
 
         final List<IssueDTO> issueDtos = issueService.listEpicsInProject(projectId, pageNo, pageSize);
-        final int count = issueDtos.size();
+        final int count = issueService.count(projectId, Issue.PROP_TYPE, IssueType.EPIC);
 
         final Pagination pagination = Pagination.with(count, pageNo, pageSize);
         final PageResult pageResult = PageResult.with(pagination, issueDtos);
@@ -158,7 +162,24 @@ public class IssueAPI extends AbstractAPI {
             @RequestParam(name = REQ_PARAM_PAGE_SIZE, defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
 
         final List<IssueDTO> issueDtos = issueService.listSubTasks(projectId, pageNo, pageSize);
-        final int count = issueDtos.size();
+        final int count = issueService.count(projectId, Issue.PROP_TYPE, IssueType.SUB_TASK);
+
+        final Pagination pagination = Pagination.with(count, pageNo, pageSize);
+        final PageResult pageResult = PageResult.with(pagination, issueDtos);
+
+        return new ResponseEntity<>(pageResult, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/search", method = RequestMethod.GET)
+    public ResponseEntity<?> search(@PathVariable("projectId") Integer projectId,
+            @RequestParam MultiValueMap<String, String> reqParams,
+            @RequestParam(name = REQ_PARAM_PAGE_NO, defaultValue = DEFAULT_PAGE_NO) int pageNo,
+            @RequestParam(name = REQ_PARAM_PAGE_SIZE, defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
+
+        final IssueSearchQuery isq = new IssueSearchQuery(reqParams);
+
+        final List<IssueDTO> issueDtos = issueService.search(isq, pageNo, pageSize);
+        final int count = issueService.count(isq);
 
         final Pagination pagination = Pagination.with(count, pageNo, pageSize);
         final PageResult pageResult = PageResult.with(pagination, issueDtos);
