@@ -7,7 +7,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -24,6 +23,22 @@ import com.mandark.jira.spi.lang.ValidationException;
         uniqueConstraints = {@UniqueConstraint(columnNames = {"email"})})
 public class User extends JpaAuditEntity {
 
+    // Field Lables
+    // ------------------------------------------------------------------------
+
+    public static final String PROP_FIRST_NAME = "firstName";
+
+    public static final String PROP_EMAIL = "email";
+
+    public static final String PROP_ORGANISATION = "organisation";
+
+    public static final String PROP_PHONE = "phone";
+
+    public static final String PROP_ROLE = "role";
+
+    // Fields
+    // ------------------------------------------------------------------------
+
     private String firstName;
 
     private String lastName;
@@ -35,10 +50,6 @@ public class User extends JpaAuditEntity {
     private Organisation organisation;
 
     private List<Comment> comments;
-
-    private List<Project> projects;
-
-    private List<Team> teams;
 
     private UserRole role;
 
@@ -59,7 +70,7 @@ public class User extends JpaAuditEntity {
     public void validate() {
 
         if (Objects.isNull(firstName)) {
-            throw new ValidationException("#validate :: userName is BLANK");
+            throw new ValidationException("#validate :: firstName is BLANK");
         }
 
         if (Objects.isNull(password)) {
@@ -70,20 +81,10 @@ public class User extends JpaAuditEntity {
             throw new ValidationException("#validate :: mail is BLANK");
         }
 
-        if (Objects.isNull(organisation)) {
-            throw new ValidationException("#validate :: organisation is BLANK");
-        }
-
-        if (Objects.isNull(role)) {
-            throw new ValidationException("#validate :: role is BLANK");
-        }
-
         if (Objects.isNull(phone)) {
             throw new ValidationException("#validate :: phone is BLANK");
         }
-
     }
-
 
     // Getters and Setters
     // ------------------------------------------------------------------------
@@ -143,25 +144,7 @@ public class User extends JpaAuditEntity {
         this.comments = comments;
     }
 
-    @ManyToMany(mappedBy = "users")
-    public List<Project> getProjects() {
-        return projects;
-    }
-
-    public void setProjects(List<Project> projects) {
-        this.projects = projects;
-    }
-
-    @ManyToMany(mappedBy = "users")
-    public List<Team> getTeams() {
-        return teams;
-    }
-
-    public void setTeams(List<Team> teams) {
-        this.teams = teams;
-    }
-
-    @Column(name = "role", nullable = false)
+    @Column(name = "role")
     public UserRole getRole() {
         return role;
     }
@@ -182,14 +165,10 @@ public class User extends JpaAuditEntity {
     // Object Methods
     // ------------------------------------------------------------------------
 
-
-
     @Override
     public String toString() {
-        return "Users [user_name=" + firstName + lastName + ", user_email=" + email + ", organisation="
-                + organisation.getName() + ", role=" + role + "]";
+        return "Users [user_name=" + firstName + lastName + ", user_email=" + email + ", organisation=" + organisation
+                + ", role=" + role + "]";
     }
-
-
 
 }

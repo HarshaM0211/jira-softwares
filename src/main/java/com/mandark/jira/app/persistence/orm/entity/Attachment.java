@@ -19,6 +19,16 @@ import com.mandark.jira.spi.lang.ValidationException;
 @Table(name = "attachments", indexes = {@Index(columnList = "issue_id", name = "issue_id")})
 public class Attachment extends JpaAuditEntity {
 
+    // Field Lables
+    // ------------------------------------------------------------------------
+
+    public static final String PROP_FILENAME = "fileName";
+
+    public static final String PROP_ISSUE = "issue";
+
+    // Fields
+    // ------------------------------------------------------------------------
+
     private String fileName;
 
     private byte[] fileData;

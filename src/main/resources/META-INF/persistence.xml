@@ -17,9 +17,11 @@
 		<class>com.mandark.jira.app.persistence.orm.entity.Issue</class>
 		<class>com.mandark.jira.app.persistence.orm.entity.Organisation</class>
 		<class>com.mandark.jira.app.persistence.orm.entity.Project</class>
+		<class>com.mandark.jira.app.persistence.orm.entity.ProjectUser</class>
 		<class>com.mandark.jira.app.persistence.orm.entity.Sprint</class>
 		<class>com.mandark.jira.app.persistence.orm.entity.Team</class>
 		<class>com.mandark.jira.app.persistence.orm.entity.User</class>
+		<class>com.mandark.jira.app.persistence.orm.entity.TeamMember</class>
 
 
 		<!-- Meta -->

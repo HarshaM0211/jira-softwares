@@ -72,9 +72,10 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
     @Override
     @Transactional
     public int create(final OrganisationBean bean) {
-        if (Objects.isNull(bean)) {
-            throw new IllegalArgumentException("[failed] - bean must not null");
-        }
+
+        // Sanity Checks
+        Verify.notNull(bean);
+
         final int id = super.save(bean);
 
         return id;
@@ -85,7 +86,8 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
 
     @Override
     @Transactional
-    public void updateOrganisation(Integer orgId, OrganisationBean orgBean) {
+    public void update(final Integer orgId, final OrganisationBean orgBean) {
+
         // Sanity Checks
         Verify.notNull(orgId, "Organisation Id is NULL");
         Verify.notNull(orgBean, "Organisation Bean is NULL");

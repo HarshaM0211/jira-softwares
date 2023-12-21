@@ -15,7 +15,8 @@ import com.mandark.jira.spi.app.query.OrderBy;
  * Data Access Object for all the Entities implementing {@link IEntity}.
  * 
  * <p>
- * This Data Access Object(DAO) provides the methods like persist, update, find/search .. to manipulate these objects.
+ * This Data Access Object(DAO) provides the methods like persist, update, find/search .. to
+ * manipulate these objects.
  * </p>
  * 
  * <p>
@@ -100,7 +101,8 @@ public interface IDao<K> {
      * 
      * @param entityCls the entity type
      * @param id entity identifier
-     * @param errorIfNotFound setting it to <code>true</code> will throw an exception if no entity is found.
+     * @param errorIfNotFound setting it to <code>true</code> will throw an exception if no entity is
+     *        found.
      * 
      * @return The entity object with the passed identifier
      */
@@ -140,8 +142,8 @@ public interface IDao<K> {
 
 
     /**
-     * Fetches a list entities with the passed deleted state and type, ordered by the give parameter. The results of
-     * this method are paginated
+     * Fetches a list entities with the passed deleted state and type, ordered by the give parameter.
+     * The results of this method are paginated
      * 
      * @param entityCls the entity type
      * @param orderby parameter name to order the objects
@@ -151,6 +153,8 @@ public interface IDao<K> {
      * @return A list of entity objects
      */
     <E extends IEntity<K>> List<E> read(Class<E> entityCls, OrderBy orderby, int pageNo, int pageSize);
+
+    <E extends IEntity<K>> List<E> read(Class<E> entityCls, List<OrderBy> orderbyList, int pageNo, int pageSize);
 
 
 
@@ -190,6 +194,9 @@ public interface IDao<K> {
      * @return {@link List} of entity objects matching the {@link Criteria}
      */
     <E extends IEntity<K>> List<E> find(Class<E> entityCls, Criteria criteria, OrderBy orderBy, int pageNo,
+            int pageSize);
+
+    <E extends IEntity<K>> List<E> find(Class<E> entityCls, Criteria criteria, List<OrderBy> orderbyList, int pageNo,
             int pageSize);
 
 

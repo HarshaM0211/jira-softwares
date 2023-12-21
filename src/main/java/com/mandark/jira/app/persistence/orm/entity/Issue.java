@@ -1,18 +1,23 @@
 package com.mandark.jira.app.persistence.orm.entity;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
+import com.mandark.jira.app.enums.IsIssueDeleted;
 import com.mandark.jira.app.enums.IssuePriority;
 import com.mandark.jira.app.enums.IssueStatus;
 import com.mandark.jira.app.enums.IssueType;
@@ -21,45 +26,75 @@ import com.mandark.jira.spi.lang.ValidationException;
 
 
 @Entity
-@Table(name = "issues")
+@Table(name = "issues",
+        indexes = {@Index(columnList = "project_id", name = "project_id"),
+                @Index(columnList = "issue_key", name = "issue_key"),
+                @Index(columnList = "parent_issue_id", name = "parent_issue_id"),
+                @Index(columnList = "reported_by", name = "reported_by"),
+                @Index(columnList = "version_str", name = "version_str")},
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"project_id", "issue_key"})})
 public class Issue extends JpaAuditEntity {
 
-    // @ManyToOne
-    // @JoinColumn(name = "org_id")
-    // private Organisations organisation;
+    // Fields Lables
+    // ------------------------------------------------------------------------
 
+    public static final String PROP_PROJECT = "project";
+
+    public static final String PROP_ISSUE_KEY = "issueKey";
+
+    public static final String PROP_TYPE = "type";
+
+    public static final String PROP_ASSIGNEE = "assignee";
+
+    public static final String PROP_STATUS = "status";
+
+    public static final String PROP_PARENT_ISSUE_ID = "parentIssueId";
+
+    public static final String PROP_SPRINT = "sprint";
+
+    public static final String PROP_REPORTED_BY = "reportedBy";
+
+    public static final String PROP_START_DATE = "startDate";
+
+    public static final String PROP_END_DATE = "endDate";
+
+    public static final String PROP_VERSION_STR = "versionStr";
+
+    public static final String PROP_PRIORITY = "priority";
+
+    // Fields
+    // ------------------------------------------------------------------------
+
+    // Info
     private Project project;
-
     private String issueKey;
+    private String summary;
 
-    private String description;// (name)
+    // Dates
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
 
+    // Tags
     private IssueType type;
+    private String versionStr;
+    private IssuePriority priority;
+    private String label;
+
+    // Extra contents
+    private List<Attachment> attachments;
+    private List<Comment> comments;
 
     private User assignee;// (mem_id)
 
     private IssueStatus status;
 
-    private int parentIssueId;// (Issue ID of this table)
+    private Integer parentIssueId;// (Issue ID of this table)
 
     private List<Sprint> sprint;
 
-    private User reportedBy;// (mem_id)
+    private User reportedBy;// (user_id)
 
-    private Date startDate;
-
-    private Date endDate;
-
-    private String versionStr;
-
-    private IssuePriority priority;
-
-    private String label;
-
-    private List<Attachment> attachments;
-
-    private List<Comment> comments;
-
+    private IsIssueDeleted isDeleted;
 
     // Constructors
     // ------------------------------------------------------------------------
@@ -75,8 +110,6 @@ public class Issue extends JpaAuditEntity {
     @Override
     public void validate() {
 
-        super.validate();
-
         if (Objects.isNull(project)) {
             throw new ValidationException("#validate :: project is BLANK");
         }
@@ -85,7 +118,7 @@ public class Issue extends JpaAuditEntity {
             throw new ValidationException("#validate :: issueKey is BLANK");
         }
 
-        if (Objects.isNull(description)) {
+        if (Objects.isNull(summary)) {
             throw new ValidationException("#validate :: description is BLANK");
         }
 
@@ -97,13 +130,21 @@ public class Issue extends JpaAuditEntity {
             throw new ValidationException("#validate :: reportedBy is BLANK");
         }
 
+        if (Objects.isNull(status)) {
+            throw new ValidationException("#validate :: status is BLANK");
+        }
+
+        if (Objects.isNull(priority)) {
+            throw new ValidationException("#validate :: priority is BLANK");
+        }
+
     }
 
     // Getters and Setters
     // -------------------------------------------------------------------------
 
     @ManyToOne
-    @JoinColumn(name = "project_id")
+    @JoinColumn(name = "project_id", nullable = false)
     public Project getProject() {
         return project;
     }
@@ -112,7 +153,7 @@ public class Issue extends JpaAuditEntity {
         this.project = project;
     }
 
-    @Column(name = "issue_key")
+    @Column(name = "issue_key", nullable = false)
     public String getIssueKey() {
         return issueKey;
     }
@@ -121,12 +162,13 @@ public class Issue extends JpaAuditEntity {
         this.issueKey = issue_key;
     }
 
-    public String getDescription() {
-        return description;
+    @Column(name = "summary", nullable = false)
+    public String getSummary() {
+        return summary;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setSummary(String summary) {
+        this.summary = summary;
     }
 
     @Column(name = "version_str")
@@ -138,6 +180,8 @@ public class Issue extends JpaAuditEntity {
         this.versionStr = versionStr;
     }
 
+    @Column(name = "type", nullable = false)
+    @Enumerated(EnumType.STRING)
     public IssueType getType() {
         return type;
     }
@@ -156,6 +200,8 @@ public class Issue extends JpaAuditEntity {
         this.assignee = assignee;
     }
 
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
     public IssueStatus getStatus() {
         return status;
     }
@@ -165,11 +211,11 @@ public class Issue extends JpaAuditEntity {
     }
 
     @Column(name = "parent_issue_id")
-    public int getParentIssueId() {
+    public Integer getParentIssueId() {
         return parentIssueId;
     }
 
-    public void setParentIssueId(int parent_issue_id) {
+    public void setParentIssueId(Integer parent_issue_id) {
         this.parentIssueId = parent_issue_id;
     }
 
@@ -184,7 +230,7 @@ public class Issue extends JpaAuditEntity {
     }
 
     @OneToOne
-    @JoinColumn(name = "reported_by")
+    @JoinColumn(name = "reported_by", nullable = false)
     public User getReportedBy() {
         return reportedBy;
     }
@@ -194,23 +240,25 @@ public class Issue extends JpaAuditEntity {
     }
 
     @Column(name = "strat_date")
-    public Date getStartDate() {
+    public LocalDateTime getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date start_date) {
+    public void setStartDate(LocalDateTime start_date) {
         this.startDate = start_date;
     }
 
     @Column(name = "end_date")
-    public Date getEndDate() {
+    public LocalDateTime getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date end_date) {
+    public void setEndDate(LocalDateTime end_date) {
         this.endDate = end_date;
     }
 
+    @Column(name = "priority", nullable = false)
+    @Enumerated(EnumType.STRING)
     public IssuePriority getPriority() {
         return priority;
     }
@@ -219,6 +267,7 @@ public class Issue extends JpaAuditEntity {
         this.priority = priority;
     }
 
+    @Column(name = "label")
     public String getLabel() {
         return label;
     }
@@ -245,16 +294,24 @@ public class Issue extends JpaAuditEntity {
         this.comments = comments;
     }
 
+    @Column(name = "is_deleted", columnDefinition = "varchar(3) default 'NO'")
+    @Enumerated(EnumType.STRING)
+    public IsIssueDeleted getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(IsIssueDeleted isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
     // Object Methods
     // -------------------------------------------------------------------------
 
     @Override
     public String toString() {
-        return "Issues [project=" + project + ", issue_key=" + issueKey + ", description=" + description + ", type="
+        return "Issues [project=" + project.getId() + ", issue_key=" + issueKey + ", summary=" + summary + ", type="
                 + type + ", assignee=" + assignee + ", status=" + status + ", parent_issue_id=" + parentIssueId
-                + ", sprint=" + sprint + ", reported_by=" + reportedBy + ", start_date=" + startDate + ", end_date="
-                + endDate + ", version=" + versionStr + ", priority=" + priority + ", label=" + label + ", Attachment="
-                + attachments + ", comments_ids=" + comments + "]";
+                + ", reported_by=" + reportedBy.getId() + "]";
     }
 
 

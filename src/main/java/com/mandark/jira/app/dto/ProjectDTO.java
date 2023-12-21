@@ -2,13 +2,12 @@ package com.mandark.jira.app.dto;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import com.mandark.jira.app.persistence.orm.entity.Issue;
 import com.mandark.jira.app.persistence.orm.entity.Project;
 import com.mandark.jira.app.persistence.orm.entity.Sprint;
-import com.mandark.jira.app.persistence.orm.entity.User;
 import com.mandark.jira.spi.app.EntityDTO;
+import com.mandark.jira.spi.util.Values;
 
 
 
@@ -25,8 +24,6 @@ public class ProjectDTO extends EntityDTO<Project> {
 
     private final List<SprintDTO> sprints;
 
-    private final List<UserDTO> users;
-
     private final List<IssueDTO> issues;
 
     // Constructors
@@ -39,23 +36,16 @@ public class ProjectDTO extends EntityDTO<Project> {
         this.name = e.getName();
         this.description = e.getDescription();
 
-        List<SprintDTO> sprintDTOs = new ArrayList<>();
+        final List<SprintDTO> sprintDTOs = new ArrayList<>();
         for (Sprint s : e.getSprints()) {
-            SprintDTO sprintDto = Objects.isNull(s) ? null : new SprintDTO(s);
+            SprintDTO sprintDto = Values.get(s, SprintDTO::new);
             sprintDTOs.add(sprintDto);
         }
         this.sprints = sprintDTOs;
 
-        List<UserDTO> userDTOs = new ArrayList<>();
-        for (User u : e.getUsers()) {
-            UserDTO userDto = Objects.isNull(u) ? null : new UserDTO(u);
-            userDTOs.add(userDto);
-        }
-        this.users = userDTOs;
-
-        List<IssueDTO> issueDTOs = new ArrayList<>();
-        for (Issue i : e.getIssues()) {
-            IssueDTO issueDto = Objects.isNull(i) ? null : new IssueDTO(i);
+        final List<IssueDTO> issueDTOs = new ArrayList<>();
+        for (Issue iss : e.getIssues()) {
+            IssueDTO issueDto = Values.get(iss, IssueDTO::new);
             issueDTOs.add(issueDto);
         }
         this.issues = issueDTOs;
@@ -70,10 +60,6 @@ public class ProjectDTO extends EntityDTO<Project> {
 
     public String getName() {
         return name;
-    }
-
-    public List<UserDTO> getUsers() {
-        return users;
     }
 
     public String getDescription() {
@@ -94,6 +80,6 @@ public class ProjectDTO extends EntityDTO<Project> {
     @Override
     public String toString() {
         return "ProjectDTO [projectKey=" + projectKey + ", name=" + name + ", description=" + description + ", sprints="
-                + sprints + ", users=" + users + ", issues=" + issues + "]";
+                + sprints + ", issues=" + issues + "]";
     }
 }

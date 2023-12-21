@@ -31,12 +31,13 @@ import com.mandark.jira.spi.lang.ObjectNotFoundException;
  * Data Access Object for all the Entities implementing {@link IEntity}.
  * 
  * <p>
- * This Data Access Object(DAO) provides the methods like persist, update, find/search .. to manipulate these objects.
+ * This Data Access Object(DAO) provides the methods like persist, update, find/search .. to
+ * manipulate these objects.
  * </p>
  * 
  * <p>
- * This implementation makes use of the JPA ( Javax Persistence API ) for its persistence context and
- * {@link EntityManager}.
+ * This implementation makes use of the JPA ( Javax Persistence API ) for its persistence context
+ * and {@link EntityManager}.
  * </p>
  * 
  * <p>
@@ -272,7 +273,7 @@ public class GenericJpaDao implements IDao<Integer> {
         final InCriteria criteria = Criteria.in(FIELD_ID, inPkeys);
 
         // Query
-        final Query query = queryBuilder.toQuery(entityCls, criteria);
+        final Query query = queryBuilder.toQuery(entityCls, criteria, (OrderBy) null);
         LOGGER.debug("#read (JPA Query) :: {}", query);
 
         // Result
@@ -300,7 +301,7 @@ public class GenericJpaDao implements IDao<Integer> {
 
     @Override
     public <E extends IEntity<Integer>> List<E> read(final Class<E> entityCls, final int pageNo, final int pageSize) {
-        return this.read(entityCls, null, pageNo, pageSize);
+        return this.read(entityCls, (OrderBy) null, pageNo, pageSize);
     }
 
     @Override
@@ -321,6 +322,13 @@ public class GenericJpaDao implements IDao<Integer> {
         // Result
         final List<E> resultList = (List<E>) query.getResultList();
         return resultList;
+    }
+
+    @Override
+    public <E extends IEntity<Integer>> List<E> read(Class<E> entityCls, List<OrderBy> orderbyList, int pageNo,
+            int pageSize) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 
@@ -346,7 +354,7 @@ public class GenericJpaDao implements IDao<Integer> {
     @Override
     public <E extends IEntity<Integer>> List<E> find(final Class<E> entityCls, final Criteria criteria,
             final int pageNo, final int pageSize) {
-        return this.find(entityCls, criteria, null, pageNo, pageSize);
+        return this.find(entityCls, criteria, (OrderBy) null, pageNo, pageSize);
     }
 
     @Override
@@ -358,7 +366,7 @@ public class GenericJpaDao implements IDao<Integer> {
         }
 
         // Query
-        final Query query = queryBuilder.toQuery(entityCls, criteria);
+        final Query query = queryBuilder.toQuery(entityCls, criteria, orderBy);
         query.setFirstResult((pageNo - 1) * pageSize);
         query.setMaxResults(pageSize);
 
@@ -369,6 +377,25 @@ public class GenericJpaDao implements IDao<Integer> {
         return resultList;
     }
 
+    @Override
+    public <E extends IEntity<Integer>> List<E> find(Class<E> entityCls, Criteria criteria, List<OrderBy> orderbyList,
+            int pageNo, int pageSize) {
+        // Sanity checks
+        if (Objects.isNull(entityCls)) {
+            throw new IllegalArgumentException("#find :: in Entity Class is NULL");
+        }
+
+        // Query
+        final Query query = queryBuilder.toQuery(entityCls, criteria, orderbyList);
+        query.setFirstResult((pageNo - 1) * pageSize);
+        query.setMaxResults(pageSize);
+
+        LOGGER.debug("#read (JPA Query) :: {}", query);
+
+        // Result
+        final List<E> resultList = (List<E>) query.getResultList();
+        return resultList;
+    }
 
     // Other Utilities
     // ------------------------------------------------------------------------
