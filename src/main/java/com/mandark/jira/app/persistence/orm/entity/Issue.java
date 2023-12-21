@@ -95,7 +95,7 @@ public class Issue extends JpaAuditEntity {
 
     private User reportedBy;// (user_id)
 
-    private Boolean isActive;
+    private Boolean isActive = true;
 
     // Constructors
     // ------------------------------------------------------------------------
@@ -295,7 +295,7 @@ public class Issue extends JpaAuditEntity {
         this.comments = comments;
     }
 
-    @Column(name = "is_active", columnDefinition = "varchar(10) default 'true'")
+    @Column(name = "is_active", nullable = false, columnDefinition = "TINYINT(1) default 1")
     public Boolean getIsActive() {
         return isActive;
     }
