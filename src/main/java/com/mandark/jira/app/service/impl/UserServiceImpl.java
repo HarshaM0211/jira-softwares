@@ -1,10 +1,8 @@
 package com.mandark.jira.app.service.impl;
 
-import static com.mandark.jira.app.persistence.orm.entity.ProjectUser.PROP_PROJECT;
-import static com.mandark.jira.app.persistence.orm.entity.ProjectUser.PROP_USER;
-
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -14,8 +12,6 @@ import org.slf4j.LoggerFactory;
 import com.mandark.jira.app.beans.UserBean;
 import com.mandark.jira.app.dto.UserDTO;
 import com.mandark.jira.app.persistence.orm.entity.Organisation;
-import com.mandark.jira.app.persistence.orm.entity.Project;
-import com.mandark.jira.app.persistence.orm.entity.ProjectUser;
 import com.mandark.jira.app.persistence.orm.entity.User;
 import com.mandark.jira.app.service.UserService;
 import com.mandark.jira.spi.app.persistence.IDao;
@@ -193,8 +189,7 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
     // Criteria
     // ------------------------------------------------------------------------
 
-    @Override
-    public Criteria getOrgCriteria(final Integer orgId) {
+    private Criteria getOrgCriteria(final Integer orgId) {
 
         // Sanity Checks
         Verify.notNull(orgId, "$getOrgCriteria :: Organisation ID : orgId must be nonn NULL");
@@ -256,20 +251,4 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
         return orgId.equals(userEntity.getOrganisation().getId());
     }
 
-    @Override
-    public boolean isUserInProject(final User userEntity, final Project projectEntity) {
-
-        // Sanity Checks
-        Verify.notNull(userEntity, "$isUserInOrg :: userEntity must be non NULL");
-        Verify.notNull(projectEntity, "$isUserInOrg :: projectEntity must be non NULL");
-
-        final Criteria projectCriteria = Criteria.equal(PROP_PROJECT, projectEntity);
-        final Criteria userCriteria = Criteria.equal(PROP_USER, userEntity);
-        final Criteria andCr = Criteria.and(projectCriteria, userCriteria);
-
-        final ProjectUser pu = this.dao.findOne(ProjectUser.class, andCr);
-        
-        return Objects.nonNull(pu);
-
-    }
 }

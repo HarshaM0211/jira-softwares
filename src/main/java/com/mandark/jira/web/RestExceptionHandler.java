@@ -33,7 +33,7 @@ import com.mandark.jira.spi.web.Responses;
 /**
  * @see WebExceptionHandler
  */
-@ControllerAdvice("com.mandark.jira.web.rest")
+@ControllerAdvice("com.mandark.gumble.web")
 public class RestExceptionHandler extends AbstractExceptionHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RestExceptionHandler.class);
