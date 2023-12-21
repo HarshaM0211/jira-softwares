@@ -1,4 +1,4 @@
-package com.mandark.jira.app.search.bean;
+package com.mandark.jira.app.bean.search;
 
 import java.util.List;
 import java.util.Map;
