@@ -6,6 +6,7 @@ import static com.mandark.jira.web.WebConstants.REQ_PARAM_PAGE_NO;
 import static com.mandark.jira.web.WebConstants.REQ_PARAM_PAGE_SIZE;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,11 +20,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mandark.jira.app.bean.search.IssueSearchQuery;
 import com.mandark.jira.app.beans.IssueBean;
 import com.mandark.jira.app.dto.IssueDTO;
 import com.mandark.jira.app.enums.IssueType;
 import com.mandark.jira.app.persistence.orm.entity.Issue;
-import com.mandark.jira.app.search.bean.IssueSearchQuery;
 import com.mandark.jira.app.service.IssueService;
 import com.mandark.jira.spi.web.PageResult;
 import com.mandark.jira.spi.web.Pagination;
@@ -42,12 +43,19 @@ public class IssueAPI extends AbstractAPI {
     public ResponseEntity<?> create(@RequestBody IssueBean issueBean, @PathVariable("projectId") Integer projectId,
             @RequestParam Integer reporterId) {
 
-        final int issueId = issueService.create(issueBean, projectId, reporterId);
+        final Integer issueId = issueService.create(issueBean, projectId, reporterId);
+        if (Objects.nonNull(issueId)) {
 
-        final String msg = String.format("$API :: Successfully created an Issue with Id : %s", issueId);
+            final String msg = String.format("$API :: Successfully created an Issue with Id : %s", issueId);
+            LOGGER.info(msg);
+
+            return Responses.ok(msg);
+        }
+        final String msg = "$API :: UnSuccessful! Not able to create an Issue. Check Request.";
         LOGGER.info(msg);
 
-        return Responses.ok(msg);
+        return Responses.badRequest(msg);
+
     }
 
     @RequestMapping(value = "/{issueId}", method = RequestMethod.PUT)
@@ -73,11 +81,18 @@ public class IssueAPI extends AbstractAPI {
     }
 
     @RequestMapping(value = "/{issueId}", method = RequestMethod.GET)
-    public ResponseEntity<?> getIssueById(@PathVariable("issueId") Integer issueId) {
+    public ResponseEntity<?> getIssueById(@PathVariable("issueId") Integer issueId,
+            @PathVariable("projectId") Integer projectId) {
 
-        final IssueDTO issueDto = issueService.getById(issueId);
+        final IssueDTO issueDto = issueService.getById(issueId, projectId);
 
-        return Responses.ok(issueDto);
+        if (Objects.nonNull(issueDto)) {
+            return Responses.ok(issueDto);
+        }
+
+        final String msg = String.format("Bad Request. Issue with ID : %s not belongs to Project with ID : %s", issueId,
+                projectId);
+        return Responses.badRequest(msg);
     }
 
     @RequestMapping(value = "", method = RequestMethod.GET)
@@ -97,11 +112,21 @@ public class IssueAPI extends AbstractAPI {
 
     @RequestMapping(value = "/{issueId}/assignee", method = RequestMethod.PUT)
     public ResponseEntity<?> updateIssueAssignee(@PathVariable("issueId") Integer issueId,
-            @RequestParam Integer userId) {
+            @PathVariable("projectId") Integer projectId, @RequestParam Integer userId) {
 
-        issueService.updateAssignee(issueId, userId);
+        final String msg = issueService.updateAssignee(issueId, userId, projectId);
 
-        final String msg = String.format("$API :: Successfully Updated Assignee of the Issue with Id : %s", issueId);
+        LOGGER.info(msg);
+
+        return Responses.ok(msg);
+    }
+
+    @RequestMapping(value = "/{issueId}/assignee", method = RequestMethod.DELETE)
+    public ResponseEntity<?> removeIssueAssignee(@PathVariable("issueId") Integer issueId,
+            @PathVariable("projectId") Integer projectId) {
+
+        final String msg = issueService.removeAssignee(issueId, projectId);
+
         LOGGER.info(msg);
 
         return Responses.ok(msg);
@@ -109,23 +134,25 @@ public class IssueAPI extends AbstractAPI {
 
     @RequestMapping(value = "/{epicId}/childs", method = RequestMethod.PUT)
     public ResponseEntity<?> addExChildIssueToEpic(@PathVariable("epicId") Integer epicId,
-            @RequestParam Integer issueId) {
+            @PathVariable("projectId") Integer projectId, @RequestParam Integer issueId) {
 
-        if (issueService.isEpic(epicId)) {
+        final String msg = issueService.addExChildIssueToEpic(issueId, epicId, projectId);
 
-            issueService.addExChildIssueToEpic(issueId, epicId);
-
-            final String msg = String.format(
-                    "$API :: Successfully Added Issue with Id : %s, as child to Epic with Id : %s", issueId, epicId);
-            LOGGER.info(msg);
-
-            return Responses.ok(msg);
-        }
-
-        final String msg = "Please make sure to select Correct EPIC";
         LOGGER.info(msg);
 
-        return Responses.badRequest(msg);
+        return Responses.ok(msg);
+    }
+
+    @RequestMapping(value = "/{nonEpicId}/subTasks", method = RequestMethod.PUT)
+    public ResponseEntity<?> addSubTaskToNonEpic(@PathVariable("nonEpicId") Integer nonEpicId,
+            @PathVariable("projectId") Integer projectId, @RequestParam Integer subTaskId) {
+
+        final String msg = issueService.addSubTaskToNonEpic(subTaskId, nonEpicId, projectId);
+
+        LOGGER.info(msg);
+
+        return Responses.ok(msg);
+
     }
 
     @RequestMapping(value = "/nonEpics", method = RequestMethod.GET)

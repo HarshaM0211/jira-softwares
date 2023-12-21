@@ -23,6 +23,7 @@ import javax.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mandark.jira.app.bean.search.IssueSearchQuery;
 import com.mandark.jira.app.beans.IssueBean;
 import com.mandark.jira.app.dto.IssueDTO;
 import com.mandark.jira.app.enums.IssuePriority;
@@ -32,12 +33,14 @@ import com.mandark.jira.app.persistence.orm.entity.Issue;
 import com.mandark.jira.app.persistence.orm.entity.Project;
 import com.mandark.jira.app.persistence.orm.entity.Sprint;
 import com.mandark.jira.app.persistence.orm.entity.User;
-import com.mandark.jira.app.search.bean.IssueSearchQuery;
 import com.mandark.jira.app.service.IssueService;
+import com.mandark.jira.app.service.UserService;
 import com.mandark.jira.spi.app.SearchQuery;
 import com.mandark.jira.spi.app.persistence.IDao;
 import com.mandark.jira.spi.app.query.Criteria;
 import com.mandark.jira.spi.app.service.AbstractJpaEntityService;
+import com.mandark.jira.spi.lang.AuthorizationException;
+import com.mandark.jira.spi.lang.ValidationException;
 import com.mandark.jira.spi.util.Verify;
 
 
@@ -45,6 +48,8 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IssueServiceImpl.class);
+
+    private UserService userService;
 
 
     public IssueServiceImpl(IDao<Integer> dao) {
@@ -105,6 +110,272 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
     }
 
     @Override
+    @Transactional
+    public Integer create(final IssueBean issueBean, final int projectId, final int reporterId) {
+
+        // Sanity Checks
+        Verify.notNull(issueBean, "$create :: issueBean must be non NULL");
+
+        final Project project = this.dao.read(Project.class, projectId, true);
+        final User reportedBy = this.dao.read(User.class, reporterId, true);
+
+        if (userService.isUserInProject(reportedBy, project)) {
+
+            final Criteria projectCriteria = Criteria.equal(PROP_PROJECT, project);
+            int count = super.count(projectCriteria);
+            count++;
+            final String issueKey = project.getProjectKey() + "-" + count;
+
+            final Issue issue = this.createFromBean(issueBean);
+
+            issue.setProject(project);
+            issue.setIssueKey(issueKey);
+            issue.setReportedBy(reportedBy);
+
+            final int issueId = this.dao.save(issue);
+            return issueId;
+        }
+        return null;
+    }
+
+    @Override
+    @Transactional
+    public void update(final int issueId, final IssueBean issueBean) {
+
+        // Sanity Checks
+        Verify.notNull(issueBean, "$update :: issueBean must be non NULL");
+
+        super.update(issueId, issueBean);
+    }
+
+    @Override
+    @Transactional
+    public void purge(final int issueId) {
+
+        final Issue issue = this.dao.read(this.getEntityClass(), issueId, true);
+        issue.setIsActive(false);
+
+        this.dao.update(issueId, issue);
+
+        final String msg = String.format("$delete :: Successfully deleted the Issue with Id : %s", issueId);
+        LOGGER.info(msg);
+    }
+
+    @Override
+    public IssueDTO getById(final int issueId, final int projectId) {
+
+        final Issue issue = this.dao.read(this.getEntityClass(), issueId, true);
+
+        if (Objects.isNull(issue.getProject()) ? false : issue.getProject().getId().equals(projectId)) {
+
+            final IssueDTO issueDto = this.toDTO(issue);
+            return issueDto;
+        }
+        return null;
+    }
+
+    @Override
+    public List<IssueDTO> readAllByProjectId(final int projectId, final int pageNo, final int pageSize) {
+
+        final Criteria projectCriteria = this.getProjectCriteria(projectId);
+        final Criteria deleteCriteria = Criteria.equal(PROP_IS_ACTIVE, true);
+
+        final Criteria andCriteria = Criteria.and(projectCriteria, deleteCriteria);
+
+        final List<IssueDTO> issueDtos = super.find(andCriteria, pageNo, pageSize);
+
+        return issueDtos;
+    }
+
+    @Override
+    @Transactional
+    public String updateAssignee(final int issueId, final Integer userId, final int projectId) {
+
+        final Issue issueEntity = this.dao.read(this.getEntityClass(), issueId, true);
+        final User userEntity = this.dao.read(User.class, userId, true);
+        final Project projectEntity = this.dao.read(Project.class, projectId, true);
+
+        if (userService.isUserInProject(userEntity, projectEntity)) {
+
+            issueEntity.setAssignee(userEntity);
+
+            this.dao.update(issueId, issueEntity);
+
+            final String msg = String
+                    .format("$updateAssignee :: Successfully updated the Assignee of the Issue with Id : %s", issueId);
+            LOGGER.info(msg);
+            return msg;
+        }
+        final String msg = String.format("$updateAssignee :: User with Id : %s not found in the Project with Id : %s",
+                userId, projectId);
+        LOGGER.info(msg);
+        throw new ValidationException(msg);
+    }
+
+    @Override
+    @Transactional
+    public String removeAssignee(final int issueId, final int projectId) {
+
+        Issue issueEntity = this.dao.read(this.getEntityClass(), issueId, true);
+
+        if (Objects.nonNull(issueEntity) && issueEntity.getProject().getId().equals(projectId)) {
+
+            issueEntity.setAssignee(null);
+            this.dao.update(issueId, issueEntity);
+
+            final String msg = String
+                    .format("$updateAssignee :: Successfully Removed the Assignee of the Issue with Id : %s", issueId);
+            LOGGER.info(msg);
+            return msg;
+        }
+        final String msg = String.format("$updateAssignee :: Not Found Issue with Id : %s in the Project with Id : %s",
+                issueId, projectId);
+        LOGGER.info(msg);
+        throw new ValidationException(msg);
+    }
+
+    @Override
+    @Transactional
+    public String addExChildIssueToEpic(final int exIssueId, final int epicId, final int projectId) {
+
+        final Issue exIssue = this.dao.read(this.getEntityClass(), exIssueId, true);
+        final Issue epic = this.dao.read(this.getEntityClass(), epicId, true);
+
+        if (this.isEpic(epicId) && !this.isEpic(exIssueId) && !this.isSubTask(exIssueId)
+                && exIssue.getProject().getId().equals(projectId) && epic.getProject().getId().equals(projectId)) {
+
+            exIssue.setParentIssueId(epicId);
+
+            this.dao.update(exIssueId, exIssue);
+
+            final String msg = String.format(
+                    "$addExChildIssueToEpic :: Successfully added Issue with Id : %s to the Epic with Id : %s",
+                    exIssueId, epicId);
+            LOGGER.info(msg);
+            return msg;
+        }
+        final String msg =
+                "$addExChildIssueToEpic :: Bad Request. Make sure to pass valid Issue and Epics from valid Project";
+        LOGGER.info(msg);
+        throw new AuthorizationException(msg);
+    }
+
+    @Override
+    @Transactional
+    public String addSubTaskToNonEpic(final int subTaskId, final int nonEpicId, final int projectId) {
+
+        final Issue subTask = this.dao.read(this.getEntityClass(), subTaskId, true);
+        final Issue nonEpic = this.dao.read(this.getEntityClass(), nonEpicId, true);
+
+        if (!this.isEpic(nonEpicId) && !this.isSubTask(nonEpicId) && this.isSubTask(subTaskId)
+                && subTask.getProject().getId().equals(projectId) && nonEpic.getProject().getId().equals(projectId)) {
+
+            subTask.setParentIssueId(nonEpicId);
+
+            this.dao.update(subTaskId, subTask);
+
+            final String msg = String.format(
+                    "$addExChildIssueToEpic :: Successfully added SubTask with Id : %s to the NonEpic Issue with Id : %s",
+                    subTaskId, nonEpicId);
+            LOGGER.info(msg);
+            return msg;
+        }
+        final String msg =
+                "$addExChildIssueToEpic :: Bad Request. Make sure to Pass Valid SubTaskId and NonEpicId from valid Project";
+        LOGGER.info(msg);
+        throw new AuthorizationException(msg);
+    }
+
+    @Override
+    public List<IssueDTO> listValidChildsForEpic(final int projectId, final int pageNo, final int pageSize) {
+
+        final Criteria nonEpicCriteria = this.getNonEpicCriteria(projectId);
+
+        final List<Issue> issueList = this.dao.find(this.getEntityClass(), nonEpicCriteria, pageNo, pageSize);
+
+        return this.toDTOs(issueList);
+    }
+
+    @Override
+    public List<IssueDTO> listEpicsInProject(final int projectId, final int pageNo, final int pageSize) {
+
+        final Criteria projectCriteria = this.getProjectCriteria(projectId);
+        final Criteria epicCriteria = Criteria.equal(PROP_TYPE, EPIC);
+
+        final Criteria andCriteria = Criteria.and(projectCriteria, epicCriteria);
+
+        final List<Issue> issues = this.dao.find(this.getEntityClass(), andCriteria, pageNo, pageSize);
+        return this.toDTOs(issues);
+    }
+
+    @Override
+    public List<IssueDTO> listSubTasks(final int projectId, final int pageNo, final int pageSize) {
+
+        final Criteria projectCriteria = this.getProjectCriteria(projectId);
+        final Criteria subTaskCriteria = Criteria.equal(PROP_TYPE, SUB_TASK);
+
+        final Criteria andCriteria = Criteria.and(projectCriteria, subTaskCriteria);
+
+        final List<Issue> issues = this.dao.find(this.getEntityClass(), andCriteria, pageNo, pageSize);
+        return this.toDTOs(issues);
+    }
+
+    @Override
+    public Criteria getNonEpicCriteria(final int projectId) {
+
+        final Criteria projectCriteria = this.getProjectCriteria(projectId);
+
+        final List<IssueType> typeList = new ArrayList<IssueType>();
+        typeList.add(STORY);
+        typeList.add(BUG);
+        typeList.add(TASK);
+
+        final Criteria typeInCriteria = Criteria.in(PROP_TYPE, typeList);
+
+        final Criteria andCriteria = Criteria.and(projectCriteria, typeInCriteria);
+
+        return andCriteria;
+    }
+
+    private Criteria getProjectCriteria(final int projectId) {
+        final Project project = this.dao.read(Project.class, projectId, true);
+        final Criteria projectCriteria = Criteria.equal(PROP_PROJECT, project);
+        return projectCriteria;
+    }
+
+    @Override
+    public boolean isEpic(final int issueId) {
+        final Issue issue = this.dao.read(Issue.class, issueId, true);
+        return IssueType.EPIC.equals(issue.getType());
+    }
+
+    @Override
+    public boolean isSubTask(final int issueId) {
+        final Issue issue = this.dao.read(Issue.class, issueId, true);
+        return IssueType.SUB_TASK.equals(issue.getType());
+    }
+
+    @Override
+    public int count(final int projectId) {
+        return super.count(this.getProjectCriteria(projectId));
+    }
+
+    @Override
+    public int count(final int projectId, String paramName, Object paramValue) {
+
+        final Criteria projectCriteria = this.getProjectCriteria(projectId);
+        final Criteria paramCriteria = Criteria.equal(paramName, paramValue);
+        final Criteria andCriteria = Criteria.and(projectCriteria, paramCriteria);
+
+        return super.count(andCriteria);
+    }
+
+    @Override
+    public int nonEpicCount(final int projectId) {
+        return super.count(this.getNonEpicCriteria(projectId));
+    }
+
+    @Override
     public Criteria asCriteria(final SearchQuery<? extends Issue> searchQuery) {
 
         // Sanity Checks
@@ -149,189 +420,11 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
         return cr;
     }
 
+    // Getters and Setters
+    // ------------------------------------------------------------------------
 
-    @Override
-    @Transactional
-    public int create(final IssueBean issueBean, final int projectId, final int reporterId) {
-
-        // Sanity Checks
-        Verify.notNull(issueBean, "$create :: issueBean must be non NULL");
-
-        final Project project = this.dao.read(Project.class, projectId, true);
-        final User reportedBy = this.dao.read(User.class, reporterId, true);
-
-        final Criteria projectCriteria = Criteria.equal(PROP_PROJECT, project);
-        int count = super.count(projectCriteria);
-        count++;
-        final String issueKey = project.getProjectKey() + "-" + count;
-
-        final Issue issue = this.createFromBean(issueBean);
-
-        issue.setProject(project);
-        issue.setIssueKey(issueKey);
-        issue.setReportedBy(reportedBy);
-
-        final int issueId = this.dao.save(issue);
-        return issueId;
-    }
-
-    @Override
-    @Transactional
-    public void update(final int issueId, final IssueBean issueBean) {
-
-        // Sanity Checks
-        Verify.notNull(issueBean, "$update :: issueBean must be non NULL");
-
-        super.update(issueId, issueBean);
-    }
-
-    @Override
-    public IssueDTO getById(final int issueId) {
-
-        final Issue issue = this.dao.read(this.getEntityClass(), issueId, true);
-        final IssueDTO issueDto = this.toDTO(issue);
-
-        return issueDto;
-    }
-
-    @Override
-    public List<IssueDTO> readAllByProjectId(final int projectId, final int pageNo, final int pageSize) {
-
-        final Criteria projectCriteria = this.getProjectCriteria(projectId);
-        final Criteria deleteCriteria = Criteria.equal(PROP_IS_ACTIVE, true);
-
-        final Criteria andCriteria = Criteria.and(projectCriteria, deleteCriteria);
-
-        final List<IssueDTO> issueDtos = super.find(andCriteria, pageNo, pageSize);
-
-        return issueDtos;
-    }
-
-    @Override
-    @Transactional
-    public void updateAssignee(final int issueId, final int userId) {
-
-        final Issue issueEntity = this.dao.read(this.getEntityClass(), issueId, true);
-        final User newAssignee = this.dao.read(User.class, userId, true);
-
-        issueEntity.setAssignee(newAssignee);
-
-        this.dao.update(issueId, issueEntity);
-
-        final String msg = String
-                .format("$updateAssignee :: Successfully updated the Assignee of the Issue with Id : %s", issueId);
-        LOGGER.info(msg);
-
-    }
-
-    @Override
-    @Transactional
-    public void addExChildIssueToEpic(final int exIssueId, final int epicId) {
-
-        final Issue exIssue = this.dao.read(Issue.class, exIssueId, true);
-
-        exIssue.setParentIssueId(epicId);
-
-        this.dao.update(exIssueId, exIssue);
-
-        LOGGER.info("$addExChildIssueToEpic :: Successfully added Issue with Id : {} to the Epic with Id : {}",
-                exIssueId, epicId);
-    }
-
-    @Override
-    public boolean isEpic(final int epicId) {
-        final Issue issue = this.dao.read(Issue.class, epicId, true);
-        return IssueType.EPIC.equals(issue.getType());
-    }
-
-    @Override
-    public int count(final int projectId) {
-        return super.count(this.getProjectCriteria(projectId));
-    }
-
-    @Override
-    public int count(final int projectId, String paramName, Object paramValue) {
-
-        final Criteria projectCriteria = this.getProjectCriteria(projectId);
-        final Criteria paramCriteria = Criteria.equal(paramName, paramValue);
-        final Criteria andCriteria = Criteria.and(projectCriteria, paramCriteria);
-
-        return super.count(andCriteria);
-    }
-
-    @Override
-    public int nonEpicCount(final int projectId) {
-        return super.count(this.getNonEpicCriteria(projectId));
-    }
-
-    @Override
-    @Transactional
-    public void purge(final int issueId) {
-
-        final Issue issue = this.dao.read(this.getEntityClass(), issueId, true);
-        issue.setIsActive(false);
-
-        this.dao.update(issueId, issue);
-
-        final String msg = String.format("$delete :: Successfully deleted the Issue with Id : %s", issueId);
-        LOGGER.info(msg);
-    }
-
-    @Override
-    public List<IssueDTO> listEpicsInProject(final int projectId, final int pageNo, final int pageSize) {
-
-        final Criteria projectCriteria = this.getProjectCriteria(projectId);
-        final Criteria epicCriteria = Criteria.equal(PROP_TYPE, EPIC);
-
-        final Criteria andCriteria = Criteria.and(projectCriteria, epicCriteria);
-
-        final List<Issue> issues = this.dao.find(this.getEntityClass(), andCriteria, pageNo, pageSize);
-        return this.toDTOs(issues);
-    }
-
-    @Override
-    public List<IssueDTO> listSubTasks(final int projectId, final int pageNo, final int pageSize) {
-
-        final Criteria projectCriteria = this.getProjectCriteria(projectId);
-        final Criteria subTaskCriteria = Criteria.equal(PROP_TYPE, SUB_TASK);
-
-        final Criteria andCriteria = Criteria.and(projectCriteria, subTaskCriteria);
-
-        final List<Issue> issues = this.dao.find(this.getEntityClass(), andCriteria, pageNo, pageSize);
-        return this.toDTOs(issues);
-    }
-
-    @Override
-    public List<IssueDTO> listValidChildsForEpic(final int projectId, final int pageNo, final int pageSize) {
-
-        final Criteria nonEpicCriteria = this.getNonEpicCriteria(projectId);
-
-        final List<Issue> issueList = this.dao.find(this.getEntityClass(), nonEpicCriteria, pageNo, pageSize);
-
-        return this.toDTOs(issueList);
-    }
-
-    @Override
-    public Criteria getNonEpicCriteria(final int projectId) {
-
-        final Criteria projectCriteria = this.getProjectCriteria(projectId);
-
-        final List<IssueType> typeList = new ArrayList<IssueType>();
-        typeList.add(STORY);
-        typeList.add(BUG);
-        typeList.add(TASK);
-
-        final Criteria typeInCriteria = Criteria.in(PROP_TYPE, typeList);
-
-        final Criteria andCriteria = Criteria.and(projectCriteria, typeInCriteria);
-
-        return andCriteria;
-    }
-
-    private Criteria getProjectCriteria(final int projectId) {
-        final Project project = this.dao.read(Project.class, projectId, true);
-        final Criteria projectCriteria = Criteria.equal(PROP_PROJECT, project);
-        return projectCriteria;
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 
 }

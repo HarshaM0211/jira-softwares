@@ -11,19 +11,23 @@ import com.mandark.jira.spi.app.service.EntityService;
 
 public interface IssueService extends EntityService<Integer, Issue, IssueDTO> {
 
-    int create(final IssueBean issueBean, final int projectId, final int reporterId);
+    Integer create(final IssueBean issueBean, final int projectId, final int reporterId);
 
     void update(final int issueId, final IssueBean issueBean);
 
     void purge(final int issueId);
 
-    IssueDTO getById(final int issueId);
+    IssueDTO getById(final int issueId, final int projectId);
 
     List<IssueDTO> readAllByProjectId(final int projectId, final int pageNo, final int pageSize);
 
-    void updateAssignee(final int issueId, final int userId);
+    String updateAssignee(final int issueId, final Integer userId, final int projectId);
 
-    void addExChildIssueToEpic(final int exIssueId, final int epicId);
+    String removeAssignee(final int issueId, final int projectId);
+
+    String addExChildIssueToEpic(final int exIssueId, final int epicId, final int projectId);
+
+    String addSubTaskToNonEpic(final int subTaskId, final int nonEpicId, final int projectId);
 
 
 
@@ -41,6 +45,8 @@ public interface IssueService extends EntityService<Integer, Issue, IssueDTO> {
     int nonEpicCount(final int projectId);
 
     boolean isEpic(final int epicId);
+
+    boolean isSubTask(final int issueId)
 
     Criteria getNonEpicCriteria(final int projectId);
 }
