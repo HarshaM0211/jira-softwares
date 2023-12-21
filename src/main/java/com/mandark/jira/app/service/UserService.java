@@ -26,10 +26,7 @@ public interface UserService extends EntityService<Integer, User, UserDTO> {
 
     boolean isUserInOrg(final Integer userId, final Integer orgId);
 
-<<<<<<< HEAD
     boolean isUserInProject(final User userEntity, final Project projectEntity);
 
-=======
->>>>>>> develop
     Criteria getOrgCriteria(final Integer orgId);
 }
