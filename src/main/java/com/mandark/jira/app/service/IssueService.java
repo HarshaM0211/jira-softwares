@@ -46,7 +46,7 @@ public interface IssueService extends EntityService<Integer, Issue, IssueDTO> {
 
     boolean isEpic(final int epicId);
 
-    boolean isSubTask(final int issueId)
+    boolean isSubTask(final int issueId);
 
     Criteria getNonEpicCriteria(final int projectId);
 }
