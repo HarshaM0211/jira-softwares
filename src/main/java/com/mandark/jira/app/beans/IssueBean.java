@@ -1,5 +1,10 @@
 package com.mandark.jira.app.beans;
 
+import java.util.Objects;
+
+import com.mandark.jira.app.enums.IssuePriority;
+import com.mandark.jira.app.enums.IssueStatus;
+import com.mandark.jira.app.enums.IssueType;
 import com.mandark.jira.app.persistence.orm.entity.Issue;
 import com.mandark.jira.spi.app.EntityBean;
 
@@ -27,6 +32,22 @@ public class IssueBean implements EntityBean<Issue> {
     private Integer sprintId;
 
     private String priorityStr;
+
+
+    // Methods
+    // ------------------------------------------------------------------------
+
+    public IssueType getIssueType() {
+        return Objects.isNull(typeStr) ? null : IssueType.valueOf(typeStr);
+    }
+
+    public IssueStatus getIssueStatus() {
+        return Objects.isNull(statusStr) ? null : IssueStatus.valueOf(statusStr);
+    }
+
+    public IssuePriority getIssuePriority() {
+        return Objects.isNull(priorityStr) ? null : IssuePriority.valueOf(priorityStr);
+    }
 
     // Constructors
     // ------------------------------------------------------------------------

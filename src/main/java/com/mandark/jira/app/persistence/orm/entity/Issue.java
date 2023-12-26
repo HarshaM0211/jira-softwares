@@ -47,7 +47,7 @@ public class Issue extends JpaAuditEntity {
 
     public static final String PROP_STATUS = "status";
 
-    public static final String PROP_PARENT_ISSUE_ID = "parentIssueId";
+    public static final String PROP_PARENT_ISSUE = "parentIssue";
 
     public static final String PROP_SPRINT = "sprint";
 
@@ -89,7 +89,7 @@ public class Issue extends JpaAuditEntity {
 
     private IssueStatus status;
 
-    private Integer parentIssueId;// (Issue ID of this table)
+    private Issue parentIssue;// (Issue ID of this table)
 
     private List<Sprint> sprint;
 
@@ -212,12 +212,12 @@ public class Issue extends JpaAuditEntity {
     }
 
     @Column(name = "parent_issue_id")
-    public Integer getParentIssueId() {
-        return parentIssueId;
+    public Issue getParentIssue() {
+        return parentIssue;
     }
 
-    public void setParentIssueId(Integer parent_issue_id) {
-        this.parentIssueId = parent_issue_id;
+    public void setParentIssue(Issue parent_issue) {
+        this.parentIssue = parent_issue;
     }
 
     @ManyToMany
@@ -310,7 +310,7 @@ public class Issue extends JpaAuditEntity {
     @Override
     public String toString() {
         return "Issues [project=" + project.getId() + ", issue_key=" + issueKey + ", summary=" + summary + ", type="
-                + type + ", assignee=" + assignee + ", status=" + status + ", parent_issue_id=" + parentIssueId
+                + type + ", assignee=" + assignee + ", status=" + status + ", parent_issue_id=" + parentIssue
                 + ", reported_by=" + reportedBy.getId() + "]";
     }
 }
