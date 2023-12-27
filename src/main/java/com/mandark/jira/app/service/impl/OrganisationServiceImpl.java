@@ -29,7 +29,7 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
     // Constructor
     // ------------------------------------------------------------------------
 
-    public OrganisationServiceImpl(IDao dao) {
+    public OrganisationServiceImpl(IDao<Integer> dao) {
         super(dao);
     }
 
@@ -97,25 +97,25 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
     }
 
     @Override
-    public boolean isUserExist(final Integer userId, final Integer orgId) {
+    public boolean isUserExist(final int userId, final int orgId) {
 
         // Sanity Checks
         Verify.notNull(userId, "$isUserInOrg :: userId must be non NULL");
         Verify.notNull(orgId, "$isUserInOrg :: orgId must be non NULL");
 
-        final User userEntity = dao.read(User.class, userId, true);
+        final User userEntity = this.dao.read(User.class, userId, true);
 
         if (Objects.isNull(userEntity.getOrganisation())) {
 
-            final String msg = String.format("User doesn't exist in the Organisation with Id : %s", orgId);
+            final String msg = String.format("User doesn't exist in any of the Organisation");
             LOGGER.info(msg);
             return false;
         }
-        final String msg = String.format("Status : User Existence in the Organisation : ",
-                orgId.equals(userEntity.getOrganisation().getId()));
+        final boolean isExist = orgId == userEntity.getOrganisation().getId();
+        final String msg = String.format("Status : User Existence in the Organisation : ", isExist);
         LOGGER.info(msg);
 
-        return orgId.equals(userEntity.getOrganisation().getId());
+        return isExist;
     }
 
 }

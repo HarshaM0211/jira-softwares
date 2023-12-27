@@ -13,6 +13,6 @@ public interface OrganisationService extends EntityService<Integer, Organisation
 
     void update(final Integer orgId, final OrganisationBean orgBean);
 
-    boolean isUserExist(final Integer userId, final Integer orgId);
+    boolean isUserExist(final int userId, final int orgId);
 
 }
