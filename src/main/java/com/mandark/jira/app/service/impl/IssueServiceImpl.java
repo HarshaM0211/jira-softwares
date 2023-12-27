@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import com.mandark.jira.app.bean.search.IssueSearchQuery;
 import com.mandark.jira.app.beans.IssueBean;
 import com.mandark.jira.app.dto.IssueDTO;
-import com.mandark.jira.app.enums.IssuePriority;
 import com.mandark.jira.app.enums.IssueStatus;
 import com.mandark.jira.app.enums.IssueType;
 import com.mandark.jira.app.persistence.orm.entity.Issue;
@@ -34,7 +33,7 @@ import com.mandark.jira.app.persistence.orm.entity.Project;
 import com.mandark.jira.app.persistence.orm.entity.Sprint;
 import com.mandark.jira.app.persistence.orm.entity.User;
 import com.mandark.jira.app.service.IssueService;
-import com.mandark.jira.app.service.UserService;
+import com.mandark.jira.app.service.ProjectService;
 import com.mandark.jira.spi.app.SearchQuery;
 import com.mandark.jira.spi.app.persistence.IDao;
 import com.mandark.jira.spi.app.query.Criteria;
@@ -50,7 +49,7 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IssueServiceImpl.class);
 
-    private UserService userService;
+    private ProjectService projectService;
 
 
     public IssueServiceImpl(IDao<Integer> dao) {
@@ -122,7 +121,7 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
         final Project project = this.dao.read(Project.class, projectId, true);
         final User reportedBy = this.dao.read(User.class, reporterId, true);
 
-        if (!userService.isUserInProject(reportedBy, project)) {
+        if (!projectService.isUserExist(reportedBy, project)) {
 
             final String msg = "The user trying to create Issue is not permitted to access the request";
             throw new AuthorizationException(msg);
@@ -178,7 +177,7 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
 
         if (Objects.isNull(issue.getProject()) || !issue.getProject().getId().equals(projectId)) {
 
-            final String msg = "Bad Request. Check must have Issue belongs to the corresponding Project";
+            final String msg = "Bad Request. Must have passed Issue belongs to the corresponding Project";
             throw new ValidationException(msg);
         }
         final IssueDTO issueDto = this.toDTO(issue);
@@ -186,7 +185,7 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
     }
 
     @Override
-    public List<IssueDTO> readAllByProjectId(final int projectId, final int pageNo, final int pageSize) {
+    public List<IssueDTO> findByProjectId(final int projectId, final int pageNo, final int pageSize) {
 
         final Criteria projectCriteria = this.getProjectCriteria(projectId);
         final Criteria deleteCriteria = Criteria.equal(PROP_IS_ACTIVE, true);
@@ -206,7 +205,7 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
         final User userEntity = this.dao.read(User.class, userId, true);
         final Project projectEntity = this.dao.read(Project.class, projectId, true);
 
-        if (!userService.isUserInProject(userEntity, projectEntity)) {
+        if (!projectService.isUserExist(userEntity, projectEntity)) {
 
             final String msg = String.format(
                     "$updateAssignee :: User with Id : %s not found in the Project with Id : %s", userId, projectId);
@@ -230,7 +229,7 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
 
         final Issue issueEntity = this.dao.read(this.getEntityClass(), issueId, true);
 
-        if (Objects.isNull(issueEntity) || !issueEntity.getProject().getId().equals(projectId)) {
+        if (issueEntity.getProject().getId() != (projectId)) {
 
             final String msg = String.format(
                     "$updateAssignee :: Not Found Issue with Id : %s in the Project with Id : %s", issueId, projectId);
@@ -438,8 +437,8 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
     // Getters and Setters
     // ------------------------------------------------------------------------
 
-    public void setUserService(UserService userService) {
-        this.userService = userService;
+    public void setProjectService(ProjectService projectService) {
+        this.projectService = projectService;
     }
 
 }

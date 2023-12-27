@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import com.mandark.jira.app.beans.OrganisationBean;
 import com.mandark.jira.app.dto.OrganisationDTO;
 import com.mandark.jira.app.persistence.orm.entity.Organisation;
+import com.mandark.jira.app.persistence.orm.entity.User;
 import com.mandark.jira.app.service.OrganisationService;
 import com.mandark.jira.spi.app.persistence.IDao;
 import com.mandark.jira.spi.app.service.AbstractJpaEntityService;
@@ -93,6 +94,28 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
         Verify.notNull(orgBean, "Organisation Bean is NULL");
 
         super.update(orgId, orgBean);
+    }
+
+    @Override
+    public boolean isUserExist(final Integer userId, final Integer orgId) {
+
+        // Sanity Checks
+        Verify.notNull(userId, "$isUserInOrg :: userId must be non NULL");
+        Verify.notNull(orgId, "$isUserInOrg :: orgId must be non NULL");
+
+        final User userEntity = dao.read(User.class, userId, true);
+
+        if (Objects.isNull(userEntity.getOrganisation())) {
+
+            final String msg = String.format("User doesn't exist in the Organisation with Id : %s", orgId);
+            LOGGER.info(msg);
+            return false;
+        }
+        final String msg = String.format("Status : User Existence in the Organisation : ",
+                orgId.equals(userEntity.getOrganisation().getId()));
+        LOGGER.info(msg);
+
+        return orgId.equals(userEntity.getOrganisation().getId());
     }
 
 }

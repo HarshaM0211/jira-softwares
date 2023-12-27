@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.mandark.jira.app.beans.TeamBean;
 import com.mandark.jira.app.dto.TeamDTO;
 import com.mandark.jira.app.dto.UserDTO;
+import com.mandark.jira.app.service.OrganisationService;
 import com.mandark.jira.app.service.TeamMemberService;
 import com.mandark.jira.app.service.TeamService;
-import com.mandark.jira.app.service.UserService;
 import com.mandark.jira.spi.web.PageResult;
 import com.mandark.jira.spi.web.Pagination;
 import com.mandark.jira.spi.web.Responses;
@@ -36,7 +36,7 @@ public class TeamAPI extends AbstractAPI {
 
     private TeamService teamService;
 
-    private UserService userService;
+    private OrganisationService orgService;
 
     private TeamMemberService teamMemberService;
 
@@ -82,7 +82,7 @@ public class TeamAPI extends AbstractAPI {
     public ResponseEntity<?> addTeamMember(@RequestParam Integer userId, @PathVariable("teamId") Integer teamId,
             @PathVariable("orgId") Integer orgId) {
 
-        if (userService.isUserInOrg(userId, orgId)) {
+        if (orgService.isUserExist(userId, orgId)) {
             teamMemberService.addMember(teamId, userId);
             final String msg =
                     String.format("Successfully added User with ID :- %s to the Team with ID :- %s", userId, teamId);
@@ -151,8 +151,8 @@ public class TeamAPI extends AbstractAPI {
         this.teamService = teamService;
     }
 
-    public void setUserService(UserService userService) {
-        this.userService = userService;
+    public void setOrgService(OrganisationService orgService) {
+        this.orgService = orgService;
     }
 
     public void setTeamMemberService(TeamMemberService teamMemberService) {

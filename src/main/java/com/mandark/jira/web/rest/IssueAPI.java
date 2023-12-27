@@ -102,7 +102,7 @@ public class IssueAPI extends AbstractAPI {
 
         final int count = issueService.count(projectId);
 
-        final List<IssueDTO> issueDtos = issueService.readAllByProjectId(projectId, pageNo, pageSize);
+        final List<IssueDTO> issueDtos = issueService.findByProjectId(projectId, pageNo, pageSize);
 
         final Pagination pagination = Pagination.with(count, pageNo, pageSize);
         final PageResult pageResult = PageResult.with(pagination, issueDtos);

@@ -263,6 +263,23 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
     }
 
     @Override
+    public boolean isUserExist(final User userEntity, final Project projectEntity) {
+
+        // Sanity Checks
+        Verify.notNull(userEntity, "$isUserInOrg :: userEntity must be non NULL");
+        Verify.notNull(projectEntity, "$isUserInOrg :: projectEntity must be non NULL");
+
+        final Criteria projectCriteria = Criteria.equal(PROP_PROJECT, projectEntity);
+        final Criteria userCriteria = Criteria.equal(PROP_USER, userEntity);
+        final Criteria andCr = Criteria.and(projectCriteria, userCriteria);
+
+        final ProjectUser pu = this.dao.findOne(ProjectUser.class, andCr);
+
+        return Objects.nonNull(pu);
+
+    }
+
+    @Override
     public int count(final Integer orgId) {
 
         // Sanity Checks

@@ -6,6 +6,7 @@ import java.util.Map;
 import com.mandark.jira.app.beans.ProjectBean;
 import com.mandark.jira.app.dto.ProjectDTO;
 import com.mandark.jira.app.persistence.orm.entity.Project;
+import com.mandark.jira.app.persistence.orm.entity.User;
 import com.mandark.jira.spi.app.service.EntityService;
 
 
@@ -29,5 +30,7 @@ public interface ProjectService extends EntityService<Integer, Project, ProjectD
             final int pageSize);
 
     int count(final Integer orgId);
+
+    boolean isUserExist(final User userEntity, final Project projectEntity);
 
 }
