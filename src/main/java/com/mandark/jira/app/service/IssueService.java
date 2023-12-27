@@ -5,43 +5,48 @@ import java.util.List;
 import com.mandark.jira.app.beans.IssueBean;
 import com.mandark.jira.app.dto.IssueDTO;
 import com.mandark.jira.app.persistence.orm.entity.Issue;
+import com.mandark.jira.spi.app.query.Criteria;
 import com.mandark.jira.spi.app.service.EntityService;
 
 
 public interface IssueService extends EntityService<Integer, Issue, IssueDTO> {
 
-    int create(final IssueBean issueBean, final int projectId, final int reporterId);
+    Integer create(final IssueBean issueBean, final int projectId, final int reporterId);
 
-    void update(final Integer issueId, final IssueBean issueBean);
+    void update(final int issueId, final IssueBean issueBean);
 
-    IssueDTO getById(final int issueId);
+    void purge(final int issueId);
 
-    List<IssueDTO> readAllByProjectId(final Integer projectId, final int pageNo, final int pageSize);
+    IssueDTO getById(final int issueId, final int projectId);
 
-    void updateAssignee(final Integer issueId, final Integer userId);
+    List<IssueDTO> readAllByProjectId(final int projectId, final int pageNo, final int pageSize);
+
+    String updateAssignee(final int issueId, final Integer userId, final int projectId);
+
+    String removeAssignee(final int issueId, final int projectId);
+
+    String addExChildIssueToEpic(final int exIssueId, final int epicId, final int projectId);
+
+    String addSubTaskToNonEpic(final int subTaskId, final int nonEpicId, final int projectId);
 
 
-    void addExChildIssueToEpic(final Integer exIssueId, final int epicId);
 
-    List<IssueDTO> listValidChildsForEpic(final Integer projectId, final int pageNo, final int pageSize);
+    List<IssueDTO> listValidChildsForEpic(final int projectId, final int pageNo, final int pageSize);
 
-    // void createChildI
+    List<IssueDTO> listEpicsInProject(final int projectId, final int pageNo, final int pageSize);
 
+    List<IssueDTO> listSubTasks(final int projectId, final int pageNo, final int pageSize);
 
-
-    void addExIssueToEpic();
-
-    void addChildIssueOfNonEpic();
-
-    void addPatrentEpic();
-
-    void addExistingSubTask();
-
-    // void delete(Integer issueId);
 
     int count(final int projectId);
 
+    int count(final int projectId, String paramName, Object paramValue);
+
+    int nonEpicCount(final int projectId);
+
     boolean isEpic(final int epicId);
 
+    boolean isSubTask(final int issueId);
 
+    Criteria getNonEpicCriteria(final int projectId);
 }

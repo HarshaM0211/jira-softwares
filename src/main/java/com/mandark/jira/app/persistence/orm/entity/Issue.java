@@ -17,7 +17,6 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-import com.mandark.jira.app.enums.IsIssueDeleted;
 import com.mandark.jira.app.enums.IssuePriority;
 import com.mandark.jira.app.enums.IssueStatus;
 import com.mandark.jira.app.enums.IssueType;
@@ -48,7 +47,7 @@ public class Issue extends JpaAuditEntity {
 
     public static final String PROP_STATUS = "status";
 
-    public static final String PROP_PARENT_ISSUE_ID = "parentIssueId";
+    public static final String PROP_PARENT_ISSUE = "parentIssue";
 
     public static final String PROP_SPRINT = "sprint";
 
@@ -61,6 +60,8 @@ public class Issue extends JpaAuditEntity {
     public static final String PROP_VERSION_STR = "versionStr";
 
     public static final String PROP_PRIORITY = "priority";
+
+    public static final String PROP_IS_ACTIVE = "isActive";
 
     // Fields
     // ------------------------------------------------------------------------
@@ -88,13 +89,13 @@ public class Issue extends JpaAuditEntity {
 
     private IssueStatus status;
 
-    private Integer parentIssueId;// (Issue ID of this table)
+    private Issue parentIssue;// (Issue ID of this table)
 
     private List<Sprint> sprint;
 
     private User reportedBy;// (user_id)
 
-    private IsIssueDeleted isDeleted;
+    private Boolean isActive = true;
 
     // Constructors
     // ------------------------------------------------------------------------
@@ -211,12 +212,12 @@ public class Issue extends JpaAuditEntity {
     }
 
     @Column(name = "parent_issue_id")
-    public Integer getParentIssueId() {
-        return parentIssueId;
+    public Issue getParentIssue() {
+        return parentIssue;
     }
 
-    public void setParentIssueId(Integer parent_issue_id) {
-        this.parentIssueId = parent_issue_id;
+    public void setParentIssue(Issue parent_issue) {
+        this.parentIssue = parent_issue;
     }
 
     @ManyToMany
@@ -294,14 +295,13 @@ public class Issue extends JpaAuditEntity {
         this.comments = comments;
     }
 
-    @Column(name = "is_deleted", columnDefinition = "varchar(3) default 'NO'")
-    @Enumerated(EnumType.STRING)
-    public IsIssueDeleted getIsDeleted() {
-        return isDeleted;
+    @Column(name = "is_active", nullable = false, columnDefinition = "TINYINT(1) default 1")
+    public Boolean getIsActive() {
+        return isActive;
     }
 
-    public void setIsDeleted(IsIssueDeleted isDeleted) {
-        this.isDeleted = isDeleted;
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
     }
 
     // Object Methods
@@ -310,10 +310,7 @@ public class Issue extends JpaAuditEntity {
     @Override
     public String toString() {
         return "Issues [project=" + project.getId() + ", issue_key=" + issueKey + ", summary=" + summary + ", type="
-                + type + ", assignee=" + assignee + ", status=" + status + ", parent_issue_id=" + parentIssueId
+                + type + ", assignee=" + assignee + ", status=" + status + ", parent_issue_id=" + parentIssue
                 + ", reported_by=" + reportedBy.getId() + "]";
     }
-
-
-
 }
