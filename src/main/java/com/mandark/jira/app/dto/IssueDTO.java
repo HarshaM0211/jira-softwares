@@ -27,7 +27,7 @@ public class IssueDTO extends EntityDTO<Issue> {
 
     private final String statusStr;
 
-    private final Issue parentIssue;// (Issue ID of this table)
+    private final Integer parentIssueId;// (Issue ID of this table)
 
     private final List<SprintDTO> sprints; // ??
 
@@ -57,7 +57,7 @@ public class IssueDTO extends EntityDTO<Issue> {
         this.typeStr = e.getType().toString();
         this.assignee = Values.get(e.getAssignee(), UserDTO::new);
         this.statusStr = e.getStatus().toString();
-        this.parentIssue = e.getParentIssue();
+        this.parentIssueId = Values.get(e.getParentIssue(), Issue::getId);
 
         final List<SprintDTO> sprintDTOs = new ArrayList<>();
         for (Sprint s : e.getSprint()) {
@@ -110,8 +110,8 @@ public class IssueDTO extends EntityDTO<Issue> {
         return statusStr;
     }
 
-    public Issue getParentIssue() {
-        return parentIssue;
+    public Integer getParentIssueId() {
+        return parentIssueId;
     }
 
     public List<SprintDTO> getSprints() {
@@ -156,7 +156,7 @@ public class IssueDTO extends EntityDTO<Issue> {
     @Override
     public String toString() {
         return "IssueDTO [issueKey=" + issueKey + ", summary=" + summary + ", type=" + typeStr + ", assignee="
-                + assignee + ", status=" + statusStr + ", parentIssueId=" + parentIssue + ", reportedBy=" + reportedBy
+                + assignee + ", status=" + statusStr + ", parentIssueId=" + parentIssueId + ", reportedBy=" + reportedBy
                 + ", startDate=" + startDate + ", endDate=" + endDate + ", versionStr=" + versionStr + ", priority="
                 + priorityStr + ", label=" + label + "]";
     }

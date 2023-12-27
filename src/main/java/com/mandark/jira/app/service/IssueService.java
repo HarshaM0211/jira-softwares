@@ -19,7 +19,7 @@ public interface IssueService extends EntityService<Integer, Issue, IssueDTO> {
 
     IssueDTO getById(final int issueId, final int projectId);
 
-    List<IssueDTO> readAllByProjectId(final int projectId, final int pageNo, final int pageSize);
+    List<IssueDTO> findByProjectId(final int projectId, final int pageNo, final int pageSize);
 
     String updateAssignee(final int issueId, final Integer userId, final int projectId);
 
