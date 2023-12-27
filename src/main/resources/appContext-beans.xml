@@ -183,6 +183,7 @@
     </bean>
     <bean id="issueService" class="com.mandark.jira.app.service.impl.IssueServiceImpl">
         <constructor-arg name="dao" ref="genericJpaDao" />
+        <property name="userService" ref="userService"></property>
     </bean>
  
 
