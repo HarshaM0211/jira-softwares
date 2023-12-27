@@ -1,14 +1,14 @@
 package com.mandark.jira.app.dto;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 import com.mandark.jira.app.enums.SprintStatus;
 import com.mandark.jira.app.persistence.orm.entity.Issue;
 import com.mandark.jira.app.persistence.orm.entity.Sprint;
 import com.mandark.jira.spi.app.EntityDTO;
+import com.mandark.jira.spi.util.Values;
 
 
 public class SprintDTO extends EntityDTO<Sprint> {
@@ -18,9 +18,9 @@ public class SprintDTO extends EntityDTO<Sprint> {
 
     private final String sprintKey;
 
-    private final Date startDate;
+    private final LocalDateTime startDate;
 
-    private final Date endDate;
+    private final LocalDateTime endDate;
 
     private final List<IssueDTO> issues;
 
@@ -36,9 +36,9 @@ public class SprintDTO extends EntityDTO<Sprint> {
         this.startDate = e.getStartDate();
         this.endDate = e.getEndDate();
 
-        List<IssueDTO> issuesDTO = new ArrayList<>();
+        final List<IssueDTO> issuesDTO = new ArrayList<>();
         for (Issue n : e.getIssues()) {
-            IssueDTO issueDto = Objects.isNull(n) ? null : new IssueDTO(n);
+            IssueDTO issueDto = Values.get(n, IssueDTO::new);
             issuesDTO.add(issueDto);
         }
 
@@ -53,11 +53,11 @@ public class SprintDTO extends EntityDTO<Sprint> {
         return sprintKey;
     }
 
-    public Date getStartDate() {
+    public LocalDateTime getStartDate() {
         return startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDateTime getEndDate() {
         return endDate;
     }
 

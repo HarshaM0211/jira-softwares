@@ -1,18 +1,15 @@
 package com.mandark.jira.app.dto;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
-import com.mandark.jira.app.enums.IssuePriority;
-import com.mandark.jira.app.enums.IssueStatus;
-import com.mandark.jira.app.enums.IssueType;
 import com.mandark.jira.app.persistence.orm.entity.Attachment;
 import com.mandark.jira.app.persistence.orm.entity.Comment;
 import com.mandark.jira.app.persistence.orm.entity.Issue;
 import com.mandark.jira.app.persistence.orm.entity.Sprint;
 import com.mandark.jira.spi.app.EntityDTO;
+import com.mandark.jira.spi.util.Values;
 
 
 public class IssueDTO extends EntityDTO<Issue> {
@@ -22,31 +19,31 @@ public class IssueDTO extends EntityDTO<Issue> {
 
     private final String issueKey;
 
-    private final String description;// (name)
+    private final String summary;// (name)
 
-    private final IssueType type;
+    private final String typeStr;
 
-    private final UserDTO assignee;// (mem_id)
+    private final UserDTO assignee;// (mem_id) // ??
 
-    private final IssueStatus status;
+    private final String statusStr;
 
-    private final int parentIssueId;// (Issue ID of this table)
+    private final Integer parentIssueId;// (Issue ID of this table)
 
-    private final List<SprintDTO> sprints;
+    private final List<SprintDTO> sprints; // ??
 
     private final UserDTO reportedBy;// (mem_id)
 
-    private final Date startDate;
+    private final LocalDateTime startDate;
 
-    private final Date endDate;
+    private final LocalDateTime endDate;
 
     private final String versionStr;
 
-    private final IssuePriority priority;
+    private final String priorityStr;
 
     private final String label;
 
-    private final List<AttachmentDTO> attachments;
+    private final List<AttachmentDTO> attachments; // ??
 
     private final List<CommentDTO> comments;
 
@@ -56,35 +53,35 @@ public class IssueDTO extends EntityDTO<Issue> {
     public IssueDTO(Issue e) {
         super(e);
         this.issueKey = e.getIssueKey();
-        this.description = e.getDescription();
-        this.type = e.getType();
-        this.assignee = Objects.isNull(e.getAssignee()) ? null : new UserDTO(e.getAssignee());
-        this.status = e.getStatus();
-        this.parentIssueId = e.getParentIssueId();
+        this.summary = e.getSummary();
+        this.typeStr = e.getType().toString();
+        this.assignee = Values.get(e.getAssignee(), UserDTO::new);
+        this.statusStr = e.getStatus().toString();
+        this.parentIssueId = Values.get(e.getParentIssue(), Issue::getId);
 
-        List<SprintDTO> sprintDTOs = new ArrayList<>();
+        final List<SprintDTO> sprintDTOs = new ArrayList<>();
         for (Sprint s : e.getSprint()) {
-            SprintDTO sprintDto = Objects.isNull(s) ? null : new SprintDTO(s);
+            SprintDTO sprintDto = Values.get(s, SprintDTO::new);
             sprintDTOs.add(sprintDto);
         }
         this.sprints = sprintDTOs;
-        this.reportedBy = new UserDTO(e.getReportedBy());
+        this.reportedBy = new UserDTO(e.getReportedBy()); // reportedBy is non Null
         this.startDate = e.getStartDate();
         this.endDate = e.getEndDate();
         this.versionStr = e.getVersionStr();
-        this.priority = e.getPriority();
+        this.priorityStr = e.getPriority().toString();
         this.label = e.getLabel();
 
-        List<AttachmentDTO> attachmentsDTO = new ArrayList<>();
+        final List<AttachmentDTO> attachmentsDTO = new ArrayList<>();
         for (Attachment a : e.getAttachments()) {
-            AttachmentDTO attDto = Objects.isNull(a) ? null : new AttachmentDTO(a);
+            AttachmentDTO attDto = Values.get(a, AttachmentDTO::new);
             attachmentsDTO.add(attDto);
         }
         this.attachments = attachmentsDTO;
 
-        List<CommentDTO> commentsDTO = new ArrayList<>();
+        final List<CommentDTO> commentsDTO = new ArrayList<>();
         for (Comment c : e.getComments()) {
-            CommentDTO cmntDto = Objects.isNull(c) ? null : new CommentDTO(c);
+            CommentDTO cmntDto = Values.get(c, CommentDTO::new);
             commentsDTO.add(cmntDto);
         }
         this.comments = commentsDTO;
@@ -97,23 +94,23 @@ public class IssueDTO extends EntityDTO<Issue> {
         return issueKey;
     }
 
-    public String getDescription() {
-        return description;
+    public String getSummary() {
+        return summary;
     }
 
-    public IssueType getType() {
-        return type;
+    public String getTypeStr() {
+        return typeStr;
     }
 
     public UserDTO getAssignee() {
         return assignee;
     }
 
-    public IssueStatus getStatus() {
-        return status;
+    public String getStatusStr() {
+        return statusStr;
     }
 
-    public int getParentIssueId() {
+    public Integer getParentIssueId() {
         return parentIssueId;
     }
 
@@ -125,11 +122,11 @@ public class IssueDTO extends EntityDTO<Issue> {
         return reportedBy;
     }
 
-    public Date getStartDate() {
+    public LocalDateTime getStartDate() {
         return startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDateTime getEndDate() {
         return endDate;
     }
 
@@ -137,8 +134,8 @@ public class IssueDTO extends EntityDTO<Issue> {
         return versionStr;
     }
 
-    public IssuePriority getPriority() {
-        return priority;
+    public String getPriorityStr() {
+        return priorityStr;
     }
 
     public String getLabel() {
@@ -153,16 +150,15 @@ public class IssueDTO extends EntityDTO<Issue> {
         return comments;
     }
 
-
     // Object Methods
     // -------------------------------------------------------------------------
 
     @Override
     public String toString() {
-        return "IssueDTO [issueKey=" + issueKey + ", description=" + description + ", type=" + type + ", assignee="
-                + assignee + ", status=" + status + ", parentIssueId=" + parentIssueId + ", reportedBy=" + reportedBy
+        return "IssueDTO [issueKey=" + issueKey + ", summary=" + summary + ", type=" + typeStr + ", assignee="
+                + assignee + ", status=" + statusStr + ", parentIssueId=" + parentIssueId + ", reportedBy=" + reportedBy
                 + ", startDate=" + startDate + ", endDate=" + endDate + ", versionStr=" + versionStr + ", priority="
-                + priority + ", label=" + label + "]";
+                + priorityStr + ", label=" + label + "]";
     }
 
 }

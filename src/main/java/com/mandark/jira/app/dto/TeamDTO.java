@@ -1,12 +1,8 @@
 package com.mandark.jira.app.dto;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 import com.mandark.jira.app.persistence.orm.entity.Team;
-import com.mandark.jira.app.persistence.orm.entity.User;
 import com.mandark.jira.spi.app.EntityDTO;
+import com.mandark.jira.spi.util.Values;
 
 
 
@@ -19,7 +15,7 @@ public class TeamDTO extends EntityDTO<Team> {
 
     private final UserDTO teamLeader; // (org_mem_id)
 
-    private final List<UserDTO> users;
+    private final String description;
 
     // Constructors
     // ------------------------------------------------------------------------
@@ -27,15 +23,8 @@ public class TeamDTO extends EntityDTO<Team> {
     public TeamDTO(Team e) {
         super(e);
         this.name = e.getName();
-        this.teamLeader = Objects.isNull(e.getTeamLeader()) ? null : new UserDTO(e.getTeamLeader());
-
-        List<UserDTO> userDTOs = new ArrayList<UserDTO>();
-        for (User n : e.getUsers()) {
-            UserDTO userDto = Objects.isNull(n) ? null : new UserDTO(n);
-            userDTOs.add(userDto);
-        }
-
-        this.users = userDTOs;
+        this.teamLeader = Values.get(e.getTeamLeader(), UserDTO::new);
+        this.description = e.getDescription();
     }
 
     // Getters
@@ -49,8 +38,8 @@ public class TeamDTO extends EntityDTO<Team> {
         return teamLeader;
     }
 
-    public List<UserDTO> getUsers() {
-        return users;
+    public String getDescription() {
+        return description;
     }
 
     // Object Methods
@@ -58,7 +47,7 @@ public class TeamDTO extends EntityDTO<Team> {
 
     @Override
     public String toString() {
-        return "TeamDTO [name=" + name + ", teamLeader=" + teamLeader + ", users=" + users + "]";
+        return "TeamDTO [name=" + name + ", teamLeader=" + teamLeader + ", description=" + description + "]";
     }
 
 }

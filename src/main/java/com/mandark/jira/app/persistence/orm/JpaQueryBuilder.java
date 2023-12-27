@@ -1,6 +1,7 @@
 package com.mandark.jira.app.persistence.orm;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
@@ -8,10 +9,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +30,9 @@ import com.mandark.jira.spi.app.query.MinCriteria;
 import com.mandark.jira.spi.app.query.NotNullCriteria;
 import com.mandark.jira.spi.app.query.NullCriteria;
 import com.mandark.jira.spi.app.query.OrCriteria;
+import com.mandark.jira.spi.app.query.OrderBy;
 import com.mandark.jira.spi.app.query.PropertyCriteria;
+import com.mandark.jira.spi.util.Values;
 
 
 /**
@@ -58,18 +63,25 @@ class JpaQueryBuilder implements QueryBuilder<Query> {
 
     @Override
     public <E extends IEntity<?>> Query toQuery(final Class<E> entityCls) {
-        return this.toQuery(entityCls, null);
+        return this.toQuery(entityCls, null, (OrderBy) null);
     }
 
     @Override
-    public <E extends IEntity<?>> Query toQuery(final Class<E> entityCls, final Criteria inCriteria) {
+    public <E extends IEntity<?>> Query toQuery(final Class<E> entityCls, final Criteria inCriteria,
+            final OrderBy orderBy) {
+        return this.toQuery(entityCls, inCriteria, Arrays.asList(orderBy));
+    }
+
+    @Override
+    public <E extends IEntity<?>> Query toQuery(final Class<E> entityCls, final Criteria inCriteria,
+            final List<OrderBy> orderByList) {
         // Sanity checks
         if (Objects.isNull(entityCls)) {
             throw new IllegalArgumentException("#toQuery :: IEntity class in NULL");
         }
 
         // Construct Query
-        final JpaQuery jpaQuery = new JpaQuery(entityCls, inCriteria, false);
+        final JpaQuery jpaQuery = new JpaQuery(entityCls, inCriteria, orderByList, false);
         final String jpaQueryStr = jpaQuery.getQueryString();
         final Hashtable<String, Object> qryParamValues = jpaQuery.getQueryParamValues();
         LOGGER.debug("JPA Query :: [{}] : {} - {}", inCriteria, jpaQueryStr, qryParamValues);
@@ -95,7 +107,7 @@ class JpaQueryBuilder implements QueryBuilder<Query> {
         }
 
         // Construct Query
-        final JpaQuery jpaQuery = new JpaQuery(entityCls, inCriteria, true);
+        final JpaQuery jpaQuery = new JpaQuery(entityCls, inCriteria, null, true);
         final String jpaQueryStr = jpaQuery.getQueryString();
         final Hashtable<String, Object> qryParamValues = jpaQuery.getQueryParamValues();
         LOGGER.debug("JPA Count Query :: [{}] : {} - {}", inCriteria, jpaQueryStr, qryParamValues);
@@ -195,7 +207,8 @@ class JpaQueryBuilder implements QueryBuilder<Query> {
         // Constructor
         // --------------------------------------------------------------------
 
-        JpaQuery(final Class<?> entityCls, final Criteria inCriteria, boolean isCountQuery) {
+        JpaQuery(final Class<?> entityCls, final Criteria inCriteria, final List<OrderBy> inOrderByList,
+                boolean isCountQuery) {
             super();
 
             // Entity Name
@@ -215,11 +228,25 @@ class JpaQueryBuilder implements QueryBuilder<Query> {
             // WHERE clause
             final Hashtable<String, Object> jpaQueryParamValues = new Hashtable<>();
             if (Objects.nonNull(inCriteria)) {
-                querySB.append(" WHERE ");
-                querySB.append(this.asCriteriaTxt(inCriteria, jpaQueryParamValues));
+                final String criteriaText = this.asCriteriaTxt(inCriteria, jpaQueryParamValues);
+                if (!StringUtils.isEmpty(criteriaText)) {
+                    querySB.append(" WHERE ");
+                    querySB.append(criteriaText);
+                }
             }
 
-            // TODO Order By
+            // ORDER BY clause
+            final List<OrderBy> orderByList = Values.getList(inOrderByList);
+            if (Objects.nonNull(orderByList) && !orderByList.isEmpty()) {
+                // Iterate and prepare
+                final String orderByStr = orderByList.stream() //
+                        .map(this::asOrderByText) //
+                        .collect(Collectors.joining(","));
+
+                // Append
+                querySB.append(" ORDER BY ");
+                querySB.append(orderByStr);
+            }
 
             final String jpaQueryStr = querySB.toString();
 
@@ -231,6 +258,14 @@ class JpaQueryBuilder implements QueryBuilder<Query> {
 
         // Methods
         // --------------------------------------------------------------------
+
+        private String asOrderByText(final OrderBy orderBy) {
+            final StringBuilder querySB = new StringBuilder();
+            querySB.append(String.format("%s.%s", INSTANCE_ALIAS, orderBy.getProperty()));
+            querySB.append(" ");
+            querySB.append(orderBy.isAsc() ? "ASC" : "DESC");
+            return querySB.toString();
+        }
 
         // Criteria :: Compound
 

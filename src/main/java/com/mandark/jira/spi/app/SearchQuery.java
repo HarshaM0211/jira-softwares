@@ -12,7 +12,7 @@ import com.mandark.jira.spi.util.Values;
 /**
  * Query object to search/filter results.
  */
-public abstract class SearchQuery {
+public abstract class SearchQuery<T> {
 
     // Formats
     public static final String DATE_FORMAT_STR = "dd-MM-yyyy";

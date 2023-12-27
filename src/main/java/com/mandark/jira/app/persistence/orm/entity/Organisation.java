@@ -3,7 +3,9 @@ package com.mandark.jira.app.persistence.orm.entity;
 import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -13,8 +15,16 @@ import com.mandark.jira.spi.lang.ValidationException;
 
 
 @Entity
-@Table(name = "organisations")
+@Table(name = "organisations", indexes = {@Index(columnList = "name", name = "name")})
 public class Organisation extends JpaAuditEntity {
+
+    // Field Lables
+    // ------------------------------------------------------------------------
+
+    public static final String PROP_NAME = "name";
+
+    // Fields
+    // ------------------------------------------------------------------------
 
     private String name;
 
@@ -22,9 +32,9 @@ public class Organisation extends JpaAuditEntity {
 
     private List<Project> projects;
 
-    private List<Sprint> sprints;
-
     private List<Team> teams;
+
+    private List<User> users;
 
     // Constructors
     // ------------------------------------------------------------------------
@@ -40,8 +50,6 @@ public class Organisation extends JpaAuditEntity {
     @Override
     public void validate() {
 
-        super.validate();
-
         if (Objects.isNull(name)) {
             throw new ValidationException("#validate :: name is BLANK");
         }
@@ -51,6 +59,7 @@ public class Organisation extends JpaAuditEntity {
     // Getters and Setters
     // ------------------------------------------------------------------------
 
+    @Column(nullable = false, unique = true)
     public String getName() {
         return name;
     }
@@ -59,6 +68,7 @@ public class Organisation extends JpaAuditEntity {
         this.name = name;
     }
 
+    @Column(name = "description")
     public String getDescription() {
         return description;
     }
@@ -77,15 +87,6 @@ public class Organisation extends JpaAuditEntity {
     }
 
     @OneToMany(mappedBy = "organisation")
-    public List<Sprint> getSprints() {
-        return sprints;
-    }
-
-    public void setSprints(List<Sprint> sprints) {
-        this.sprints = sprints;
-    }
-
-    @OneToMany(mappedBy = "organisation")
     public List<Team> getTeams() {
         return teams;
     }
@@ -94,12 +95,21 @@ public class Organisation extends JpaAuditEntity {
         this.teams = teams;
     }
 
+    @OneToMany(mappedBy = "organisation")
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
+    }
+
     // Object Methods
     // ------------------------------------------------------------------------
 
+
     @Override
     public String toString() {
-        return "Organisations [name=" + name + ", description=" + description + ", project_ids=" + projects
-                + ", sprint_ids=" + sprints + ", team_ids=" + teams + "]";
+        return "Organisations [name=" + name + ", description=" + description + "]";
     }
 }

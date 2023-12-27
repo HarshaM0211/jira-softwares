@@ -9,8 +9,6 @@ public class CommentDTO extends EntityDTO<Comment> {
     // Fields
     // -------------------------------------------------------------------------
 
-    private final IssueDTO issue;
-
     private final UserDTO commenter;// (org_member)
 
     private final String comment;
@@ -21,17 +19,12 @@ public class CommentDTO extends EntityDTO<Comment> {
 
     public CommentDTO(Comment e) {
         super(e);
-        this.issue = new IssueDTO(e.getIssue());
         this.commenter = new UserDTO(e.getCommenter());
         this.comment = e.getComment();
     }
 
     // Getters and Setters
     // -------------------------------------------------------------------------
-
-    public IssueDTO getIssue() {
-        return issue;
-    }
 
     public UserDTO getCommenter() {
         return commenter;
@@ -46,7 +39,7 @@ public class CommentDTO extends EntityDTO<Comment> {
 
     @Override
     public String toString() {
-        return "CommentDTO [issue=" + issue + ", commenter=" + commenter + ", comment=" + comment + "]";
+        return "CommentDTO [Commenter=" + commenter + ", comment=" + comment + "]";
     }
 
 
