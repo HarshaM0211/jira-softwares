@@ -3,6 +3,7 @@ package com.mandark.jira.app.dto;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mandark.jira.app.persistence.orm.entity.Issue;
 import com.mandark.jira.app.persistence.orm.entity.Project;
 import com.mandark.jira.app.persistence.orm.entity.Sprint;
@@ -66,10 +67,12 @@ public class ProjectDTO extends EntityDTO<Project> {
         return description;
     }
 
+    @JsonIgnore
     public List<SprintDTO> getSprints() {
         return sprints;
     }
 
+    @JsonIgnore
     public List<IssueDTO> getIssues() {
         return issues;
     }
