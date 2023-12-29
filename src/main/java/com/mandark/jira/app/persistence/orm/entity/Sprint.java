@@ -1,7 +1,6 @@
 package com.mandark.jira.app.persistence.orm.entity;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.Column;
@@ -10,7 +9,6 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -51,8 +49,6 @@ public class Sprint extends JpaAuditEntity {
     private LocalDateTime startDate;
 
     private LocalDateTime endDate;
-
-    private List<Issue> issues;
 
     private SprintStatus status;
 
@@ -122,15 +118,6 @@ public class Sprint extends JpaAuditEntity {
 
     public void setEndDate(LocalDateTime end_date) {
         this.endDate = end_date;
-    }
-
-    @ManyToMany(mappedBy = "sprint")
-    public List<Issue> getIssues() {
-        return issues;
-    }
-
-    public void setIssues(List<Issue> issues) {
-        this.issues = issues;
     }
 
     @Column(name = "status", nullable = false)
