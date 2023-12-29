@@ -10,7 +10,6 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -90,8 +89,6 @@ public class Issue extends JpaAuditEntity {
     private IssueStatus status;
 
     private Issue parentIssue;// (Issue ID of this table)
-
-    private List<Sprint> sprint;
 
     private User reportedBy;// (user_id)
 
@@ -211,23 +208,14 @@ public class Issue extends JpaAuditEntity {
         this.status = status;
     }
 
-    @Column(name = "parent_issue_id")
+    @ManyToOne
+    @JoinColumn(name = "parent_issue_id")
     public Issue getParentIssue() {
         return parentIssue;
     }
 
     public void setParentIssue(Issue parent_issue) {
         this.parentIssue = parent_issue;
-    }
-
-    @ManyToMany
-    @JoinColumn(name = "sprint_id")
-    public List<Sprint> getSprint() {
-        return sprint;
-    }
-
-    public void setSprint(List<Sprint> sprint) {
-        this.sprint = sprint;
     }
 
     @OneToOne

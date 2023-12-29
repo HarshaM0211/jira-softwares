@@ -30,7 +30,6 @@ import com.mandark.jira.app.enums.IssueStatus;
 import com.mandark.jira.app.enums.IssueType;
 import com.mandark.jira.app.persistence.orm.entity.Issue;
 import com.mandark.jira.app.persistence.orm.entity.Project;
-import com.mandark.jira.app.persistence.orm.entity.Sprint;
 import com.mandark.jira.app.persistence.orm.entity.User;
 import com.mandark.jira.app.service.IssueService;
 import com.mandark.jira.app.service.ProjectService;
@@ -95,12 +94,6 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
         final Issue beanParentIssue = Objects.isNull(entityBean.getParentIssueId()) ? null
                 : this.dao.read(Issue.class, entityBean.getParentIssueId(), true);
         exEntity.setParentIssue(beanParentIssue);
-
-        final List<Sprint> sprints = new ArrayList<Sprint>();
-        final Sprint beanSprint = Objects.isNull(entityBean.getSprintId()) ? null
-                : this.dao.read(Sprint.class, entityBean.getSprintId(), true);
-        sprints.add(beanSprint);
-        exEntity.setSprint(sprints);
 
         exEntity.setPriority(entityBean.getIssuePriority());
         exEntity.setStatus(entityBean.getIssueStatus());
