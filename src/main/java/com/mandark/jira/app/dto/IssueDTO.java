@@ -7,7 +7,6 @@ import java.util.List;
 import com.mandark.jira.app.persistence.orm.entity.Attachment;
 import com.mandark.jira.app.persistence.orm.entity.Comment;
 import com.mandark.jira.app.persistence.orm.entity.Issue;
-import com.mandark.jira.app.persistence.orm.entity.Sprint;
 import com.mandark.jira.spi.app.EntityDTO;
 import com.mandark.jira.spi.util.Values;
 
@@ -28,8 +27,6 @@ public class IssueDTO extends EntityDTO<Issue> {
     private final String statusStr;
 
     private final Integer parentIssueId;// (Issue ID of this table)
-
-    private final List<SprintDTO> sprints; // ??
 
     private final UserDTO reportedBy;// (mem_id)
 
@@ -52,24 +49,24 @@ public class IssueDTO extends EntityDTO<Issue> {
 
     public IssueDTO(Issue e) {
         super(e);
+
         this.issueKey = e.getIssueKey();
+
         this.summary = e.getSummary();
-        this.typeStr = e.getType().toString();
+        this.typeStr = e.getType().name(); // Type is NonNull
+
         this.assignee = Values.get(e.getAssignee(), UserDTO::new);
-        this.statusStr = e.getStatus().toString();
+
+        this.statusStr = e.getStatus().name();
         this.parentIssueId = Values.get(e.getParentIssue(), Issue::getId);
 
-        final List<SprintDTO> sprintDTOs = new ArrayList<>();
-        for (Sprint s : e.getSprint()) {
-            SprintDTO sprintDto = Values.get(s, SprintDTO::new);
-            sprintDTOs.add(sprintDto);
-        }
-        this.sprints = sprintDTOs;
         this.reportedBy = new UserDTO(e.getReportedBy()); // reportedBy is non Null
+
         this.startDate = e.getStartDate();
         this.endDate = e.getEndDate();
+
         this.versionStr = e.getVersionStr();
-        this.priorityStr = e.getPriority().toString();
+        this.priorityStr = e.getPriority().name();
         this.label = e.getLabel();
 
         final List<AttachmentDTO> attachmentsDTO = new ArrayList<>();
@@ -112,10 +109,6 @@ public class IssueDTO extends EntityDTO<Issue> {
 
     public Integer getParentIssueId() {
         return parentIssueId;
-    }
-
-    public List<SprintDTO> getSprints() {
-        return sprints;
     }
 
     public UserDTO getReportedBy() {
