@@ -32,7 +32,7 @@ public class SprintAPI extends AbstractAPI {
     SprintService sprintService;
 
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public ResponseEntity<?> create(@PathVariable("projectId") Integer projectId) {
+    public ResponseEntity<?> create(@PathVariable("projectId") int projectId) {
 
         final int sprintId = sprintService.create(projectId);
 
@@ -43,7 +43,7 @@ public class SprintAPI extends AbstractAPI {
     }
 
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public ResponseEntity<?> getByProjectId(@PathVariable("projectId") Integer projectId) {
+    public ResponseEntity<?> getByProjectId(@PathVariable("projectId") int projectId) {
 
         final List<SprintDTO> sprintDtos = sprintService.getByProjectId(projectId);
 
@@ -59,7 +59,7 @@ public class SprintAPI extends AbstractAPI {
     }
 
     @RequestMapping(value = "/{sprintId}", method = RequestMethod.PUT)
-    public ResponseEntity<?> update(@RequestBody SprintBean sprintBean, @PathVariable("sprintId") Integer sprintId) {
+    public ResponseEntity<?> update(@RequestBody SprintBean sprintBean, @PathVariable("sprintId") int sprintId) {
 
         sprintService.update(sprintId, sprintBean);
 
@@ -70,8 +70,8 @@ public class SprintAPI extends AbstractAPI {
     }
 
     @RequestMapping(value = "/{sprintId}/{status}", method = RequestMethod.PUT)
-    public ResponseEntity<?> updateStatus(@PathVariable("sprintId") int sprintId, @RequestParam Integer nextSprintId,
-            @PathVariable("status") String status) {
+    public ResponseEntity<?> updateStatus(@PathVariable("sprintId") int sprintId,
+            @RequestParam(required = false) Integer nextSprintId, @PathVariable("status") String status) {
 
         if (status.equals("start")) {
 
@@ -94,7 +94,7 @@ public class SprintAPI extends AbstractAPI {
     }
 
     @RequestMapping(value = "/{sprintId}/issues/{issueId}", method = RequestMethod.PUT)
-    public ResponseEntity<?> removeIssue(@PathVariable Integer issueId) {
+    public ResponseEntity<?> removeIssue(@PathVariable int issueId) {
 
         final String msg = sprintService.removeIssue(issueId);
 
