@@ -12,8 +12,6 @@ import static com.mandark.jira.app.persistence.orm.entity.SprintIssue.PROP_ISSUE
 import static com.mandark.jira.app.persistence.orm.entity.SprintIssue.PROP_IS_LATEST;
 import static com.mandark.jira.app.persistence.orm.entity.SprintIssue.PROP_SPRINT;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -45,9 +43,7 @@ import com.mandark.jira.web.WebConstants;
 public class SprintServiceImpl extends AbstractJpaEntityService<Sprint, SprintBean, SprintDTO>
         implements SprintService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrganisationServiceImpl.class);
-
-    public static final String ENTITY_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:s";
+    private static final Logger LOGGER = LoggerFactory.getLogger(SprintServiceImpl.class);
 
     public SprintServiceImpl(IDao<Integer> dao) {
         super(dao);
@@ -74,42 +70,56 @@ public class SprintServiceImpl extends AbstractJpaEntityService<Sprint, SprintBe
         if (Objects.isNull(exEntity) || Objects.isNull(entityBean)) {
             return exEntity;
         }
-        exEntity.setSprintKey(entityBean.getSprintKey());
 
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(ENTITY_DATE_TIME_FORMAT);
-
-        final LocalDateTime startDate = Objects.isNull(entityBean.getStartDate()) ? null
-                : LocalDateTime.parse(entityBean.getStartDate(), formatter);
-        exEntity.setStartDate(startDate);
-
-        final LocalDateTime endDate = Objects.isNull(entityBean.getEndDate()) ? null
-                : LocalDateTime.parse(entityBean.getEndDate(), formatter);
-        exEntity.setEndDate(endDate);
-
+        if (Objects.nonNull(entityBean.getSprintKey())) {
+            exEntity.setSprintKey(entityBean.getSprintKey());
+        }
+        if (Objects.nonNull(entityBean.getStartDate())) {
+            exEntity.setStartDate(entityBean.getStartDate());
+        }
+        if (Objects.nonNull(entityBean.getEndDate())) {
+            exEntity.setEndDate(entityBean.getEndDate());
+        }
         return exEntity;
     }
 
     @Override
     @Transactional
-    public int create(final int projectId) {
+    public int create(final int projectId, final SprintBean sprintBean) {
 
-        final Sprint sprintEntity = new Sprint();
-        final Project project = this.dao.read(Project.class, projectId, true);
+        // Sanity Checks
+        Verify.notNull(sprintBean, "$create :: sprintBean must be non NULL");
+
+        final Sprint sprintEntity = this.createFromBean(sprintBean);
+        final Project project = super.readEntity(Project.class, projectId, true);
 
         final Criteria projectCriteria = Criteria.equal(PROP_PROJECT, project);
-        int count = this.dao.count(this.getEntityClass(), projectCriteria);
+        int count = super.count(projectCriteria);
         count++;
 
+        sprintEntity.setProject(project);
+        sprintEntity.setStatus(INACTIVE);
+
+
+        final String beanKey = sprintEntity.getSprintKey();
+
+        if (Objects.nonNull(beanKey)) {
+
+            sprintEntity.setSprintKey(beanKey);
+            final int sprintId = this.dao.save(sprintEntity);
+            return sprintId;
+        }
         final StringBuilder sprintKeyBuilder = new StringBuilder();
         sprintKeyBuilder.append(project.getProjectKey());
         sprintKeyBuilder.append(" Sprint ");
-        sprintKeyBuilder.append("" + count);
+        sprintKeyBuilder.append(String.valueOf(count));
 
-        sprintEntity.setProject(project);
         sprintEntity.setSprintKey(sprintKeyBuilder.toString());
-        sprintEntity.setStatus(INACTIVE);
 
         final int sprintId = this.dao.save(sprintEntity);
+
+        final String msg = String.format("Successfully Created a Sprint with Id : %s", sprintId);
+        LOGGER.info(msg);
 
         return sprintId;
     }
@@ -121,17 +131,16 @@ public class SprintServiceImpl extends AbstractJpaEntityService<Sprint, SprintBe
         // Sanity Checks
         Verify.notNull(sprintBean, "$update :: sprintBean must be non NULL");
 
-        final Sprint sprintEntity = this.dao.read(this.getEntityClass(), sprintId, true);
-        final Sprint sprint = this.copyFromBean(sprintEntity, sprintBean);
+        super.update(sprintId, sprintBean);
 
-        this.dao.update(sprintId, sprint);
-
+        final String msg = String.format("Successfully Updated a Sprint with Id : %s", sprintId);
+        LOGGER.info(msg);
     }
 
     @Override
     public List<SprintDTO> getByProjectId(final int projectId) {
 
-        final Project project = this.dao.read(Project.class, projectId, true);
+        final Project project = super.readEntity(Project.class, projectId, true);
 
         final Criteria projectCriteria = Criteria.equal(PROP_PROJECT, project);
         final List<SprintStatus> statusList = new ArrayList<>();
@@ -141,10 +150,8 @@ public class SprintServiceImpl extends AbstractJpaEntityService<Sprint, SprintBe
         final Criteria projectAndStatusCr = Criteria.and(projectCriteria, inCriteria);
 
         final int count = this.dao.count(this.getEntityClass(), projectAndStatusCr);
-        final int pageNo = Values.get(WebConstants.DEFAULT_PAGE_NO, Integer::parseInt);
 
-        final List<Sprint> sprints = this.dao.find(this.getEntityClass(), projectAndStatusCr, pageNo, count);
-        final List<SprintDTO> sprintDtos = this.toDTOs(sprints);
+        final List<SprintDTO> sprintDtos = super.find(projectAndStatusCr, 1, count);
 
         return sprintDtos;
     }
@@ -153,7 +160,7 @@ public class SprintServiceImpl extends AbstractJpaEntityService<Sprint, SprintBe
     @Transactional
     public void start(final int sprintId) {
 
-        final Sprint sprint = this.dao.read(this.getEntityClass(), sprintId, true);
+        final Sprint sprint = super.readEntity(this.getEntityClass(), sprintId, true);
 
         if (Objects.isNull(sprint.getEndDate()) || Objects.isNull(sprint.getStartDate())) {
 
@@ -182,23 +189,22 @@ public class SprintServiceImpl extends AbstractJpaEntityService<Sprint, SprintBe
             // Issue Done
 
             // Checking childs
-            final Issue issue = this.dao.read(Issue.class, issueId, true);
+            final Issue issue = super.readEntity(Issue.class, issueId, true);
 
             final Criteria parentCriteria = Criteria.equal(Issue.PROP_PARENT_ISSUE, issue);
 
             final int count = this.dao.count(Issue.class, parentCriteria);
             final int pageNo = Values.get(WebConstants.DEFAULT_PAGE_NO, Integer::parseInt);
 
-            List<Issue> childIssues = new ArrayList<>();
-            try {
-                childIssues = this.dao.find(Issue.class, parentCriteria, pageNo, count);
-            } catch (Exception e) {
+            final List<Issue> childIssues = this.dao.find(Issue.class, parentCriteria, pageNo, count);
+
+            if (childIssues.isEmpty()) {
                 LOGGER.info("Issue with Id : {} have no Child Issues", issueId);
                 continue;
             }
             for (Issue childIssue : childIssues) {
 
-                if (childIssue.getStatus().equals(DONE)) {
+                if (DONE.equals(childIssue.getStatus())) {
                     continue;
                 }
                 final String msg = String.format("Can't Complete the Sprint. Found InCompleted Sub Task of Id : %s",
@@ -212,7 +218,7 @@ public class SprintServiceImpl extends AbstractJpaEntityService<Sprint, SprintBe
             this.addIssues(unDoneIssueIds, nextSprintId);
         }
         // Updating current Sprint as Completed
-        final Sprint sprint = this.dao.read(this.getEntityClass(), sprintId, true);
+        final Sprint sprint = super.readEntity(this.getEntityClass(), sprintId, true);
         sprint.setStatus(COMPLETED);
         this.dao.update(sprintId, sprint);
         final String msg = String.format("Successfully Completed the Sprint with Id : %s", sprintId);
@@ -223,7 +229,7 @@ public class SprintServiceImpl extends AbstractJpaEntityService<Sprint, SprintBe
     @Override
     @Transactional
     public String removeIssue(final int issueId) {
-        final Issue issue = this.dao.read(Issue.class, issueId, true);
+        final Issue issue = super.readEntity(Issue.class, issueId, true);
         final String msg = this.removeIssue(issue);
         return msg;
     }
@@ -267,7 +273,7 @@ public class SprintServiceImpl extends AbstractJpaEntityService<Sprint, SprintBe
 
         for (Issue issue : issueEntities) {
 
-            boolean isValid = this.isValid(issue);
+            final boolean isValid = this.isValid(issue);
             if (!isValid) {
                 LOGGER.info("Invalid IssueType! Skipped adding of Issue with Id : {} into the Sprint with Id : {}",
                         issue.getId(), sprintId);
@@ -301,7 +307,7 @@ public class SprintServiceImpl extends AbstractJpaEntityService<Sprint, SprintBe
     @Override
     public List<IssueDTO> getIssues(final int sprintId) {
 
-        final Sprint sprint = this.dao.read(this.getEntityClass(), sprintId, true);
+        final Sprint sprint = super.readEntity(this.getEntityClass(), sprintId, true);
 
         final Criteria sprintCriteria = Criteria.equal(PROP_SPRINT, sprint);
         final Criteria latestCriteria = Criteria.equal(PROP_IS_LATEST, true);
