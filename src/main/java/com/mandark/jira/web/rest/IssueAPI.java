@@ -219,9 +219,9 @@ public class IssueAPI extends AbstractAPI {
     @RequestMapping(value = "/{issueId}/history", method = RequestMethod.GET)
     public ResponseEntity<?> getSprintHistory(@PathVariable("issueId") Integer issueId) {
 
-        final Map<String, Map<SprintDTO, String>> sprintHistoryMap = issueService.getSprintHistory(issueId);
+        final Map<String, List<SprintDTO>> sprintHistoryMap = issueService.getSprintHistory(issueId);
 
-        return new ResponseEntity<Map<String, Map<SprintDTO, String>>>(sprintHistoryMap, HttpStatus.OK);
+        return new ResponseEntity<Map<String, List<SprintDTO>>>(sprintHistoryMap, HttpStatus.OK);
     }
 
 

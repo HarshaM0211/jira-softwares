@@ -32,7 +32,7 @@ public interface IssueService extends EntityService<Integer, Issue, IssueDTO> {
     String addSubTaskToNonEpic(final int subTaskId, final int nonEpicId, final int projectId);
 
 
-    Map<String, Map<SprintDTO, String>> getSprintHistory(final int issueId);
+    Map<String, List<SprintDTO>> getSprintHistory(final int issueId);
 
 
     List<IssueDTO> listValidChildsForEpic(final int projectId, final int pageNo, final int pageSize);

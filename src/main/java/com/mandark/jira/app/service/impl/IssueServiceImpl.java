@@ -1,11 +1,11 @@
 package com.mandark.jira.app.service.impl;
 
-import static com.mandark.jira.app.dto.SprintDTO.DTO_DATE_FORMAT;
 import static com.mandark.jira.app.enums.IssueType.BUG;
 import static com.mandark.jira.app.enums.IssueType.EPIC;
 import static com.mandark.jira.app.enums.IssueType.STORY;
 import static com.mandark.jira.app.enums.IssueType.SUB_TASK;
 import static com.mandark.jira.app.enums.IssueType.TASK;
+import static com.mandark.jira.app.enums.SprintStatus.INACTIVE;
 import static com.mandark.jira.app.persistence.orm.entity.Issue.PROP_ASSIGNEE;
 import static com.mandark.jira.app.persistence.orm.entity.Issue.PROP_IS_ACTIVE;
 import static com.mandark.jira.app.persistence.orm.entity.Issue.PROP_PROJECT;
@@ -302,7 +302,7 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
     }
 
     @Override
-    public Map<String, Map<SprintDTO, String>> getSprintHistory(final int issueId) {
+    public Map<String, List<SprintDTO>> getSprintHistory(final int issueId) {
 
         final Issue issue = this.dao.read(this.getEntityClass(), issueId, true);
         final Criteria issueCr = Criteria.equal(PROP_ISSUE, issue);
@@ -312,35 +312,28 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
 
         final List<SprintIssue> sprintIssues = this.dao.find(SprintIssue.class, issueCr, pageNo, count);
 
-        final Map<SprintDTO, String> passedBySprintMap = new HashedMap<>();
-
-        final Map<SprintDTO, String> currentSprintMap = new HashedMap<>();
-
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DTO_DATE_FORMAT);
+        // Initialization
+        final List<SprintDTO> passedBySprints = new ArrayList<>();
+        final List<SprintDTO> currentSprints = new ArrayList<>();
 
         for (SprintIssue si : sprintIssues) {
 
             final Sprint sprint = si.getSprint();
 
             if (!si.getIsLatest()) {
-                final LocalDateTime endDate = sprint.getEndDate();
-                final String endDateStr = endDate.toLocalDate().format(formatter);
                 final SprintDTO sprintDto = new SprintDTO(sprint);// sprint is non null field
-                passedBySprintMap.put(sprintDto, endDateStr);
+                passedBySprints.add(sprintDto);
                 continue;
             }
-
-            final LocalDateTime endDate = sprint.getEndDate();
-            if (Objects.isNull(endDate)) {
+            if (INACTIVE.equals(sprint.getStatus())) {
                 continue; // Skipping as Sprint is not Started - INACTIVE Sprint
             }
-            final String endDateStr = endDate.toLocalDate().format(formatter);
             final SprintDTO sprintDto = new SprintDTO(sprint);
-            currentSprintMap.put(sprintDto, endDateStr);
+            currentSprints.add(sprintDto);
         }
-        final Map<String, Map<SprintDTO, String>> statusSprintsMap = new HashedMap<String, Map<SprintDTO, String>>();
-        statusSprintsMap.put("PASSED BY", passedBySprintMap);
-        statusSprintsMap.put("CURRENT", currentSprintMap);
+        final Map<String, List<SprintDTO>> statusSprintsMap = new HashedMap<String, List<SprintDTO>>();
+        statusSprintsMap.put("PASSED BY", passedBySprints);
+        statusSprintsMap.put("CURRENT", currentSprints);
         return statusSprintsMap;
     }
 
