@@ -7,6 +7,7 @@ import static com.mandark.jira.app.enums.SprintStatus.ACTIVE;
 import static com.mandark.jira.app.enums.SprintStatus.COMPLETED;
 import static com.mandark.jira.app.enums.SprintStatus.INACTIVE;
 import static com.mandark.jira.app.persistence.orm.entity.Sprint.PROP_PROJECT;
+import static com.mandark.jira.app.persistence.orm.entity.Sprint.PROP_STATUS;
 import static com.mandark.jira.app.persistence.orm.entity.SprintIssue.PROP_ISSUE;
 import static com.mandark.jira.app.persistence.orm.entity.SprintIssue.PROP_IS_LATEST;
 import static com.mandark.jira.app.persistence.orm.entity.SprintIssue.PROP_SPRINT;
@@ -26,6 +27,7 @@ import com.mandark.jira.app.beans.SprintBean;
 import com.mandark.jira.app.dto.IssueDTO;
 import com.mandark.jira.app.dto.SprintDTO;
 import com.mandark.jira.app.enums.IssueType;
+import com.mandark.jira.app.enums.SprintStatus;
 import com.mandark.jira.app.persistence.orm.entity.Issue;
 import com.mandark.jira.app.persistence.orm.entity.Project;
 import com.mandark.jira.app.persistence.orm.entity.Sprint;
@@ -132,11 +134,16 @@ public class SprintServiceImpl extends AbstractJpaEntityService<Sprint, SprintBe
         final Project project = this.dao.read(Project.class, projectId, true);
 
         final Criteria projectCriteria = Criteria.equal(PROP_PROJECT, project);
+        final List<SprintStatus> statusList = new ArrayList<>();
+        statusList.add(INACTIVE);
+        statusList.add(ACTIVE);
+        final Criteria inCriteria = Criteria.in(PROP_STATUS, statusList);
+        final Criteria projectAndStatusCr = Criteria.and(projectCriteria, inCriteria);
 
-        final int count = this.dao.count(this.getEntityClass(), projectCriteria);
+        final int count = this.dao.count(this.getEntityClass(), projectAndStatusCr);
         final int pageNo = Values.get(WebConstants.DEFAULT_PAGE_NO, Integer::parseInt);
 
-        final List<Sprint> sprints = this.dao.find(this.getEntityClass(), projectCriteria, pageNo, count);
+        final List<Sprint> sprints = this.dao.find(this.getEntityClass(), projectAndStatusCr, pageNo, count);
         final List<SprintDTO> sprintDtos = this.toDTOs(sprints);
 
         return sprintDtos;
@@ -147,6 +154,11 @@ public class SprintServiceImpl extends AbstractJpaEntityService<Sprint, SprintBe
     public void start(final int sprintId) {
 
         final Sprint sprint = this.dao.read(this.getEntityClass(), sprintId, true);
+
+        if (Objects.isNull(sprint.getEndDate()) || Objects.isNull(sprint.getStartDate())) {
+
+            throw new ValidationException("Please add dates for Sprint before Starting");
+        }
         sprint.setStatus(ACTIVE);
         this.dao.update(sprintId, sprint);
     }
@@ -237,7 +249,7 @@ public class SprintServiceImpl extends AbstractJpaEntityService<Sprint, SprintBe
 
         this.dao.update(id, sprintIssue);
 
-        final String msg = String.format("Successfully removed Issue with Id : {} from it's Sprint", issue.getId());
+        final String msg = String.format("Successfully removed Issue with Id : %s from it's Sprint", issue.getId());
         LOGGER.info(msg);
         return msg;
     }
