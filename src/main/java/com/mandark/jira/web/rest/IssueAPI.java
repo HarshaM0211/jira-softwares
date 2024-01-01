@@ -6,6 +6,7 @@ import static com.mandark.jira.web.WebConstants.REQ_PARAM_PAGE_NO;
 import static com.mandark.jira.web.WebConstants.REQ_PARAM_PAGE_SIZE;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.slf4j.Logger;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.mandark.jira.app.bean.search.IssueSearchQuery;
 import com.mandark.jira.app.beans.IssueBean;
 import com.mandark.jira.app.dto.IssueDTO;
+import com.mandark.jira.app.dto.SprintDTO;
 import com.mandark.jira.app.enums.IssueType;
 import com.mandark.jira.app.persistence.orm.entity.Issue;
 import com.mandark.jira.app.service.IssueService;
@@ -213,6 +215,15 @@ public class IssueAPI extends AbstractAPI {
 
         return new ResponseEntity<>(pageResult, HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/{issueId}/history", method = RequestMethod.GET)
+    public ResponseEntity<?> getSprintHistory(@PathVariable("issueId") Integer issueId) {
+
+        final Map<String, Map<SprintDTO, String>> sprintHistoryMap = issueService.getSprintHistory(issueId);
+
+        return new ResponseEntity<Map<String, Map<SprintDTO, String>>>(sprintHistoryMap, HttpStatus.OK);
+    }
+
 
     // Getters and Setters
     // ------------------------------------------------------------------------
