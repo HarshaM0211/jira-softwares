@@ -9,7 +9,7 @@ import com.mandark.jira.spi.app.EntityDTO;
 
 public class SprintDTO extends EntityDTO<Sprint> {
 
-    public static final String DTO_DATE_FORMAT = "dd MMM";
+    public static final String DTO_DATE_FORMAT = "dd MMM yyyy";
 
     // Fields
     // -------------------------------------------------------------------------
@@ -61,8 +61,7 @@ public class SprintDTO extends EntityDTO<Sprint> {
 
     @Override
     public String toString() {
-        return "SprintDTO [sprintKey=" + sprintKey + ", startDate=" + startDate + ", endDate=" + endDate + ", status="
-                + status + "]";
+        return "SprintDTO [sprintId = " + id + ", sprintKey=" + sprintKey + "]";
     }
 
 }
