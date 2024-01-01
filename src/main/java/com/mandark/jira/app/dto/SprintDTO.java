@@ -1,7 +1,6 @@
 package com.mandark.jira.app.dto;
 
-import java.time.format.DateTimeFormatter;
-import java.util.Objects;
+import java.sql.Timestamp;
 
 import com.mandark.jira.app.persistence.orm.entity.Sprint;
 import com.mandark.jira.spi.app.EntityDTO;
@@ -9,16 +8,14 @@ import com.mandark.jira.spi.app.EntityDTO;
 
 public class SprintDTO extends EntityDTO<Sprint> {
 
-    public static final String DTO_DATE_FORMAT = "dd MMM yyyy";
-
     // Fields
     // -------------------------------------------------------------------------
 
     private final String sprintKey;
 
-    private final String startDate;
+    private final Timestamp startDate;
 
-    private final String endDate;
+    private final Timestamp endDate;
 
     private final String status;
 
@@ -29,11 +26,8 @@ public class SprintDTO extends EntityDTO<Sprint> {
         super(e);
 
         this.sprintKey = e.getSprintKey();
-
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DTO_DATE_FORMAT);
-
-        this.startDate = Objects.isNull(e.getStartDate()) ? null : e.getStartDate().toLocalDate().format(formatter);
-        this.endDate = Objects.isNull(e.getEndDate()) ? null : e.getEndDate().toLocalDate().format(formatter);
+        this.startDate = e.getStartDate();
+        this.endDate = e.getEndDate();
         this.status = e.getStatus().toString();
     }
 
@@ -44,11 +38,11 @@ public class SprintDTO extends EntityDTO<Sprint> {
         return sprintKey;
     }
 
-    public String getStartDate() {
+    public Timestamp getStartDate() {
         return startDate;
     }
 
-    public String getEndDate() {
+    public Timestamp getEndDate() {
         return endDate;
     }
 

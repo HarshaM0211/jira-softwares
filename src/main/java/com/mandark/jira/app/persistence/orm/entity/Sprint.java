@@ -1,6 +1,6 @@
 package com.mandark.jira.app.persistence.orm.entity;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 import java.util.Objects;
 
 import javax.persistence.Column;
@@ -46,9 +46,9 @@ public class Sprint extends JpaAuditEntity {
 
     private String sprintKey;
 
-    private LocalDateTime startDate;
+    private Timestamp startDate;
 
-    private LocalDateTime endDate;
+    private Timestamp endDate;
 
     private SprintStatus status;
 
@@ -103,20 +103,20 @@ public class Sprint extends JpaAuditEntity {
     }
 
     @Column(name = "start_date")
-    public LocalDateTime getStartDate() {
+    public Timestamp getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(LocalDateTime start_date) {
+    public void setStartDate(Timestamp start_date) {
         this.startDate = start_date;
     }
 
     @Column(name = "end_date")
-    public LocalDateTime getEndDate() {
+    public Timestamp getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(LocalDateTime end_date) {
+    public void setEndDate(Timestamp end_date) {
         this.endDate = end_date;
     }
 
