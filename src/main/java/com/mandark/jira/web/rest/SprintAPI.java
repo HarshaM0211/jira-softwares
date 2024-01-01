@@ -29,12 +29,12 @@ public class SprintAPI extends AbstractAPI {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SprintAPI.class);
 
-    SprintService sprintService;
+    private SprintService sprintService;
 
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public ResponseEntity<?> create(@PathVariable("projectId") int projectId) {
+    public ResponseEntity<?> create(@PathVariable("projectId") int projectId, @RequestBody SprintBean sprintBean) {
 
-        final int sprintId = sprintService.create(projectId);
+        final int sprintId = sprintService.create(projectId, sprintBean);
 
         final String msg = String.format("$API :: Successfully created the Sprint with Id : %s", sprintId);
         LOGGER.info(msg);
@@ -107,7 +107,7 @@ public class SprintAPI extends AbstractAPI {
     public ResponseEntity<?> addIssues(@RequestBody Map<String, int[]> issueIds,
             @PathVariable("sprintId") int sprintId) {
 
-        int[] idsArray = issueIds.get("issueIds");
+        final int[] idsArray = issueIds.get("issueIds");
         final List<Integer> issueIdList = Arrays.stream(idsArray).boxed().collect(Collectors.toList());
         sprintService.addIssues(issueIdList, sprintId);
 

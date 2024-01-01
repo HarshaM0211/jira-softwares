@@ -11,7 +11,7 @@ import com.mandark.jira.spi.app.service.EntityService;
 
 public interface SprintService extends EntityService<Integer, Sprint, SprintDTO> {
 
-    int create(final int projectId);
+    int create(final int projectId, final SprintBean sprintBean);
 
     void update(final int sprintId, final SprintBean sprintBean);
 
