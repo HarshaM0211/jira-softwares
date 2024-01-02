@@ -5,31 +5,39 @@ import static com.mandark.jira.app.enums.IssueType.EPIC;
 import static com.mandark.jira.app.enums.IssueType.STORY;
 import static com.mandark.jira.app.enums.IssueType.SUB_TASK;
 import static com.mandark.jira.app.enums.IssueType.TASK;
+import static com.mandark.jira.app.enums.SprintStatus.INACTIVE;
 import static com.mandark.jira.app.persistence.orm.entity.Issue.PROP_ASSIGNEE;
 import static com.mandark.jira.app.persistence.orm.entity.Issue.PROP_IS_ACTIVE;
 import static com.mandark.jira.app.persistence.orm.entity.Issue.PROP_PROJECT;
 import static com.mandark.jira.app.persistence.orm.entity.Issue.PROP_STATUS;
 import static com.mandark.jira.app.persistence.orm.entity.Issue.PROP_TYPE;
+import static com.mandark.jira.app.persistence.orm.entity.SprintIssue.PROP_ISSUE;
 import static com.mandark.jira.spi.app.SearchQuery.DATE_FORMAT_STR;
+import static com.mandark.jira.web.WebConstants.DEFAULT_PAGE_NO;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.transaction.Transactional;
 
+import org.apache.commons.collections4.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mandark.jira.app.bean.search.IssueSearchQuery;
 import com.mandark.jira.app.beans.IssueBean;
 import com.mandark.jira.app.dto.IssueDTO;
+import com.mandark.jira.app.dto.SprintDTO;
 import com.mandark.jira.app.enums.IssueStatus;
 import com.mandark.jira.app.enums.IssueType;
 import com.mandark.jira.app.persistence.orm.entity.Issue;
 import com.mandark.jira.app.persistence.orm.entity.Project;
+import com.mandark.jira.app.persistence.orm.entity.Sprint;
+import com.mandark.jira.app.persistence.orm.entity.SprintIssue;
 import com.mandark.jira.app.persistence.orm.entity.User;
 import com.mandark.jira.app.service.IssueService;
 import com.mandark.jira.app.service.ProjectService;
@@ -291,6 +299,42 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
                 subTaskId, nonEpicId);
         LOGGER.info(msg);
         return msg;
+    }
+
+    @Override
+    public Map<String, List<SprintDTO>> getSprintHistory(final int issueId) {
+
+        final Issue issue = this.dao.read(this.getEntityClass(), issueId, true);
+        final Criteria issueCr = Criteria.equal(PROP_ISSUE, issue);
+
+        final int count = this.dao.count(SprintIssue.class, issueCr);
+        final int pageNo = Values.get(DEFAULT_PAGE_NO, Integer::parseInt);
+
+        final List<SprintIssue> sprintIssues = this.dao.find(SprintIssue.class, issueCr, pageNo, count);
+
+        // Initialization
+        final List<SprintDTO> passedBySprints = new ArrayList<>();
+        final List<SprintDTO> currentSprints = new ArrayList<>();
+
+        for (SprintIssue si : sprintIssues) {
+
+            final Sprint sprint = si.getSprint();
+
+            if (!si.getIsLatest()) {
+                final SprintDTO sprintDto = new SprintDTO(sprint);// sprint is non null field
+                passedBySprints.add(sprintDto);
+                continue;
+            }
+            if (INACTIVE.equals(sprint.getStatus())) {
+                continue; // Skipping as Sprint is not Started - INACTIVE Sprint
+            }
+            final SprintDTO sprintDto = new SprintDTO(sprint);
+            currentSprints.add(sprintDto);
+        }
+        final Map<String, List<SprintDTO>> statusSprintsMap = new HashedMap<String, List<SprintDTO>>();
+        statusSprintsMap.put("PASSED BY", passedBySprints);
+        statusSprintsMap.put("CURRENT", currentSprints);
+        return statusSprintsMap;
     }
 
     @Override

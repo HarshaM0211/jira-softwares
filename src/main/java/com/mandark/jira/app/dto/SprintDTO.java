@@ -1,14 +1,9 @@
 package com.mandark.jira.app.dto;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.Timestamp;
 
-import com.mandark.jira.app.enums.SprintStatus;
-import com.mandark.jira.app.persistence.orm.entity.Issue;
 import com.mandark.jira.app.persistence.orm.entity.Sprint;
 import com.mandark.jira.spi.app.EntityDTO;
-import com.mandark.jira.spi.util.Values;
 
 
 public class SprintDTO extends EntityDTO<Sprint> {
@@ -18,13 +13,11 @@ public class SprintDTO extends EntityDTO<Sprint> {
 
     private final String sprintKey;
 
-    private final LocalDateTime startDate;
+    private final Timestamp startDate;
 
-    private final LocalDateTime endDate;
+    private final Timestamp endDate;
 
-    private final List<IssueDTO> issues;
-
-    private final SprintStatus status;
+    private final String status;
 
     // Constructors
     // ------------------------------------------------------------------------
@@ -35,15 +28,7 @@ public class SprintDTO extends EntityDTO<Sprint> {
         this.sprintKey = e.getSprintKey();
         this.startDate = e.getStartDate();
         this.endDate = e.getEndDate();
-
-        final List<IssueDTO> issuesDTO = new ArrayList<>();
-        for (Issue n : e.getIssues()) {
-            IssueDTO issueDto = Values.get(n, IssueDTO::new);
-            issuesDTO.add(issueDto);
-        }
-
-        this.issues = issuesDTO;
-        this.status = e.getStatus();
+        this.status = e.getStatus().toString();
     }
 
     // Getters
@@ -53,19 +38,15 @@ public class SprintDTO extends EntityDTO<Sprint> {
         return sprintKey;
     }
 
-    public LocalDateTime getStartDate() {
+    public Timestamp getStartDate() {
         return startDate;
     }
 
-    public LocalDateTime getEndDate() {
+    public Timestamp getEndDate() {
         return endDate;
     }
 
-    public List<IssueDTO> getIssues() {
-        return issues;
-    }
-
-    public SprintStatus getStatus() {
+    public String getStatus() {
         return status;
     }
 
@@ -74,8 +55,7 @@ public class SprintDTO extends EntityDTO<Sprint> {
 
     @Override
     public String toString() {
-        return "SprintDTO [sprintKey=" + sprintKey + ", startDate=" + startDate + ", endDate=" + endDate + ", issues="
-                + issues + ", status=" + status + "]";
+        return "SprintDTO [sprintId = " + id + ", sprintKey=" + sprintKey + "]";
     }
 
 }
