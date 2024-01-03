@@ -91,6 +91,7 @@ public class AttachmentServiceImpl extends AbstractJpaEntityService<Attachment, 
     }
 
     @Override
+    @Transactional
     public String delete(final List<Integer> attachmentIds) {
 
         // Sanity Checks
