@@ -172,7 +172,30 @@ public class SprintServiceImpl extends AbstractJpaEntityService<Sprint, SprintBe
 
     @Override
     @Transactional
-    public String complete(final int sprintId, final Integer nextSprintId) {
+    public String complete(final int sprintId, final int nextSprintId) {
+
+        final List<Integer> unDoneIssueIds = this.getUndoneIssueIds(sprintId);
+        // Adding UnDone Issues to next Sprint
+        if (!unDoneIssueIds.isEmpty() && Objects.nonNull(nextSprintId)) {
+            this.addIssues(unDoneIssueIds, nextSprintId);
+        }
+        // Updating current Sprint as Completed
+        final Sprint sprint = super.readEntity(this.getEntityClass(), sprintId, true);
+        sprint.setStatus(COMPLETED);
+        this.dao.update(sprintId, sprint);
+        final String msg = String.format("Successfully Completed the Sprint with Id : %s", sprintId);
+        LOGGER.info(msg);
+        return msg;
+    }
+
+    @Override
+    public boolean isIssuesDone(final int sprintId) {
+
+        final List<Integer> unDoneIssueIds = this.getUndoneIssueIds(sprintId);
+        return unDoneIssueIds.isEmpty();
+    }
+
+    private List<Integer> getUndoneIssueIds(final int sprintId) {
 
         final List<IssueDTO> issueDtos = this.getIssues(sprintId);
 
@@ -213,17 +236,7 @@ public class SprintServiceImpl extends AbstractJpaEntityService<Sprint, SprintBe
             }
             // Child Issues Done
         }
-        // Adding UnDone Issues to next Sprint
-        if (!unDoneIssueIds.isEmpty() && Objects.nonNull(nextSprintId)) {
-            this.addIssues(unDoneIssueIds, nextSprintId);
-        }
-        // Updating current Sprint as Completed
-        final Sprint sprint = super.readEntity(this.getEntityClass(), sprintId, true);
-        sprint.setStatus(COMPLETED);
-        this.dao.update(sprintId, sprint);
-        final String msg = String.format("Successfully Completed the Sprint with Id : %s", sprintId);
-        LOGGER.info(msg);
-        return msg;
+        return unDoneIssueIds;
     }
 
     @Override

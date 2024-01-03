@@ -21,10 +21,12 @@ public interface SprintService extends EntityService<Integer, Sprint, SprintDTO>
 
     void start(final int sprintId);
 
-    String complete(final int sprintId, final Integer nextSprintId);
+    String complete(final int sprintId, final int nextSprintId);
 
     void addIssues(final List<Integer> issueIds, final int sprintId);
 
     String removeIssue(final int issueId);
+
+    boolean isIssuesDone(final int sprintId);
 
 }
