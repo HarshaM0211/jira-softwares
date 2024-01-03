@@ -52,6 +52,9 @@ dependencies {
     // Main compile
     // ----------------------------------------------------------------------------------
 
+    implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.4'
+
+
 
     // Slf4j + Log4j2
     compile group: 'org.slf4j', name: 'slf4j-api', version: '2.0.7'
