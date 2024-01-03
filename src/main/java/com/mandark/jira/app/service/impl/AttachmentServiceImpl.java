@@ -16,6 +16,7 @@ import com.mandark.jira.app.persistence.orm.entity.Attachment;
 import com.mandark.jira.app.persistence.orm.entity.Issue;
 import com.mandark.jira.app.service.AttachmentService;
 import com.mandark.jira.spi.app.persistence.IDao;
+import com.mandark.jira.spi.app.query.Criteria;
 import com.mandark.jira.spi.app.service.AbstractJpaEntityService;
 import com.mandark.jira.spi.util.Verify;
 
@@ -103,6 +104,23 @@ public class AttachmentServiceImpl extends AbstractJpaEntityService<Attachment, 
 
         LOGGER.info(msg);
         return msg;
+    }
+
+    @Override
+    public AttachmentDTO get(final int issueId, final String fileName) {
+
+        // Sanity Checks
+        Verify.notNull(fileName, "$getByIssueId :: fileName must be non NULL");
+
+        final Issue issue = super.readEntity(Issue.class, issueId, true);
+
+        final Criteria issueCr = Criteria.equal(Attachment.PROP_ISSUE, issue);
+        final Criteria fileNameCr = Criteria.equal(Attachment.PROP_FILENAME, fileName);
+        final Criteria issueAndFileNameCr = Criteria.and(issueCr, fileNameCr);
+
+        final Attachment attachment = this.dao.findOne(this.getEntityClass(), issueAndFileNameCr);
+
+        return this.toDTO(attachment);
     }
 
 }

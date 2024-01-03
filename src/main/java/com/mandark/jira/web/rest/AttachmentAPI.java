@@ -13,19 +13,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mandark.jira.app.dto.AttachmentDTO;
 import com.mandark.jira.app.service.AttachmentService;
 import com.mandark.jira.spi.web.Responses;
 
 
 @RestController
-// @MultipartConfig(fileSizeThreshold = 1024 * 1024, // 1MB
-// maxFileSize = 10 * 1024 * 1024, // 10MB
-// maxRequestSize = 50 * 1024 * 1024 // 50MB
-// )
 @RequestMapping(value = "/api/v1/issues/{issueId}/attachments")
 public class AttachmentAPI extends AbstractAPI {
 
@@ -34,7 +32,7 @@ public class AttachmentAPI extends AbstractAPI {
     private AttachmentService attachmentService;
 
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public ResponseEntity<?> attach(@PathVariable("issueId") int issueId, @RequestBody String description,
+    public ResponseEntity<?> attach(@PathVariable("issueId") int issueId, @RequestParam String description,
             @RequestPart MultipartFile file) {
         LOGGER.info("Hit API");
 
@@ -57,6 +55,16 @@ public class AttachmentAPI extends AbstractAPI {
         LOGGER.info(msg);
 
         return Responses.ok(msg);
+    }
+
+    @RequestMapping(value = "", method = RequestMethod.GET)
+    public ResponseEntity<?> get(@PathVariable("issueId") int issueId, @RequestParam String cacheControlValue,
+            @RequestParam String fileName) {
+
+        final AttachmentDTO attachmentDto = attachmentService.get(issueId, fileName);
+        final byte[] image = attachmentDto.getFileData();
+
+        return Responses.imageFile(image, fileName, cacheControlValue);
     }
 
     // Getters and Setters

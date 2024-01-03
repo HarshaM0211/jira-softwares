@@ -15,4 +15,5 @@ public interface AttachmentService extends EntityService<Integer, Attachment, At
 
     String delete(final List<Integer> attachmentIds);
 
+    AttachmentDTO get(final int issueId, final String fileName);
 }
