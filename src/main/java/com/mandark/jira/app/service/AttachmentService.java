@@ -1,5 +1,7 @@
 package com.mandark.jira.app.service;
 
+import java.util.List;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import com.mandark.jira.app.dto.AttachmentDTO;
@@ -11,6 +13,6 @@ public interface AttachmentService extends EntityService<Integer, Attachment, At
 
     int attach(final int issueId, final String description, final MultipartFile file);
 
-    void delete();
+    String delete(final List<Integer> attachmentIds);
 
 }

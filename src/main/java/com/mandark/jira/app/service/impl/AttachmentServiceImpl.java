@@ -1,6 +1,7 @@
 package com.mandark.jira.app.service.impl;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 
 import javax.transaction.Transactional;
@@ -16,6 +17,7 @@ import com.mandark.jira.app.persistence.orm.entity.Issue;
 import com.mandark.jira.app.service.AttachmentService;
 import com.mandark.jira.spi.app.persistence.IDao;
 import com.mandark.jira.spi.app.service.AbstractJpaEntityService;
+import com.mandark.jira.spi.util.Verify;
 
 
 public class AttachmentServiceImpl extends AbstractJpaEntityService<Attachment, AttachmentBean, AttachmentDTO>
@@ -89,8 +91,17 @@ public class AttachmentServiceImpl extends AbstractJpaEntityService<Attachment, 
     }
 
     @Override
-    public void delete() {
+    public String delete(final List<Integer> attachmentIds) {
 
+        // Sanity Checks
+        Verify.notEmpty(attachmentIds);
+
+        super.purge(attachmentIds);
+
+        final String msg = String.format("#delete :: Successfully Deleted attachments with Ids : %s", attachmentIds);
+
+        LOGGER.info(msg);
+        return msg;
     }
 
 }
