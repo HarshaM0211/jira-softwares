@@ -101,11 +101,11 @@ public class SprintServiceImpl extends AbstractJpaEntityService<Sprint, SprintBe
         sprintEntity.setStatus(INACTIVE);
 
 
-        final String beanKey = sprintEntity.getSprintKey();
+        final String beanSprintKey = sprintEntity.getSprintKey();
 
-        if (Objects.nonNull(beanKey)) {
+        if (Objects.nonNull(beanSprintKey)) {
 
-            sprintEntity.setSprintKey(beanKey);
+            sprintEntity.setSprintKey(beanSprintKey);
             final int sprintId = this.dao.save(sprintEntity);
             return sprintId;
         }
