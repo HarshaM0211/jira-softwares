@@ -1,9 +1,11 @@
 package com.mandark.jira.app.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.mandark.jira.app.beans.IssueBean;
 import com.mandark.jira.app.dto.IssueDTO;
+import com.mandark.jira.app.dto.SprintDTO;
 import com.mandark.jira.app.persistence.orm.entity.Issue;
 import com.mandark.jira.spi.app.query.Criteria;
 import com.mandark.jira.spi.app.service.EntityService;
@@ -29,6 +31,8 @@ public interface IssueService extends EntityService<Integer, Issue, IssueDTO> {
 
     String addSubTaskToNonEpic(final int subTaskId, final int nonEpicId, final int projectId);
 
+
+    Map<String, List<SprintDTO>> getSprintHistory(final int issueId);
 
 
     List<IssueDTO> listValidChildsForEpic(final int projectId, final int pageNo, final int pageSize);
