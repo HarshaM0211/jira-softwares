@@ -1,6 +1,7 @@
 package com.mandark.jira.web.rest;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -70,8 +71,8 @@ public class SprintAPI extends AbstractAPI {
     }
 
     @RequestMapping(value = "/{sprintId}/{status}", method = RequestMethod.PUT)
-    public ResponseEntity<?> updateStatus(@PathVariable("sprintId") int sprintId,
-            @RequestParam(required = false) Integer nextSprintId, @PathVariable("status") String status) {
+    public ResponseEntity<?> updateStatus(@PathVariable("sprintId") int sprintId, @RequestParam(required = false) Integer nextSprintId,
+            @PathVariable("status") String status) {
 
         if (status.equals("start")) {
 
@@ -90,6 +91,18 @@ public class SprintAPI extends AbstractAPI {
 
             return Responses.ok(msg);
         }
+        if (status.equals("canComplete")) {
+
+            final boolean isIssuesDone = sprintService.isIssuesDone(sprintId);
+
+            final Map<String, Object> returnMap = new HashMap<String, Object>();
+            returnMap.put("isIssuesDone", isIssuesDone);
+
+            LOGGER.info("Status : isIssuesDone - {}", isIssuesDone);
+
+            return Responses.ok(returnMap);
+        }
+
         throw new IllegalArgumentException("Bad Request. No Service available for the request");
     }
 

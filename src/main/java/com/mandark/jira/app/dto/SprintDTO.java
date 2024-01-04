@@ -1,7 +1,6 @@
 package com.mandark.jira.app.dto;
 
-import java.sql.Timestamp;
-
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mandark.jira.app.persistence.orm.entity.Sprint;
 import com.mandark.jira.spi.app.EntityDTO;
 
@@ -13,9 +12,9 @@ public class SprintDTO extends EntityDTO<Sprint> {
 
     private final String sprintKey;
 
-    private final Timestamp startDate;
+    private final Long startTimeStamp;
 
-    private final Timestamp endDate;
+    private final Long endTimeStamp;
 
     private final String status;
 
@@ -26,8 +25,8 @@ public class SprintDTO extends EntityDTO<Sprint> {
         super(e);
 
         this.sprintKey = e.getSprintKey();
-        this.startDate = e.getStartDate();
-        this.endDate = e.getEndDate();
+        this.startTimeStamp = e.getStartTimeStamp();
+        this.endTimeStamp = e.getEndTimeStamp();
         this.status = e.getStatus().toString();
     }
 
@@ -38,12 +37,14 @@ public class SprintDTO extends EntityDTO<Sprint> {
         return sprintKey;
     }
 
-    public Timestamp getStartDate() {
-        return startDate;
+    @JsonInclude
+    public Long getStartTimeStamp() {
+        return startTimeStamp;
     }
 
-    public Timestamp getEndDate() {
-        return endDate;
+    @JsonInclude
+    public Long getEndTimeStamp() {
+        return endTimeStamp;
     }
 
     public String getStatus() {

@@ -1,6 +1,5 @@
 package com.mandark.jira.app.persistence.orm.entity;
 
-import java.sql.Timestamp;
 import java.util.Objects;
 
 import javax.persistence.Column;
@@ -21,8 +20,8 @@ import com.mandark.jira.spi.lang.ValidationException;
 @Entity
 @Table(name = "sprints",
         indexes = {@Index(columnList = "project_id", name = "project_id"),
-                @Index(columnList = "start_date", name = "start_date"),
-                @Index(columnList = "end_date", name = "end_date"), @Index(columnList = "status", name = "status")},
+                @Index(columnList = "start_time_stamp", name = "start_time_stamp"),
+                @Index(columnList = "end_time_stamp", name = "end_time_stamp"), @Index(columnList = "status", name = "status")},
         uniqueConstraints = {@UniqueConstraint(columnNames = {"project_id", "sprint_key"})})
 public class Sprint extends JpaAuditEntity {
 
@@ -46,9 +45,9 @@ public class Sprint extends JpaAuditEntity {
 
     private String sprintKey;
 
-    private Timestamp startDate;
+    private Long startTimeStamp;
 
-    private Timestamp endDate;
+    private Long endTimeStamp;
 
     private SprintStatus status;
 
@@ -102,22 +101,22 @@ public class Sprint extends JpaAuditEntity {
         this.sprintKey = sprint_key;
     }
 
-    @Column(name = "start_date")
-    public Timestamp getStartDate() {
-        return startDate;
+    @Column(name = "start_time_stamp")
+    public Long getStartTimeStamp() {
+        return startTimeStamp;
     }
 
-    public void setStartDate(Timestamp start_date) {
-        this.startDate = start_date;
+    public void setStartTimeStamp(Long startTimeStamp) {
+        this.startTimeStamp = startTimeStamp;
     }
 
-    @Column(name = "end_date")
-    public Timestamp getEndDate() {
-        return endDate;
+    @Column(name = "end_time_stamp")
+    public Long getEndTimeStamp() {
+        return endTimeStamp;
     }
 
-    public void setEndDate(Timestamp end_date) {
-        this.endDate = end_date;
+    public void setEndTimeStamp(Long endTimeStamp) {
+        this.endTimeStamp = endTimeStamp;
     }
 
     @Column(name = "status", nullable = false)
