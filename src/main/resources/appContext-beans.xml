@@ -191,6 +191,9 @@
     <bean id="commentService" class="com.mandark.jira.app.service.impl.CommentServiceImpl">
         <constructor-arg name="dao" ref="genericJpaDao" />
     </bean>
+    <bean id="attachmentService" class="com.mandark.jira.app.service.impl.AttachmentServiceImpl">
+        <constructor-arg name="dao" ref="genericJpaDao" />
+    </bean>
  
 
 
@@ -230,6 +233,9 @@
     </bean>
     <bean id="commentAPI" class="com.mandark.jira.web.rest.CommentAPI">
     <property name="commentService" ref="commentService"/>
+    </bean>
+    <bean id="attachmentAPI" class="com.mandark.jira.web.rest.AttachmentAPI">
+    <property name="attachmentService" ref="attachmentService"/>
     </bean>
 
 
