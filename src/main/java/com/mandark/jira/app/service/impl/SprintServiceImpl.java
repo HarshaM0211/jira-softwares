@@ -74,11 +74,11 @@ public class SprintServiceImpl extends AbstractJpaEntityService<Sprint, SprintBe
         if (Objects.nonNull(entityBean.getSprintKey())) {
             exEntity.setSprintKey(entityBean.getSprintKey());
         }
-        if (Objects.nonNull(entityBean.getStartDate())) {
-            exEntity.setStartDate(entityBean.getStartDate());
+        if (Objects.nonNull(entityBean.getStartTimeStamp())) {
+            exEntity.setStartTimeStamp(entityBean.getStartTimeStamp());
         }
-        if (Objects.nonNull(entityBean.getEndDate())) {
-            exEntity.setEndDate(entityBean.getEndDate());
+        if (Objects.nonNull(entityBean.getEndTimeStamp())) {
+            exEntity.setEndTimeStamp(entityBean.getEndTimeStamp());
         }
         return exEntity;
     }
@@ -162,7 +162,7 @@ public class SprintServiceImpl extends AbstractJpaEntityService<Sprint, SprintBe
 
         final Sprint sprint = super.readEntity(this.getEntityClass(), sprintId, true);
 
-        if (Objects.isNull(sprint.getEndDate()) || Objects.isNull(sprint.getStartDate())) {
+        if (Objects.isNull(sprint.getEndTimeStamp()) || Objects.isNull(sprint.getStartTimeStamp())) {
 
             throw new ValidationException("Please add dates for Sprint before Starting");
         }
