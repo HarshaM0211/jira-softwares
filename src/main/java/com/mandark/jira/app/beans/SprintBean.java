@@ -1,7 +1,5 @@
 package com.mandark.jira.app.beans;
 
-import java.sql.Timestamp;
-
 import com.mandark.jira.app.persistence.orm.entity.Sprint;
 import com.mandark.jira.spi.app.EntityBean;
 
@@ -13,9 +11,9 @@ public class SprintBean implements EntityBean<Sprint> {
 
     public String sprintKey;
 
-    public Timestamp startDate;
+    public Long startTimeStamp;
 
-    public Timestamp endDate;
+    public Long endTimeStamp;
 
     // Getters and Setters
     // ------------------------------------------------------------------------
@@ -28,19 +26,20 @@ public class SprintBean implements EntityBean<Sprint> {
         this.sprintKey = sprintKey;
     }
 
-    public Timestamp getStartDate() {
-        return startDate;
+    public Long getStartTimeStamp() {
+        return startTimeStamp;
     }
 
-    public void setStartDate(Timestamp startDate) {
-        this.startDate = startDate;
+    public void setStartTimeStamp(Long startTimeStamp) {
+        this.startTimeStamp = startTimeStamp;
     }
 
-    public Timestamp getEndDate() {
-        return endDate;
+    public Long getEndTimeStamp() {
+        return endTimeStamp;
     }
 
-    public void setEndDate(Timestamp endDate) {
-        this.endDate = endDate;
+    public void setEndTimeStamp(Long endTimeStamp) {
+        this.endTimeStamp = endTimeStamp;
     }
+
 }

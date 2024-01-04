@@ -74,11 +74,11 @@ public class SprintServiceImpl extends AbstractJpaEntityService<Sprint, SprintBe
         if (Objects.nonNull(entityBean.getSprintKey())) {
             exEntity.setSprintKey(entityBean.getSprintKey());
         }
-        if (Objects.nonNull(entityBean.getStartDate())) {
-            exEntity.setStartDate(entityBean.getStartDate());
+        if (Objects.nonNull(entityBean.getStartTimeStamp())) {
+            exEntity.setStartTimeStamp(entityBean.getStartTimeStamp());
         }
-        if (Objects.nonNull(entityBean.getEndDate())) {
-            exEntity.setEndDate(entityBean.getEndDate());
+        if (Objects.nonNull(entityBean.getEndTimeStamp())) {
+            exEntity.setEndTimeStamp(entityBean.getEndTimeStamp());
         }
         return exEntity;
     }
@@ -101,11 +101,11 @@ public class SprintServiceImpl extends AbstractJpaEntityService<Sprint, SprintBe
         sprintEntity.setStatus(INACTIVE);
 
 
-        final String beanKey = sprintEntity.getSprintKey();
+        final String beanSprintKey = sprintEntity.getSprintKey();
 
-        if (Objects.nonNull(beanKey)) {
+        if (Objects.nonNull(beanSprintKey)) {
 
-            sprintEntity.setSprintKey(beanKey);
+            sprintEntity.setSprintKey(beanSprintKey);
             final int sprintId = this.dao.save(sprintEntity);
             return sprintId;
         }
@@ -162,7 +162,7 @@ public class SprintServiceImpl extends AbstractJpaEntityService<Sprint, SprintBe
 
         final Sprint sprint = super.readEntity(this.getEntityClass(), sprintId, true);
 
-        if (Objects.isNull(sprint.getEndDate()) || Objects.isNull(sprint.getStartDate())) {
+        if (Objects.isNull(sprint.getEndTimeStamp()) || Objects.isNull(sprint.getStartTimeStamp())) {
 
             throw new ValidationException("Please add dates for Sprint before Starting");
         }
@@ -172,7 +172,30 @@ public class SprintServiceImpl extends AbstractJpaEntityService<Sprint, SprintBe
 
     @Override
     @Transactional
-    public String complete(final int sprintId, final Integer nextSprintId) {
+    public String complete(final int sprintId, final int nextSprintId) {
+
+        final List<Integer> unDoneIssueIds = this.getUndoneIssueIds(sprintId);
+        // Adding UnDone Issues to next Sprint
+        if (!unDoneIssueIds.isEmpty() && Objects.nonNull(nextSprintId)) {
+            this.addIssues(unDoneIssueIds, nextSprintId);
+        }
+        // Updating current Sprint as Completed
+        final Sprint sprint = super.readEntity(this.getEntityClass(), sprintId, true);
+        sprint.setStatus(COMPLETED);
+        this.dao.update(sprintId, sprint);
+        final String msg = String.format("Successfully Completed the Sprint with Id : %s", sprintId);
+        LOGGER.info(msg);
+        return msg;
+    }
+
+    @Override
+    public boolean isIssuesDone(final int sprintId) {
+
+        final List<Integer> unDoneIssueIds = this.getUndoneIssueIds(sprintId);
+        return unDoneIssueIds.isEmpty();
+    }
+
+    private List<Integer> getUndoneIssueIds(final int sprintId) {
 
         final List<IssueDTO> issueDtos = this.getIssues(sprintId);
 
@@ -213,17 +236,7 @@ public class SprintServiceImpl extends AbstractJpaEntityService<Sprint, SprintBe
             }
             // Child Issues Done
         }
-        // Adding UnDone Issues to next Sprint
-        if (!unDoneIssueIds.isEmpty() && Objects.nonNull(nextSprintId)) {
-            this.addIssues(unDoneIssueIds, nextSprintId);
-        }
-        // Updating current Sprint as Completed
-        final Sprint sprint = super.readEntity(this.getEntityClass(), sprintId, true);
-        sprint.setStatus(COMPLETED);
-        this.dao.update(sprintId, sprint);
-        final String msg = String.format("Successfully Completed the Sprint with Id : %s", sprintId);
-        LOGGER.info(msg);
-        return msg;
+        return unDoneIssueIds;
     }
 
     @Override
