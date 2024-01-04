@@ -71,7 +71,7 @@ public class SprintAPI extends AbstractAPI {
     }
 
     @RequestMapping(value = "/{sprintId}/{status}", method = RequestMethod.PUT)
-    public ResponseEntity<?> updateStatus(@PathVariable("sprintId") int sprintId, @RequestParam Integer nextSprintId,
+    public ResponseEntity<?> updateStatus(@PathVariable("sprintId") int sprintId, @RequestParam(required = false) Integer nextSprintId,
             @PathVariable("status") String status) {
 
         if (status.equals("start")) {

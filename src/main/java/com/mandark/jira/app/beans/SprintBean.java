@@ -11,9 +11,9 @@ public class SprintBean implements EntityBean<Sprint> {
 
     public String sprintKey;
 
-    public long startTimeStamp;
+    public Long startTimeStamp;
 
-    public long endTimeStamp;
+    public Long endTimeStamp;
 
     // Getters and Setters
     // ------------------------------------------------------------------------
@@ -26,19 +26,19 @@ public class SprintBean implements EntityBean<Sprint> {
         this.sprintKey = sprintKey;
     }
 
-    public long getStartTimeStamp() {
+    public Long getStartTimeStamp() {
         return startTimeStamp;
     }
 
-    public void setStartTimeStamp(long startTimeStamp) {
+    public void setStartTimeStamp(Long startTimeStamp) {
         this.startTimeStamp = startTimeStamp;
     }
 
-    public long getEndTimeStamp() {
+    public Long getEndTimeStamp() {
         return endTimeStamp;
     }
 
-    public void setEndTimeStamp(long endTimeStamp) {
+    public void setEndTimeStamp(Long endTimeStamp) {
         this.endTimeStamp = endTimeStamp;
     }
 

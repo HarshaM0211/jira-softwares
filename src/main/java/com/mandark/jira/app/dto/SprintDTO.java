@@ -1,5 +1,6 @@
 package com.mandark.jira.app.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mandark.jira.app.persistence.orm.entity.Sprint;
 import com.mandark.jira.spi.app.EntityDTO;
 
@@ -11,9 +12,9 @@ public class SprintDTO extends EntityDTO<Sprint> {
 
     private final String sprintKey;
 
-    private final long startTimeStamp;
+    private final Long startTimeStamp;
 
-    private final long endTimeStamp;
+    private final Long endTimeStamp;
 
     private final String status;
 
@@ -36,11 +37,13 @@ public class SprintDTO extends EntityDTO<Sprint> {
         return sprintKey;
     }
 
-    public long getStartTimeStamp() {
+    @JsonInclude
+    public Long getStartTimeStamp() {
         return startTimeStamp;
     }
 
-    public long getEndTimeStamp() {
+    @JsonInclude
+    public Long getEndTimeStamp() {
         return endTimeStamp;
     }
 
