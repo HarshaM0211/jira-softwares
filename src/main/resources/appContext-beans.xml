@@ -188,6 +188,9 @@
     <bean id="sprintService" class="com.mandark.jira.app.service.impl.SprintServiceImpl">
         <constructor-arg name="dao" ref="genericJpaDao" />
     </bean>
+    <bean id="commentService" class="com.mandark.jira.app.service.impl.CommentServiceImpl">
+        <constructor-arg name="dao" ref="genericJpaDao" />
+    </bean>
  
 
 
@@ -224,6 +227,9 @@
     </bean>
     <bean id="sprintAPI" class="com.mandark.jira.web.rest.SprintAPI">
     <property name="sprintService" ref="sprintService"/>
+    </bean>
+    <bean id="commentAPI" class="com.mandark.jira.web.rest.CommentAPI">
+    <property name="commentService" ref="commentService"/>
     </bean>
 
 
