@@ -34,7 +34,6 @@ public class AttachmentAPI extends AbstractAPI {
     @RequestMapping(value = "", method = RequestMethod.POST)
     public ResponseEntity<?> attach(@PathVariable("issueId") int issueId, @RequestParam String description,
             @RequestPart MultipartFile file) {
-        LOGGER.info("Hit API");
 
         final int id = attachmentService.attach(issueId, description, file);
 

@@ -3,6 +3,7 @@ package com.mandark.jira.app.persistence.orm.entity;
 import java.util.Objects;
 
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -12,7 +13,8 @@ import com.mandark.jira.spi.lang.ValidationException;
 
 
 @Entity
-@Table(name = "projects_users")
+@Table(name = "projects_users", indexes = {@Index(columnList = "project_id", name = "project_id"),
+        @Index(columnList = "user_id", name = "user_id")})
 public class ProjectUser extends JpaAuditEntity {
 
     // Field Lables

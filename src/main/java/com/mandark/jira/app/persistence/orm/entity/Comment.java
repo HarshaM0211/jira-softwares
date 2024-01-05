@@ -64,8 +64,6 @@ public class Comment extends JpaAuditEntity {
 
     }
 
-
-
     // Getters and Setters
     // -------------------------------------------------------------------------
 
@@ -106,7 +104,5 @@ public class Comment extends JpaAuditEntity {
         return "Comments [issue=" + issue.getId() + ", org_member=" + commenter.getFirstName() + commenter.getLastName()
                 + ", comment=" + comment + "]";
     }
-
-
 
 }

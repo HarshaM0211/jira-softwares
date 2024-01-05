@@ -10,13 +10,16 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.mandark.jira.app.persistence.orm.JpaAuditEntity;
 import com.mandark.jira.spi.lang.ValidationException;
 
 
 
 @Entity
-@Table(name = "attachments", indexes = {@Index(columnList = "issue_id", name = "issue_id")})
+@Table(name = "attachments", indexes = {@Index(columnList = "issue_id", name = "issue_id"),
+        @Index(columnList = "file_name", name = "file_name")})
+@JsonIgnoreProperties
 public class Attachment extends JpaAuditEntity {
 
     // Field Lables
@@ -45,7 +48,6 @@ public class Attachment extends JpaAuditEntity {
         super();
     }
 
-
     // Validatable
     // ------------------------------------------------------------------------
 
@@ -65,7 +67,6 @@ public class Attachment extends JpaAuditEntity {
         }
 
     }
-
 
     // Getters and Setters
     // -------------------------------------------------------------------------
@@ -115,7 +116,5 @@ public class Attachment extends JpaAuditEntity {
     public String toString() {
         return "Attachments [file_name=" + fileName + ", issue=" + issue.getId() + ", description=" + description + "]";
     }
-
-
 
 }

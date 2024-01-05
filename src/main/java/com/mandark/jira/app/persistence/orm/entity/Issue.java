@@ -1,6 +1,5 @@
 package com.mandark.jira.app.persistence.orm.entity;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,7 +28,7 @@ import com.mandark.jira.spi.lang.ValidationException;
                 @Index(columnList = "issue_key", name = "issue_key"),
                 @Index(columnList = "parent_issue_id", name = "parent_issue_id"),
                 @Index(columnList = "reported_by", name = "reported_by"),
-                @Index(columnList = "version_str", name = "version_str")},
+                @Index(columnList = "version_str", name = "version_str"), @Index(columnList = "type", name = "type")},
         uniqueConstraints = {@UniqueConstraint(columnNames = {"project_id", "issue_key"})})
 public class Issue extends JpaAuditEntity {
 
@@ -71,8 +70,8 @@ public class Issue extends JpaAuditEntity {
     private String summary;
 
     // Dates
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private Long startTimeStamp;
+    private Long endTimeStamp;
 
     // Tags
     private IssueType type;
@@ -228,22 +227,22 @@ public class Issue extends JpaAuditEntity {
         this.reportedBy = reported_by;
     }
 
-    @Column(name = "strat_date")
-    public LocalDateTime getStartDate() {
-        return startDate;
+    @Column(name = "start_time_stamp")
+    public Long getStartTimeStamp() {
+        return startTimeStamp;
     }
 
-    public void setStartDate(LocalDateTime start_date) {
-        this.startDate = start_date;
+    public void setStartTimeStamp(Long startTimeStamp) {
+        this.startTimeStamp = startTimeStamp;
     }
 
-    @Column(name = "end_date")
-    public LocalDateTime getEndDate() {
-        return endDate;
+    @Column(name = "end_time_stamp")
+    public Long getEndTimeStamp() {
+        return endTimeStamp;
     }
 
-    public void setEndDate(LocalDateTime end_date) {
-        this.endDate = end_date;
+    public void setEndTimeStamp(Long endTimeStamp) {
+        this.endTimeStamp = endTimeStamp;
     }
 
     @Column(name = "priority", nullable = false)

@@ -70,7 +70,12 @@ public class AttachmentServiceImpl extends AbstractJpaEntityService<Attachment, 
     @Transactional
     public int attach(final int issueId, final String description, final MultipartFile file) {
 
-        Attachment attachment = new Attachment();
+        // Sanity Checks
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("File Uploaded is EMPTY");
+        }
+
+        final Attachment attachment = new Attachment();
 
         final String fileName = file.getOriginalFilename();
         attachment.setFileName(fileName);
@@ -96,7 +101,7 @@ public class AttachmentServiceImpl extends AbstractJpaEntityService<Attachment, 
     public String delete(final List<Integer> attachmentIds) {
 
         // Sanity Checks
-        Verify.notEmpty(attachmentIds);
+        Verify.notEmpty(attachmentIds, "$delete :: attachmentIds List must not be Empty");
 
         super.purge(attachmentIds);
 

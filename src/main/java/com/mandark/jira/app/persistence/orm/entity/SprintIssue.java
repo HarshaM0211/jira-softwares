@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -13,7 +14,8 @@ import com.mandark.jira.spi.lang.ValidationException;
 
 
 @Entity
-@Table(name = "sprints_issues")
+@Table(name = "sprints_issues", indexes = {@Index(columnList = "sprint_id", name = "sprint_id"),
+        @Index(columnList = "issue_id", name = "issue_id")})
 public class SprintIssue extends JpaAuditEntity {
 
     // Field Lables

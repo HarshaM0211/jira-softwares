@@ -104,7 +104,7 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
         Verify.notNull(orgId, "$getKeyAuto :: orgId must be non NULL");
         Verify.notNull(projectName, "$getKeyAuto :: projectName must be non NULL");
 
-        Map<String, Object> keyMap = new HashMap<String, Object>();
+        final Map<String, Object> keyMap = new HashMap<String, Object>();
 
         final List<String> keyList = this.generateKeys(orgId, projectName);
         for (String key : keyList) {
@@ -320,17 +320,17 @@ public class ProjectServiceImpl extends AbstractJpaEntityService<Project, Projec
         Verify.notNull(orgId, "$generateKeys :: orgId must be non NULL");
 
         final String[] subStrings = projectName.split(" ");
-        String key = "";
+        final StringBuilder keySB = new StringBuilder();
         final List<String> keys = new ArrayList<String>();
 
         for (String s : subStrings) {
             for (int i = 2; i < s.length(); i++) {
                 keys.add(s.substring(0, i).toUpperCase());
             }
-            key = key + s.charAt(0);
+            keySB.append(s.charAt(0));
         }
-        if (key.length() >= 2) {
-            keys.add(0, key.toUpperCase());
+        if (keySB.length() >= 2) {
+            keys.add(0, keySB.toString().toUpperCase());
         }
         LOGGER.info("$generateKeys :: Generated Keys : {}", keys);
         return keys;

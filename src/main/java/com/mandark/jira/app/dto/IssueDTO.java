@@ -1,6 +1,5 @@
 package com.mandark.jira.app.dto;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +21,7 @@ public class IssueDTO extends EntityDTO<Issue> {
 
     private final String typeStr;
 
-    private final UserDTO assignee;// (mem_id) // ??
+    private final UserDTO assignee;// (mem_id)
 
     private final String statusStr;
 
@@ -30,9 +29,9 @@ public class IssueDTO extends EntityDTO<Issue> {
 
     private final UserDTO reportedBy;// (mem_id)
 
-    private final LocalDateTime startDate;
+    private final Long startDate;
 
-    private final LocalDateTime endDate;
+    private final Long endDate;
 
     private final String versionStr;
 
@@ -40,7 +39,7 @@ public class IssueDTO extends EntityDTO<Issue> {
 
     private final String label;
 
-    private final List<AttachmentDTO> attachments; // ??
+    private final List<AttachmentDTO> attachments;
 
     private final List<CommentDTO> comments;
 
@@ -62,8 +61,8 @@ public class IssueDTO extends EntityDTO<Issue> {
 
         this.reportedBy = new UserDTO(e.getReportedBy()); // reportedBy is non Null
 
-        this.startDate = e.getStartDate();
-        this.endDate = e.getEndDate();
+        this.startDate = e.getStartTimeStamp();
+        this.endDate = e.getEndTimeStamp();
 
         this.versionStr = e.getVersionStr();
         this.priorityStr = e.getPriority().name();
@@ -115,11 +114,11 @@ public class IssueDTO extends EntityDTO<Issue> {
         return reportedBy;
     }
 
-    public LocalDateTime getStartDate() {
+    public Long getStartDate() {
         return startDate;
     }
 
-    public LocalDateTime getEndDate() {
+    public Long getEndDate() {
         return endDate;
     }
 

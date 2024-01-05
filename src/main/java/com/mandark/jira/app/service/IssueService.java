@@ -44,7 +44,7 @@ public interface IssueService extends EntityService<Integer, Issue, IssueDTO> {
 
     int count(final int projectId);
 
-    int count(final int projectId, String paramName, Object paramValue);
+    int count(final int projectId, final String paramName, final Object paramValue);
 
     int nonEpicCount(final int projectId);
 

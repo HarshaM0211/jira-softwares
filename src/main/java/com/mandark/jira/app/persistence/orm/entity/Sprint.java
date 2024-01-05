@@ -18,10 +18,9 @@ import com.mandark.jira.spi.lang.ValidationException;
 
 
 @Entity
-@Table(name = "sprints",
-        indexes = {@Index(columnList = "project_id", name = "project_id"),
-                @Index(columnList = "start_time_stamp", name = "start_time_stamp"),
-                @Index(columnList = "end_time_stamp", name = "end_time_stamp"), @Index(columnList = "status", name = "status")},
+@Table(name = "sprints", indexes = {@Index(columnList = "project_id", name = "project_id"),
+        @Index(columnList = "start_time_stamp", name = "start_time_stamp"),
+        @Index(columnList = "end_time_stamp", name = "end_time_stamp"), @Index(columnList = "status", name = "status")},
         uniqueConstraints = {@UniqueConstraint(columnNames = {"project_id", "sprint_key"})})
 public class Sprint extends JpaAuditEntity {
 

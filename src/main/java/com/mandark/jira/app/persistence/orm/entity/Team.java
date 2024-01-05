@@ -17,7 +17,9 @@ import com.mandark.jira.spi.lang.ValidationException;
 
 
 @Entity
-@Table(name = "teams", indexes = {@Index(columnList = "org_id", name = "org_id")},
+@Table(name = "teams",
+        indexes = {@Index(columnList = "org_id", name = "org_id"),
+                @Index(columnList = "team_leader_id", name = "team_leader_id")},
         uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "org_id"})})
 public class Team extends JpaAuditEntity {
 

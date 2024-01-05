@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.mandark.jira.app.beans.UserBean;
 import com.mandark.jira.app.dto.UserDTO;
 import com.mandark.jira.app.service.UserService;
-import com.mandark.jira.spi.app.query.Criteria;
 import com.mandark.jira.spi.web.PageResult;
 import com.mandark.jira.spi.web.Pagination;
 import com.mandark.jira.spi.web.Responses;

@@ -102,7 +102,7 @@ public class TeamMemberServiceImpl implements TeamMemberService {
     // ------------------------------------------------------------------------
 
     @Override
-    public List<TeamDTO> getTeamsByUserId(Integer userId, int pageNo, int pageSize) {
+    public List<TeamDTO> getTeamsByUserId(final Integer userId, int pageNo, int pageSize) {
 
         // Sanity checks
         Verify.notNull(userId);

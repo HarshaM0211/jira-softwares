@@ -74,7 +74,7 @@ public class OrganisationAPI extends AbstractAPI {
         final String msg = String.format("Successfully fetched list of all Organisations");
         LOGGER.info(msg);
 
-        int count = orgService.count();
+        final int count = orgService.count();
         Pagination pagination = Pagination.with(count, pageNo, pageSize);
         PageResult pageResult = PageResult.with(pagination, organisations);
 

@@ -112,6 +112,4 @@ public class CommentServiceImpl extends AbstractJpaEntityService<Comment, Commen
         final List<Comment> comments = issue.getComments();
         return this.toDTOs(comments);
     }
-
-
 }

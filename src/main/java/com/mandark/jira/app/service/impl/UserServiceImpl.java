@@ -1,5 +1,8 @@
 package com.mandark.jira.app.service.impl;
 
+import static com.mandark.jira.app.persistence.orm.entity.User.PROP_EMAIL;
+import static com.mandark.jira.app.persistence.orm.entity.User.PROP_ORGANISATION;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -16,6 +19,7 @@ import com.mandark.jira.app.service.UserService;
 import com.mandark.jira.spi.app.persistence.IDao;
 import com.mandark.jira.spi.app.query.Criteria;
 import com.mandark.jira.spi.app.service.AbstractJpaEntityService;
+import com.mandark.jira.spi.lang.ValidationException;
 import com.mandark.jira.spi.util.Verify;
 
 
@@ -97,7 +101,7 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
         Verify.notNull(orgId, "Organisation ID is NULL");
         Verify.notNull(userEmail, "User Mail is NULL");
 
-        final Criteria userEmailCriteria = Criteria.equal("email", userEmail);
+        final Criteria userEmailCriteria = Criteria.equal(PROP_EMAIL, userEmail);
         final User userEntity = dao.findOne(this.getEntityClass(), userEmailCriteria);
         this.addUserToOrg(orgId, userEntity);
 
@@ -116,12 +120,11 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
         Verify.notNull(userEntity, "UserEntity is NULL");
 
         if (Objects.nonNull(userEntity.getOrganisation())) {
-            // TODO throw new Exception ?
+
             final String msg = String.format(
                     "Not Successfull. User with ID :- %s is already a member in the Organisation with ID :- %s",
                     userEntity.getId(), userEntity.getOrganisation().getId());
-            LOGGER.info(msg);
-            return;
+            throw new ValidationException(msg);
         }
 
         final Organisation organisation = dao.read(Organisation.class, orgId, true);
@@ -160,8 +163,8 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
         Verify.notNull(orgId, "Organisation ID is NULL");
 
         final Organisation organisation = dao.read(Organisation.class, orgId, true);
-        final Criteria orgUsersCriteria = Criteria.equal("organisation", organisation);
-        final List<UserDTO> userDtos = super.find(orgUsersCriteria, null, pageNo, pageSize);
+        final Criteria orgUsersCriteria = Criteria.equal(PROP_ORGANISATION, organisation);
+        final List<UserDTO> userDtos = super.find(orgUsersCriteria, pageNo, pageSize);
 
         LOGGER.info("Successfully fetched Users from Organisation with ID : {}", orgId);
 
@@ -195,7 +198,7 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
         Verify.notNull(orgId, "$getOrgCriteria :: Organisation ID : orgId must be non NULL");
 
         final Organisation organisation = dao.read(Organisation.class, orgId, true);
-        final Criteria criteria = Criteria.equal("organisation", organisation);
+        final Criteria criteria = Criteria.equal(PROP_ORGANISATION, organisation);
 
         return criteria;
     }

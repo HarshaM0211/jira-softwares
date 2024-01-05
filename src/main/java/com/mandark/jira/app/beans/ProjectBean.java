@@ -20,7 +20,6 @@ public class ProjectBean implements EntityBean<Project> {
 
     public ProjectBean() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
     public ProjectBean(String projectKey, String name, String description) {

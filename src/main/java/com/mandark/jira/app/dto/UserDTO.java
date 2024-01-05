@@ -23,7 +23,7 @@ public class UserDTO extends EntityDTO<User> {
 
     public UserDTO(User e) {
         super(e);
-        this.userName = e.getFirstName() + e.getLastName();
+        this.userName = e.getFirstName() + " " + e.getLastName();
         this.email = e.getEmail();
         this.role = e.getRole();
         this.phone = e.getPhone();

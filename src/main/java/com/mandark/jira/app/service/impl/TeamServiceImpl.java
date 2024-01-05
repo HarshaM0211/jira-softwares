@@ -5,9 +5,6 @@ import java.util.Objects;
 
 import javax.transaction.Transactional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.mandark.jira.app.beans.TeamBean;
 import com.mandark.jira.app.dto.TeamDTO;
 import com.mandark.jira.app.persistence.orm.entity.Organisation;
@@ -20,8 +17,6 @@ import com.mandark.jira.spi.util.Verify;
 
 
 public class TeamServiceImpl extends AbstractJpaEntityService<Team, TeamBean, TeamDTO> implements TeamService {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(TeamServiceImpl.class);
 
     // Constructor
     // ------------------------------------------------------------------------

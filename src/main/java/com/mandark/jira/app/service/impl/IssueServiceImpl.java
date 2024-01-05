@@ -12,11 +12,8 @@ import static com.mandark.jira.app.persistence.orm.entity.Issue.PROP_PROJECT;
 import static com.mandark.jira.app.persistence.orm.entity.Issue.PROP_STATUS;
 import static com.mandark.jira.app.persistence.orm.entity.Issue.PROP_TYPE;
 import static com.mandark.jira.app.persistence.orm.entity.SprintIssue.PROP_ISSUE;
-import static com.mandark.jira.spi.app.SearchQuery.DATE_FORMAT_STR;
 import static com.mandark.jira.web.WebConstants.DEFAULT_PAGE_NO;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -89,14 +86,8 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
                 : this.dao.read(User.class, entityBean.getAssigneeId(), true);
         exEntity.setAssignee(beanAssignee);
 
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT_STR);
-        final LocalDateTime endDate = Objects.isNull(entityBean.getEndDate()) ? null
-                : LocalDateTime.parse(entityBean.getEndDate(), formatter);
-        exEntity.setEndDate(endDate);
-
-        final LocalDateTime startDate = Objects.isNull(entityBean.getStartDate()) ? null
-                : LocalDateTime.parse(entityBean.getStartDate(), formatter);
-        exEntity.setStartDate(startDate);
+        exEntity.setEndTimeStamp(entityBean.getEndTimeStamp());
+        exEntity.setStartTimeStamp(entityBean.getStartTimeStamp());
 
         exEntity.setLabel(entityBean.getLabel());
         final Issue beanParentIssue = Objects.isNull(entityBean.getParentIssueId()) ? null
@@ -412,7 +403,11 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
     }
 
     @Override
-    public int count(final int projectId, String paramName, Object paramValue) {
+    public int count(final int projectId, final String paramName, final Object paramValue) {
+
+        // Sanity Checks
+        Verify.notNull(paramName, "$count :: paramName must be non NULL");
+        Verify.notNull(paramValue, "$count :: paramValue must be non NULL");
 
         final Criteria projectCriteria = this.getProjectCriteria(projectId);
         final Criteria paramCriteria = Criteria.equal(paramName, paramValue);

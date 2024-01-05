@@ -56,8 +56,7 @@ public class IssueAPI extends AbstractAPI {
         final String msg = "$API :: UnSuccessful! Not able to create an Issue. Check Request.";
         LOGGER.info(msg);
 
-        return Responses.badRequest(msg);
-
+        throw new IllegalArgumentException(msg);
     }
 
     @RequestMapping(value = "/{issueId}", method = RequestMethod.PUT)
@@ -94,7 +93,8 @@ public class IssueAPI extends AbstractAPI {
 
         final String msg = String.format("Bad Request. Issue with ID : %s not belongs to Project with ID : %s", issueId,
                 projectId);
-        return Responses.badRequest(msg);
+        LOGGER.info(msg);
+        throw new IllegalArgumentException(msg);
     }
 
     @RequestMapping(value = "", method = RequestMethod.GET)
