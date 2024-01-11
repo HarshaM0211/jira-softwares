@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.mandark.jira.app.beans.TeamBean;
 import com.mandark.jira.app.dto.TeamDTO;
-import com.mandark.jira.app.dto.UserDTO;
 import com.mandark.jira.app.persistence.orm.entity.Team;
 import com.mandark.jira.spi.app.service.EntityService;
 

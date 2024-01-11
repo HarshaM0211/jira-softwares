@@ -3,6 +3,7 @@ package com.mandark.jira.app.persistence.orm.entity;
 import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Index;
@@ -135,7 +136,7 @@ public class User extends JpaAuditEntity {
         this.organisation = organisation;
     }
 
-    @OneToMany(mappedBy = "commenter")
+    @OneToMany(mappedBy = "commenter", cascade = CascadeType.REMOVE)
     public List<Comment> getComments() {
         return comments;
     }

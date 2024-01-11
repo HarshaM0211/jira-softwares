@@ -28,7 +28,7 @@ public class CommentAPI extends AbstractAPI {
     private CommentService commentService;
 
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public ResponseEntity<?> add(@PathVariable("issueId") int issueId, @RequestParam int commenterId,
+    public ResponseEntity<?> add(@PathVariable("issueId") int issueId, @RequestParam(required = true) int commenterId,
             @RequestBody CommentBean commentBean) {
 
         final int commentId = commentService.add(issueId, commenterId, commentBean);

@@ -3,6 +3,7 @@ package com.mandark.jira.app.persistence.orm.entity;
 import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -123,10 +124,6 @@ public class Issue extends JpaAuditEntity {
             throw new ValidationException("#validate :: type is BLANK");
         }
 
-        if (Objects.isNull(reportedBy)) {
-            throw new ValidationException("#validate :: reportedBy is BLANK");
-        }
-
         if (Objects.isNull(status)) {
             throw new ValidationException("#validate :: status is BLANK");
         }
@@ -218,7 +215,7 @@ public class Issue extends JpaAuditEntity {
     }
 
     @OneToOne
-    @JoinColumn(name = "reported_by", nullable = false)
+    @JoinColumn(name = "reported_by")
     public User getReportedBy() {
         return reportedBy;
     }
@@ -264,7 +261,7 @@ public class Issue extends JpaAuditEntity {
         this.label = label;
     }
 
-    @OneToMany(mappedBy = "issue")
+    @OneToMany(mappedBy = "issue", cascade = CascadeType.REMOVE)
     public List<Attachment> getAttachments() {
         return attachments;
     }
@@ -273,7 +270,7 @@ public class Issue extends JpaAuditEntity {
         this.attachments = Attachment;
     }
 
-    @OneToMany(mappedBy = "issue")
+    @OneToMany(mappedBy = "issue", cascade = CascadeType.REMOVE)
     public List<Comment> getComments() {
         return comments;
     }

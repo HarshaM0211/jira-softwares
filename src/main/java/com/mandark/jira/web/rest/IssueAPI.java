@@ -43,7 +43,7 @@ public class IssueAPI extends AbstractAPI {
 
     @RequestMapping(value = "", method = RequestMethod.POST)
     public ResponseEntity<?> create(@RequestBody IssueBean issueBean, @PathVariable("projectId") Integer projectId,
-            @RequestParam Integer reporterId) {
+            @RequestParam(required = true) Integer reporterId) {
 
         final Integer issueId = issueService.create(issueBean, projectId, reporterId);
         if (Objects.nonNull(issueId)) {

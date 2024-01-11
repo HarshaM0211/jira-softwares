@@ -112,7 +112,7 @@ public class OrganisationServiceImpl extends AbstractJpaEntityService<Organisati
             return false;
         }
         final boolean isExist = orgId == userEntity.getOrganisation().getId();
-        final String msg = String.format("Status : User Existence in the Organisation : ", isExist);
+        final String msg = String.format("Status : User Existence in the Organisation : %s", isExist);
         LOGGER.info(msg);
 
         return isExist;

@@ -70,9 +70,20 @@ public class SprintAPI extends AbstractAPI {
         return Responses.ok(msg);
     }
 
+    @RequestMapping(value = "/{sprintId}", method = RequestMethod.DELETE)
+    public ResponseEntity<?> delete(@PathVariable("sprintId") int sprintId) {
+
+        sprintService.delete(sprintId);
+
+        final String msg = String.format("$API :: Successfully deleted the Sprint with Id : %s", sprintId);
+        LOGGER.info(msg);
+
+        return Responses.ok(msg);
+    }
+
     @RequestMapping(value = "/{sprintId}/{status}", method = RequestMethod.PUT)
-    public ResponseEntity<?> updateStatus(@PathVariable("sprintId") int sprintId, @RequestParam(required = false) Integer nextSprintId,
-            @PathVariable("status") String status) {
+    public ResponseEntity<?> updateStatus(@PathVariable("sprintId") int sprintId,
+            @RequestParam(required = false) Integer nextSprintId, @PathVariable("status") String status) {
 
         if (status.equals("start")) {
 

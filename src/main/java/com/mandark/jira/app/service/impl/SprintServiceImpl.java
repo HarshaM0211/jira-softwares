@@ -138,6 +138,22 @@ public class SprintServiceImpl extends AbstractJpaEntityService<Sprint, SprintBe
     }
 
     @Override
+    @Transactional
+    public void delete(final int sprintId) {
+
+        final Sprint sprint = super.readEntity(this.getEntityClass(), sprintId, true);
+        final Criteria sprintCr = Criteria.equal(PROP_SPRINT, sprint);
+        final int count = this.count(sprintCr);
+        final List<SprintIssue> sprintIssues = this.dao.find(SprintIssue.class, sprintCr, 1, count);
+        for (SprintIssue sprintIssue : sprintIssues) {
+            this.dao.purge(SprintIssue.class, sprintIssue.getId());
+        }
+        final String msg = String.format(
+                "Deleted Sprint of Id : %s. Associated issues with this sprint are moved into BackLog", sprintId);
+        LOGGER.info(msg);
+    }
+
+    @Override
     public List<SprintDTO> getByProjectId(final int projectId) {
 
         final Project project = super.readEntity(Project.class, projectId, true);

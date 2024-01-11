@@ -2,6 +2,7 @@ package com.mandark.jira.app.dto;
 
 import com.mandark.jira.app.persistence.orm.entity.Comment;
 import com.mandark.jira.spi.app.EntityDTO;
+import com.mandark.jira.spi.util.Values;
 
 
 public class CommentDTO extends EntityDTO<Comment> {
@@ -19,7 +20,7 @@ public class CommentDTO extends EntityDTO<Comment> {
 
     public CommentDTO(Comment e) {
         super(e);
-        this.commenter = new UserDTO(e.getCommenter());
+        this.commenter = Values.get(e.getCommenter(), UserDTO::new);
         this.comment = e.getComment();
     }
 

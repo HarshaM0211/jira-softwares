@@ -54,10 +54,6 @@ public class Comment extends JpaAuditEntity {
             throw new ValidationException("#validate :: issue is BLANK");
         }
 
-        if (Objects.isNull(commenter)) {
-            throw new ValidationException("#validate :: commenter is BLANK");
-        }
-
         if (Objects.isNull(comment)) {
             throw new ValidationException("#validate :: comment is BLANK");
         }
@@ -78,7 +74,7 @@ public class Comment extends JpaAuditEntity {
     }
 
     @ManyToOne
-    @JoinColumn(name = "commenter_id", nullable = false)
+    @JoinColumn(name = "commenter_id")
     public User getCommenter() {
         return commenter;
     }

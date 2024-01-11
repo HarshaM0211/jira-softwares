@@ -153,9 +153,16 @@ public class IssueServiceImpl extends AbstractJpaEntityService<Issue, IssueBean,
     @Transactional
     public void purge(final int issueId) {
 
-        final Issue issue = this.dao.read(this.getEntityClass(), issueId, true);
-        issue.setIsActive(false);
+        final Issue issue = super.readEntity(this.getEntityClass(), issueId, true);
+        final Criteria parentIssCr = Criteria.equal(Issue.PROP_PARENT_ISSUE, issue);
+        final int count = super.count(parentIssCr);
+        final List<Issue> childIssues = this.dao.find(this.getEntityClass(), parentIssCr, 1, count);
 
+        for (Issue child : childIssues) {
+            child.setParentIssue(null);
+            this.dao.update(child.getId(), child);
+        }
+        issue.setIsActive(false);
         this.dao.update(issueId, issue);
 
         final String msg = String.format("$delete :: Successfully deleted the Issue with Id : %s", issueId);

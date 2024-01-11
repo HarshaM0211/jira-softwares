@@ -2,6 +2,7 @@ package com.mandark.jira.app.persistence.orm.entity;
 
 import java.util.Objects;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Index;
@@ -72,7 +73,7 @@ public class SprintIssue extends JpaAuditEntity {
         this.sprint = sprint;
     }
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "issue_id", nullable = false)
     public Issue getIssue() {
         return issue;

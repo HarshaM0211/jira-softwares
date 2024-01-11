@@ -59,7 +59,7 @@ public class IssueDTO extends EntityDTO<Issue> {
         this.statusStr = e.getStatus().name();
         this.parentIssueId = Values.get(e.getParentIssue(), Issue::getId);
 
-        this.reportedBy = new UserDTO(e.getReportedBy()); // reportedBy is non Null
+        this.reportedBy = Values.get(e.getReportedBy(), UserDTO::new);
 
         this.startDate = e.getStartTimeStamp();
         this.endDate = e.getEndTimeStamp();

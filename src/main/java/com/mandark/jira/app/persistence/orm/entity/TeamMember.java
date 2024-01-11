@@ -17,6 +17,13 @@ import com.mandark.jira.spi.lang.ValidationException;
         indexes = {@Index(columnList = "team_id", name = "team_id"), @Index(columnList = "user_id", name = "user_id")})
 public class TeamMember extends JpaAuditEntity {
 
+    // Field Lables
+    // ------------------------------------------------------------------------
+
+    public static final String PROP_TEAM = "team";
+
+    public static final String PROP_USER = "user";
+
     // Fields
     // ------------------------------------------------------------------------
 

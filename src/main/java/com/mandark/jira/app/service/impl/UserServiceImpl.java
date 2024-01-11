@@ -1,5 +1,9 @@
 package com.mandark.jira.app.service.impl;
 
+import static com.mandark.jira.app.persistence.orm.entity.Comment.PROP_COMMENTER;
+import static com.mandark.jira.app.persistence.orm.entity.Issue.PROP_ASSIGNEE;
+import static com.mandark.jira.app.persistence.orm.entity.Issue.PROP_REPORTED_BY;
+import static com.mandark.jira.app.persistence.orm.entity.ProjectUser.PROP_USER;
 import static com.mandark.jira.app.persistence.orm.entity.User.PROP_EMAIL;
 import static com.mandark.jira.app.persistence.orm.entity.User.PROP_ORGANISATION;
 
@@ -13,7 +17,12 @@ import org.slf4j.LoggerFactory;
 
 import com.mandark.jira.app.beans.UserBean;
 import com.mandark.jira.app.dto.UserDTO;
+import com.mandark.jira.app.persistence.orm.entity.Comment;
+import com.mandark.jira.app.persistence.orm.entity.Issue;
 import com.mandark.jira.app.persistence.orm.entity.Organisation;
+import com.mandark.jira.app.persistence.orm.entity.ProjectUser;
+import com.mandark.jira.app.persistence.orm.entity.Team;
+import com.mandark.jira.app.persistence.orm.entity.TeamMember;
 import com.mandark.jira.app.persistence.orm.entity.User;
 import com.mandark.jira.app.service.UserService;
 import com.mandark.jira.spi.app.persistence.IDao;
@@ -210,6 +219,10 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
     @Transactional
     public String removeFromOrg(final Integer orgId, final Integer userId) {
 
+        // Sanity Checks
+        Verify.notNull(orgId, "$removeFromOrg :: orgId must be non NULL");
+        Verify.notNull(userId, "$removeFromOrg :: orgId must be non NULL");
+
         final User user = this.dao.read(this.getEntityClass(), userId, true);
 
         if (Objects.isNull(user.getOrganisation())) {
@@ -220,6 +233,17 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
         }
         if (orgId.equals(user.getOrganisation().getId())) {
             user.setOrganisation(null);
+
+            this.resetComments(user); // Comments will be updated to No-Commenter
+
+            this.resetIssues(user); // Issues will be updated to No-Assignee, No-ReportedBy
+
+            this.resetProjectUser(user); // ManyToMany record of User in Project is deleted
+
+            this.resetTeamMember(user); // ManyToMany record of User in Team is deleted
+
+            this.reserTeamLeader(user); // Teams will be updated to No-TeamLeader
+
             this.dao.update(userId, user);
             final String msg = String.format(
                     "$removeFromOrg :: Successfully removed User with ID : %s , from Organisation with ID : %s", userId,
@@ -230,6 +254,80 @@ public class UserServiceImpl extends AbstractJpaEntityService<User, UserBean, Us
         final String msg = String.format("User with Id : %s, not belongs to Organisation with Id : %s", userId, orgId);
 
         return msg;
+    }
+
+    private void reserTeamLeader(final User user) {
+
+        // Sanity Checks
+        Verify.notNull(user, "$resetIssues :: user must be non NULL");
+
+        final Criteria teamLeadCr = Criteria.equal(Team.PROP_TEAM_LEADER, user);
+        final Team team = this.dao.findOne(Team.class, teamLeadCr);
+        if (Objects.isNull(team)) {
+            return;
+        }
+        team.setTeamLeader(null);
+        this.dao.update(team.getId(), team);
+    }
+
+    private void resetTeamMember(final User user) {
+
+        // Sanity Checks
+        Verify.notNull(user, "$resetIssues :: user must be non NULL");
+
+        final Criteria userCr = Criteria.equal(TeamMember.PROP_USER, user);
+        final int count = this.dao.count(TeamMember.class, userCr);
+        final List<TeamMember> teamMembers = this.dao.find(TeamMember.class, userCr, 1, count);
+        for (TeamMember teamMem : teamMembers) {
+            this.dao.purge(TeamMember.class, teamMem.getId());
+        }
+    }
+
+    private void resetProjectUser(final User user) {
+
+        // Sanity Checks
+        Verify.notNull(user, "$resetIssues :: user must be non NULL");
+
+        final Criteria userCr = Criteria.equal(PROP_USER, user);
+        final int count = this.dao.count(ProjectUser.class, userCr);
+        final List<ProjectUser> projectsUsers = this.dao.find(ProjectUser.class, userCr, 1, count);
+
+        for (ProjectUser projectUser : projectsUsers) {
+            this.dao.purge(ProjectUser.class, projectUser.getId());
+        }
+    }
+
+    private void resetIssues(final User user) {
+
+        // Sanity Checks
+        Verify.notNull(user, "$resetIssues :: user must be non NULL");
+
+        final Criteria assigneeCr = Criteria.equal(PROP_ASSIGNEE, user);
+        final Criteria reportedByCr = Criteria.equal(PROP_REPORTED_BY, user);
+        final Criteria asgnOrRprtdByCr = Criteria.or(assigneeCr, reportedByCr);
+        final int count = this.dao.count(Issue.class, asgnOrRprtdByCr);
+        final List<Issue> issues = this.dao.find(Issue.class, asgnOrRprtdByCr, 1, count);
+
+        for (Issue issue : issues) {
+            issue.setAssignee(null);
+            issue.setReportedBy(null);
+            dao.update(issue.getId(), issue);
+        }
+    }
+
+    private void resetComments(final User user) {
+
+        // Sanity Checks
+        Verify.notNull(user, "$resetIssues :: user must be non NULL");
+
+        final Criteria commentsCr = Criteria.equal(PROP_COMMENTER, user);
+        final int count = this.dao.count(Comment.class, commentsCr);
+        final List<Comment> comments = this.dao.find(Comment.class, commentsCr, 1, count);
+
+        for (Comment cmnt : comments) {
+            cmnt.setCommenter(null);
+        }
+        this.dao.update(comments);
     }
 
 }

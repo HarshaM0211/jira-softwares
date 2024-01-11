@@ -51,7 +51,6 @@ public class Project extends JpaAuditEntity {
 
     public Project() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
     // Validatable

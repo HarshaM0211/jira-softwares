@@ -15,6 +15,8 @@ public interface SprintService extends EntityService<Integer, Sprint, SprintDTO>
 
     void update(final int sprintId, final SprintBean sprintBean);
 
+    void delete(final int sprintId);
+
     List<SprintDTO> getByProjectId(final int projectId);
 
     List<IssueDTO> getIssues(final int sprintId);
